@@ -1,6 +1,6 @@
 <template>
     <div class="input-container">
-        <div class="input-grammer">
+        <div class="input-grammar">
             <div class="step" :class="{ 'active-step': step === 1 }">Step1 请先完成文法定义：</div>
             <div class="wrapper" :class="{ 'wrapper-simple': radioMode === 'simple' }">
                 <span class="mode">模式选择</span>
@@ -11,12 +11,15 @@
                 <div class="statement">
                     {{ mode[radioMode].statement }}
                 </div>
-                <span class="input-title"> 输入文法</span>
-                <el-input class="input-area" type="textarea" :autosize="{ minRows: 10, maxRows: 12 }" ref="inputRef"
-                    placeholder="A => A c | A a d | b d | ϵ" v-model="inputGrammer">
+                <span class="input-title">{{ step=== 1 ? '输入' : '' }}文法</span>
+                <el-input v-if="step === 1" class="input-area" type="textarea" :autosize="{ minRows: 10, maxRows: 12 }"
+                    ref="inputRef" placeholder="A => A c | A a d | b d | ε （所有token需要输入空格分割）" v-model="inputGrammar">
                 </el-input>
-                <span class="input-title-none" v-if="radioMode === 'custom'">输入非终结符</span>
-                <div class="input-none" v-if="radioMode === 'custom'">
+                <ol v-else class="input-area" style="margin-left: 17px;">
+                    <li v-for="item in grammar" :key="item" class="grammar-li">{{ item }}</li>
+                </ol>
+                <span class="input-title-none" v-if="radioMode === 'custom'">{{ step=== 1 ? '输入' : ''}}非终结符</span>
+                <div class="input-none" v-if="radioMode === 'custom' && step === 1">
                     <el-tag v-for="tag in noneTer.values" :key="tag" closable :disable-transitions="false" size="large"
                         @close="handleClose(noneTer.values, tag)">
                         {{ tag }}
@@ -28,8 +31,11 @@
                         点击新增
                     </el-button>
                 </div>
-                <span class="input-title-ter" v-if="radioMode === 'custom'">输入终结符</span>
-                <div class="input-ter" v-if="radioMode === 'custom'">
+                <div class="input-none" v-if="radioMode === 'custom' && step === 2">
+                    <span v-for="item in nonTerminal" :key="item">{{ item }}</span>
+                </div>
+                <span class="input-title-ter" v-if="radioMode === 'custom'">{{ step=== 1 ? '输入' : ''}}终结符</span>
+                <div class="input-ter" v-if="radioMode === 'custom' && step === 1">
                     <el-tag v-for="tag in Ter.values" :key="tag" closable :disable-transitions="false" size="large"
                         @close="handleClose(Ter.values, tag)">
                         {{ tag }}
@@ -40,7 +46,12 @@
                         点击新增
                     </el-button>
                 </div>
-                <el-button class="btn-save" type="primary" plain @click="handleGrammer">输入完成</el-button>
+                <div class="input-ter" v-if="radioMode === 'custom' && step === 2">
+                    <span v-for="item in terminal" :key="item">{{ item }}</span>
+                </div>
+                <el-button v-if="step === 1" class="btn-save" type="primary" plain
+                    @click="handleGrammar">输入完成</el-button>
+                <el-button v-if="step === 2" class="btn-save" :icon="Edit" @click="handleInputGrammar">重新定义</el-button>
             </div>
             <div class="step-unfinish" :class="{ 'active-step': step === 2 }">Step2 请选择分析过程：</div>
             <div class="analysis" :class="{ 'link-unfinish': step < 2 }">
@@ -142,24 +153,37 @@
                 </el-icon>
             </div>
             <div class="right" v-if="unfold">
-                <RightTips type="examples"></RightTips>
+                <RightTips type="examples" :mode="radioMode"></RightTips>
             </div>
         </div>
+        <FormatTips v-if="showDialog" :dialogVisible="showDialog" :needHandle="needHandle" @saveGrammar="saveGrammar"
+            @onClose="onClose" />
     </div>
 </template>
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
+import FormatTips from '@/components/FormatTip.vue';
 import lucy from "lucy-compiler";
-import { reactive, ref, nextTick } from 'vue';
-import { ElMessage, ElInput } from 'element-plus';
+import { reactive, ref, nextTick, computed } from 'vue';
+import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
+import { Edit } from '@element-plus/icons-vue'
+import { useStore } from 'vuex';
 
+const store = useStore();
 const router = useRouter();
 const unfold = ref(true);
-const step = ref(1);
+const showDialog = ref(false);
+// const needHandle = reactive({
+//     needUnion: true,
+//     needLiftUp: true,
+//     needClearRecursion: false
+// })
+const needHandle = ref([]);
+const step = ref(store.state.grammarStore.grammar.length ? 2 : 1);
 const inputRef = ref();
-const inputGrammer = ref('');
+const inputGrammar = ref('');
 const radioMode = ref('simple');
 const mode = reactive({
     simple: {
@@ -209,6 +233,27 @@ const Ter = reactive({
     inputVisible: false,
 })
 
+const grammar = computed(() => {
+    return store.state.grammarStore.grammar;
+})
+
+const nonTerminal = computed(() => {
+    return store.state.grammarStore.nonTerminal;
+})
+
+const terminal = computed(() => {
+    return store.state.grammarStore.terminal;
+})
+
+const onClose = () => {
+    showDialog.value = false;
+    finishInput();
+}
+
+const finishInput = () => {
+    step.value++;
+}
+
 const toggleFold = () => {
     unfold.value = !unfold.value;
 }
@@ -234,7 +279,7 @@ const handleInputConfirm = (tags) => {
     if (tags.inputValue.trim()) {
         tags.values.push(tags.inputValue);
     }
-    tags.inputValue = ''
+    tags.inputValue = '';
 }
 
 const handleBlur = (tags) => {
@@ -242,57 +287,147 @@ const handleBlur = (tags) => {
     tags.inputVisible = false;
 }
 
-const saveGrammer = (garmmar) => {
-    // this.$store.commit('setGrammer', garmmar);
+const saveGrammar = (garmmar) => {
+    if (radioMode.value === 'simple') {
+        try {
+            const { nonTerminals, terminals } = lucy.getTockFromSimpleGrammers(garmmar);
+            saveNonTerminal(nonTerminals);
+            saveTerminal(terminals);
+        } catch (error) {
+            ElMessage({
+                message: '存在非法字符，请检查或切换自定义模式',
+                type: 'error',
+            });
+            return;
+        }
+    } else {
+        if (noneTer.values) {
+            saveNonTerminal(noneTer.values);
+        }
+        if (Ter.values) {
+            saveTerminal(Ter.values);
+        }
+    }
+    store.commit("grammarStore/updateGrammar", garmmar);
 }
 
-const handleGrammer = () => {
+const saveMode = () => {
+    store.commit("grammarStore/updateCustomMode", radioMode === 'custom');
+}
+
+const saveNonTerminal = (value) => {
+    store.commit("grammarStore/updateNonTerminal", value);
+}
+
+const saveTerminal = (value) => {
+    store.commit("grammarStore/updateTerminal", value);
+}
+
+const pushGrammar = (item, grammar) => {
+    if (!grammar.length || !item) {
+        return '';
+    }
+    let str = `${item} =>`;
+    grammar.forEach((val, index) => {
+        val.forEach(token => {
+            str += ` ${token}`;
+        })
+        if (index < grammar.length - 1) {
+            str += ` |`
+        }
+    })
+    return str;
+}
+
+const handleInputGrammar = () => {
+    step.value--;
+    let value = '';
+    if (!grammar.value.length) {
+        return;
+    }
+    grammar.value.forEach((val) => {
+        value += val;
+        value += '\n';
+    })
+    inputGrammar.value = value;
+    noneTer.values = nonTerminal.value;
+    Ter.values = terminal.value;
+}
+
+const handleGrammar = () => {
+    if (!inputGrammar.value.trim()) {
+        ElMessage({
+            message: '请先输入文法',
+            type: 'warning',
+        });
+        return;
+    }
+    if (radioMode === 'custom') {
+        if (!noneTer.values.length) {
+            ElMessage({
+                message: '请输入非终结符',
+                type: 'warning',
+            });
+            return;
+        }
+        if (!Ter.values.length) {
+            ElMessage({
+                message: '请输入终结符',
+                type: 'warning',
+            });
+            return;
+        }
+    }
     let index = 0,
-        grammar = {},
+        grammar = [],
         head = null,
-        tokens = inputGrammer.value.split(/\s+/).filter(function (token) {
+        tokens = inputGrammar.value.split(/\s+/).filter(function (token) {
             return token.length > 0;
         });
+    let grammars = [];
     while (index < tokens.length) {
         if (index + 1 < tokens.length && tokens[index + 1] === '=>') {
+            const result = pushGrammar(head, grammar);
+            if (result) {
+                grammars.push(result);
+            }
             head = tokens[index];
             index += 2;
-            grammar[head] = [[]];
+            grammar = [[]];
         } else if (tokens[index] === '|') {
-            if (!grammar[head]) {
+            if (!head || !grammar) {
                 ElMessage('文法格式错误，请检查');
+                inputRef.value && inputRef.value.focus();
                 return;
             }
-            grammar[head].push([]);
+            grammar.push([]);
             index += 1;
         } else {
-            if (!grammar[head]) {
+            if (!head || !grammar) {
                 ElMessage('文法格式错误，请检查');
+                inputRef.value && inputRef.value.focus();
                 return;
             }
-            grammar[head][grammar[head].length - 1].push(tokens[index]);
+            grammar[grammar.length - 1].push(tokens[index]);
             index += 1;
         }
     }
-    let hanleGrammers = [];
-    for (let item in grammar) {
-        if (!grammar[item].length) {
-            continue;
-        }
-        let str = `${item} =>`;
-        grammar[item].forEach((val, index) => {
-
-            val.forEach(token => {
-                str += ` ${token}`;
-            })
-            if (index < grammar[item].length - 1) {
-                str += ` |`
-            }
-        })
-        hanleGrammers.push(str);
+    const result = pushGrammar(head, grammar);
+    if (result) {
+        grammars.push(result);
     }
-    console.log(hanleGrammers);
-    saveGrammer(hanleGrammers);
+    console.log(grammars);
+    saveGrammar(grammars);
+    saveMode();
+    needHandle.value = [];
+    lucy.checkNeedunionGrammers(grammars) && needHandle.value.push('needUnion');
+    lucy.checkNeedliftUpCommonTocken(grammars) && needHandle.value.push('needLiftUp');
+    lucy.checkNeedClearRightRecursion(grammars) && needHandle.value.push('needClearRecursion');
+    if (needHandle.value.length > 0) {
+        showDialog.value = true;
+    } else {
+        finishInput();
+    }
 }
 
 const jump = (route) => {
@@ -318,7 +453,7 @@ const jump = (route) => {
     gap: 10px;
     height: 100%;
 
-    .input-grammer {
+    .input-grammar {
         height: 100%;
         padding: 20px;
         display: flex;
@@ -331,18 +466,22 @@ const jump = (route) => {
             font-weight: 600;
         }
 
+        .step-unfinish {
+            color: #B3C0D1;
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
         .active-step {
             color: #537FE7;
         }
 
-        .step-unfinish {
-            color: #B3C0D1;
-        }
 
         .wrapper {
             display: grid;
             grid-template-columns: 100px calc(100% - 100px);
-            grid-gap: 10px;
+            grid-gap: 15px 10px;
             grid-template-areas:
                 "mode radio"
                 ". statement"
@@ -375,6 +514,12 @@ const jump = (route) => {
 
             .input-area {
                 grid-area: input-area;
+                padding: 0;
+                margin: 0;
+            }
+
+            .grammar-li {
+                line-height: 25px;
             }
 
             .input-title-none {

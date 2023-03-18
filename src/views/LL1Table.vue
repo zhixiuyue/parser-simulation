@@ -1,5 +1,13 @@
 <template>
-    <div class="table-container">
+    <el-page-header :icon="ArrowLeft">
+        <template #content>
+            <span class="text-large font-600 mr-3"> Title </span>
+        </template>
+    </el-page-header>
+    <div class="right" v-if="unfold">
+        <RightTips type="examples" :mode="radioMode"></RightTips>
+    </div>
+    <!-- <div class="table-container">
         <div class="table">
             <el-table :data="tableData" style="width: 100%; background:none" height="100%" border>
                 <el-table-column fixed prop="date" label="" width="150">
@@ -22,11 +30,13 @@
                 <li v-for="item in TABLERULES" :key="item">{{ item }}</li>
             </ul>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script setup>
-
+import RightTips from '@/components/RightTips.vue';
+import { reactive, ref, nextTick, computed } from 'vue';
+const unfold = ref(true);
 // export default {
 //     name: 'LL1Table',
 //     data() {

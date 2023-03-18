@@ -15,7 +15,7 @@ const router = createRouter({
         {
           path: '/',
           name: 'Input',
-          component: () => import('@/views/InputGrammer.vue'),
+          component: () => import('@/views/InputGrammar.vue'),
         },
         {
           path: '/LL1Table',
