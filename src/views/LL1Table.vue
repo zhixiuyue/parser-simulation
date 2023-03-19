@@ -1,28 +1,35 @@
 <template>
-    <el-page-header :icon="ArrowLeft">
-        <template #content>
-            <span class="text-large font-600 mr-3"> Title </span>
-        </template>
-    </el-page-header>
-    <div class="right" v-if="unfold">
-        <RightTips type="examples" :mode="radioMode"></RightTips>
+    <div class="table-container">
+        <div class="table">
+            <el-page-header :icon="ArrowLeft" title="返回" @back="goBack">
+                <template #content>
+                    <span class="title">LL(1)分析表构造</span>
+                </template>
+            </el-page-header>
+            <el-table :data="tableData" max-height="600" border class="table-data">
+                <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
+                </el-table-column>
+                <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
+                    <template #default="scope">
+                        <ul>
+                            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="first">FIRST&FOLLOW</div>
+            <el-table :data="tableData_1" stripe style="width: 100%">
+                <el-table-column prop="nonTerminal" label="" />
+                <el-table-column prop="FIRST" label="FIRST" />
+                <el-table-column prop="FOLLOW" label="FOLLOW" />
+            </el-table>
+        </div>
+        <RightTips type="grammar" />
     </div>
     <!-- <div class="table-container">
         <div class="table">
-            <el-table :data="tableData" style="width: 100%; background:none" height="100%" border>
-                <el-table-column fixed prop="date" label="" width="150">
-                </el-table-column>
-                <el-table-column prop="a" :label="a">
-                </el-table-column>
-                <el-table-column prop="b" label="b">
-                </el-table-column>
-                <el-table-column prop="c" label="c">
-                </el-table-column>
-                <el-table-column prop="d" label="d">
-                </el-table-column>
-                <el-table-column prop="e" label="#">
-                </el-table-column>
-            </el-table>
         </div>
         <div>
             <span>计算规则</span>
@@ -36,88 +43,18 @@
 <script setup>
 import RightTips from '@/components/RightTips.vue';
 import { reactive, ref, nextTick, computed } from 'vue';
+import { ArrowLeft } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
 const unfold = ref(true);
-// export default {
-//     name: 'LL1Table',
-//     data() {
-//         return {
-//             a: '1',
-//             tableData: [
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 }
-//             ]
-//         }
-//     },
+const router = useRouter();
+const goBack = () => {
+    router.push('/');
+}
+
+const store = useStore();
+
 //     created() {
 //         this.TABLERULES = [
 //             "若X ∈ VT，则FIRST(X) = {X}；【终结符自己就是自己的FIRST集合】",
@@ -128,20 +65,97 @@ const unfold = ref(true);
 //         ];
 //     }
 // }
+
+const ll1Parser = computed(() => {
+    return store.getters["grammarStore/getParser"];
+})
+
+const nonTerminal = computed(() => {
+    return store.getters["grammarStore/getNonTerminal"];
+})
+
+const terminal = computed(() => {
+    return store.getters["grammarStore/getTerminal"];
+})
+
+const firstSet = computed(() => {
+    return ll1Parser.value.getFirstSet();
+})
+
+const followSet = computed(() => {
+    return ll1Parser.value.getFollowSet(firstSet.value);
+})
+
+const tableData = computed(() => {
+    const predictTable = ll1Parser.value.getPredictTable(firstSet.value, followSet.value);
+    if (!predictTable.length) {
+        return [];
+    }
+    const arr = predictTable.map((item) => {
+        const { nonTerminal = '', terminal2Derivation = {} } = item;
+        terminal2Derivation.forEach((value, key) => {
+            const { derivations = [], nonTerminal = '' } = value;
+            const newStrArr = derivations.map((val) => {
+                if (!val.length) return '';
+                return `${nonTerminal} => ${val.join(' ')}`;
+            })
+            terminal2Derivation.set(key, newStrArr);
+        })
+        return {
+            nonTerminal,
+            ...Object.fromEntries(terminal2Derivation.entries()),
+        }
+    })
+    return arr;
+})
+
+
+// const tableData_1 = computed(()=>{
+//     const arr = [];
+
+// })
 </script>
 
 <style scoped lang="less">
 .table-container {
+    // height: 91%;
+    // justify-content: space-between;
+    // flex-direction: column;
+
     display: flex;
-    height: 91%;
-    justify-content: space-between;
-    flex-direction: column;
     gap: 10px;
+    height: 100%;
 
     .table {
         flex: 1;
-        height: 0;
-        overflow: auto;
+        padding: 20px;
+        width: 0;
+        // height: 0;
+        // overflow: auto;
+
+        .title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .table-data {
+            background: none;
+            width: 100%;
+            margin-top: 10px;
+
+            ul {
+                padding: 0;
+            }
+
+            li {
+                list-style-type: none;
+            }
+        }
+
+        .first {
+            font-weight: 600;
+            margin-top: 20px;
+        }
     }
 
     .compute-rules {

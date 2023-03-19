@@ -1,3 +1,5 @@
+import lucy from "lucy-compiler";
+
 const state = {
     grammar: [],
     nonTerminal: [],
@@ -12,11 +14,21 @@ const getters = {
     getNonTerminal: (state) => {
         return state.nonTerminal;
     },
-    getNonTerminal: (state) => {
-        return state.terminal;
+    getTerminal: (state) => {
+        return state.terminal.map((value) => {
+            return value[0];
+        });
     },
     getCustomMode: (state) => {
         return state.customMode;
+    },
+    getParser: (state) => {
+        const ll1Parser = new lucy.LL1Parser(
+            state.terminal,
+            state.nonTerminal,
+            state.grammar
+        );
+        return ll1Parser;
     }
 }
 

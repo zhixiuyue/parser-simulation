@@ -145,17 +145,7 @@
             </div>
         </div> -->
         </div>
-        <div class="right-contant-container">
-            <div class="fold-btn" @click="toggleFold">
-                <el-icon :size="20">
-                    <DArrowRight v-if="unfold" />
-                    <DArrowLeft v-else />
-                </el-icon>
-            </div>
-            <div class="right" v-if="unfold">
-                <RightTips type="examples" :mode="radioMode"></RightTips>
-            </div>
-        </div>
+        <RightTips type="examples" :mode="radioMode" />
         <FormatTips v-if="showDialog" :dialogVisible="showDialog" :needHandle="needHandle" @saveGrammar="saveGrammar"
             @onClose="onClose" />
     </div>
@@ -173,7 +163,6 @@ import { useStore } from 'vuex';
 
 const store = useStore();
 const router = useRouter();
-const unfold = ref(true);
 const showDialog = ref(false);
 // const needHandle = reactive({
 //     needUnion: true,
@@ -238,11 +227,11 @@ const grammar = computed(() => {
 })
 
 const nonTerminal = computed(() => {
-    return store.state.grammarStore.nonTerminal;
+    return store.getters["grammarStore/getNonTerminal"];
 })
 
 const terminal = computed(() => {
-    return store.state.grammarStore.terminal;
+    return store.getters["grammarStore/getTerminal"];
 })
 
 const onClose = () => {
@@ -252,10 +241,6 @@ const onClose = () => {
 
 const finishInput = () => {
     step.value++;
-}
-
-const toggleFold = () => {
-    unfold.value = !unfold.value;
 }
 
 const handleClose = (tags, tag) => {
@@ -627,31 +612,6 @@ const jump = (route) => {
                     // }
                 }
             }
-        }
-    }
-
-    .right-contant-container {
-        background-color: #fff;
-        position: relative;
-        border-left: 1px solid rgb(219, 219, 219);
-
-        .fold-btn {
-            position: absolute;
-            height: 30px;
-            width: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fff;
-            bottom: 5px;
-            left: -26px;
-            cursor: pointer;
-        }
-
-        .right {
-            padding: 15px;
-            width: 280px;
-            height: 100%;
         }
     }
 }

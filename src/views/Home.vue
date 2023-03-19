@@ -5,20 +5,14 @@
         <span class="title">编译器语法分析模拟系统</span>
       </el-header>
       <el-container class="content-container">
-        <el-main><router-view :key="$route.fullPath"></router-view></el-main>
+        <el-main><router-view></router-view></el-main>
+        <!-- <el-main><router-view :key="$route.fullPath"></router-view></el-main> -->
       </el-container>
     </el-container>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue';
-import { useRoute } from 'vue-router';
-const route = useRoute();
-
-const router = computed(() => {
-  return route.path;
-})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
