@@ -1,6 +1,6 @@
 <template>
     <div class="table-container">
-        <div class="table">
+        <div class="table" @click="showData">
             <el-page-header :icon="ArrowLeft" title="返回" @back="goBack">
                 <template #content>
                     <span class="title">LL(1)分析表构造</span>
@@ -20,51 +20,29 @@
                 </el-table-column>
             </el-table>
             <div class="first">FIRST&FOLLOW</div>
-            <el-table :data="tableData_1" stripe style="width: 100%">
-                <el-table-column prop="nonTerminal" label="" />
-                <el-table-column prop="FIRST" label="FIRST" />
-                <el-table-column prop="FOLLOW" label="FOLLOW" />
+            <el-table :data="fistData" stripe style="width: 100%" border>
+                <el-table-column prop="nonTerminal" label="" align="center" />
+                <el-table-column prop="FIRST" label="FIRST" align="center" />
+                <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
             </el-table>
         </div>
         <RightTips type="grammar" />
     </div>
-    <!-- <div class="table-container">
-        <div class="table">
-        </div>
-        <div>
-            <span>计算规则</span>
-            <ul class="compute-rules">
-                <li v-for="item in TABLERULES" :key="item">{{ item }}</li>
-            </ul>
-        </div>
-    </div> -->
 </template>
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
-import { reactive, ref, nextTick, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
-const unfold = ref(true);
 const router = useRouter();
 const goBack = () => {
     router.push('/');
 }
 
 const store = useStore();
-
-//     created() {
-//         this.TABLERULES = [
-//             "若X ∈ VT，则FIRST(X) = {X}；【终结符自己就是自己的FIRST集合】",
-//             "若X ∈ VN，且有产生式X -> a……， a ∈ VT，则a ∈ FIRST(X)；【非终结符，选第一个终结符加入】",
-//             "若X ∈ VN，X -> ε，则 ε ∈ FIRST(X)；【能直接推出ε，ε加入FIRST】",
-//             "若X,Y1,Y2,……,Yn ∈ VN，而有产生式X -> Y1,Y2,……,Yn。当Y1,Y2,……,Y(i-1)直接推出ε时，则FIRST(Y1) - ε, FIRST(Y2) - ε, …… , FIRST(Y(i-1) - ε) ,FIRST(Yi) 都包含在FIRST(X)中；【位于中间的ε是不可加入进去】",
-//             "当（4）中所有Yi 都推出 ε时，则最后的FIRST(X) = FIRST(Y1) ∪ FIRST(Y2) ∪ …… ∪ FIRST(Yn) ∪ {ε}；"
-//         ];
-//     }
-// }
 
 const ll1Parser = computed(() => {
     return store.getters["grammarStore/getParser"];
@@ -75,7 +53,7 @@ const nonTerminal = computed(() => {
 })
 
 const terminal = computed(() => {
-    return store.getters["grammarStore/getTerminal"];
+    return [...store.getters["grammarStore/getTerminal"], '$'];
 })
 
 const firstSet = computed(() => {
@@ -109,11 +87,30 @@ const tableData = computed(() => {
     return arr;
 })
 
+const fistData = computed(() => {
+    const firstSetMap = firstSet.value.reduce((acc, curr) => {
+        acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(' , ')} }`;
+        return acc;
+    }, {});
+    const followSetMap = followSet.value.reduce((acc, curr) => {
+        acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(' , ')} }`;
+        return acc;
+    }, {});
 
-// const tableData_1 = computed(()=>{
-//     const arr = [];
+    const arr = nonTerminal.value.map((val) => {
+        return {
+            nonTerminal: val,
+            FIRST: firstSetMap[val],
+            FOLLOW: followSetMap[val],
+        }
+    });
+    return arr;
+})
 
-// })
+// TODO
+const showData = () => {
+    console.log(ll1Parser.value.getPredictTable(firstSet.value, followSet.value))
+}
 </script>
 
 <style scoped lang="less">
@@ -130,6 +127,9 @@ const tableData = computed(() => {
         flex: 1;
         padding: 20px;
         width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         // height: 0;
         // overflow: auto;
 
@@ -141,7 +141,6 @@ const tableData = computed(() => {
         .table-data {
             background: none;
             width: 100%;
-            margin-top: 10px;
 
             ul {
                 padding: 0;
@@ -154,13 +153,8 @@ const tableData = computed(() => {
 
         .first {
             font-weight: 600;
-            margin-top: 20px;
+            margin-top: 10px;
         }
-    }
-
-    .compute-rules {
-        font-size: 14px;
-        line-height: 1.5;
     }
 }
 </style>
