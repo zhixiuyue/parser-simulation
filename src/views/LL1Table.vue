@@ -32,7 +32,7 @@
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';

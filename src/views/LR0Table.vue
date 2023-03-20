@@ -1,142 +1,78 @@
 <template>
     <div class="table-container">
         <div class="table">
-            <el-table :data="tableData" style="width: 100%; background:none" height="100%" border>
-                <el-table-column fixed prop="date" label="" width="150">
+            <el-page-header :icon="ArrowLeft" title="返回" @back="goBack">
+                <template #content>
+                    <span class="title">LL(1)分析表构造</span>
+                </template>
+            </el-page-header>
+            <el-table :data="tableData" style="width: 100%">
+                <el-table-column prop="State" label="STATE" />
+                <el-table-column label="ACTION">
+                    <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item">
+                    </el-table-column>
                 </el-table-column>
-                <el-table-column prop="a" :label="a">
-                </el-table-column>
-                <el-table-column prop="b" label="b">
-                </el-table-column>
-                <el-table-column prop="c" label="c">
-                </el-table-column>
-                <el-table-column prop="d" label="d">
-                </el-table-column>
-                <el-table-column prop="e" label="#">
+                <el-table-column label="GOTO">
+                    <el-table-column v-for="item in nonTerminal" :key="item" :prop="item" :label="item">
+                    </el-table-column>
                 </el-table-column>
             </el-table>
         </div>
-        <div>
-            <span>计算规则</span>
-            <ul class="compute-rules">
-                <li v-for="item in TABLERULES" :key="item">{{ item }}</li>
-            </ul>
-        </div>
+        <RightTips type="grammar" />
     </div>
 </template>
 
 <script setup>
+import RightTips from '@/components/RightTips.vue';
+import { computed } from 'vue';
+import { ArrowLeft } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+const tableData = [
+    {
+        date: '2016-05-03',
+        a: 'Tom',
+        b: 'California',
+        c: 'Los Angeles',
+        d: 'No. 189, Grove St, Los Angeles',
+        zip: 'CA 90036',
+    }]
 
-// export default {
-//     name: 'LR0Table',
-//     data() {
-//         return {
-//             a: '1',
-//             tableData: [
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 },
-//                 {
-//                     date: 'A',
-//                     a: 1,
-//                     b: 2,
-//                     c: 3,
-//                     d: 4,
-//                     e: 5,
-//                 }
-//             ]
-//         }
-//     },
-//     created() {
-//         this.TABLERULES = [
-//             "若X ∈ VT，则FIRST(X) = {X}；【终结符自己就是自己的FIRST集合】",
-//             "若X ∈ VN，且有产生式X -> a……， a ∈ VT，则a ∈ FIRST(X)；【非终结符，选第一个终结符加入】",
-//             "若X ∈ VN，X -> ε，则 ε ∈ FIRST(X)；【能直接推出ε，ε加入FIRST】",
-//             "若X,Y1,Y2,……,Yn ∈ VN，而有产生式X -> Y1,Y2,……,Yn。当Y1,Y2,……,Y(i-1)直接推出ε时，则FIRST(Y1) - ε, FIRST(Y2) - ε, …… , FIRST(Y(i-1) - ε) ,FIRST(Yi) 都包含在FIRST(X)中；【位于中间的ε是不可加入进去】",
-//             "当（4）中所有Yi 都推出 ε时，则最后的FIRST(X) = FIRST(Y1) ∪ FIRST(Y2) ∪ …… ∪ FIRST(Yn) ∪ {ε}；"
-//         ];
-//     }
-// }
+const router = useRouter();
+const goBack = () => {
+    router.push('/');
+}
+
+const store = useStore();
+
+const nonTerminal = computed(() => {
+    return store.getters["grammarStore/getNonTerminal"];
+})
+
+const terminal = computed(() => {
+    return [...store.getters["grammarStore/getTerminal"], '$'];
+})
 </script>
 
 <style scoped lang="less">
 .table-container {
     display: flex;
-    height: 91%;
-    justify-content: space-between;
-    flex-direction: column;
     gap: 10px;
+    height: 100%;
 
     .table {
         flex: 1;
-        height: 0;
-        overflow: auto;
+        padding: 20px;
+        width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .title {
+            font-weight: 600;
+            font-size: 14px;
+        }
     }
 
-    .compute-rules {
-        font-size: 14px;
-        line-height: 1.5;
-    }
 }
 </style>

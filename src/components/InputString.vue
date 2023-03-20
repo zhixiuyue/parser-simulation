@@ -1,35 +1,34 @@
 <template>
     <el-dialog v-model="props.dialogVisible" title="提示" class="dialog" @close="onClose" width="500px">
-        <div class="item">
-            <span>请输入待分析字符串：</span>
-            <el-input v-model="inputString" placeholder="请使用空格分隔每个token" clearable class="input-area" />
-        </div>
-        <div class="item">
-            <span>请选择首个非终结符：</span>
-            <el-select v-model="value" placeholder="请选择">
-                <el-option v-for="item in nonTerminal" :key="item" :label="item" :value="item" />
-            </el-select>
-        </div>
-        <div class="btn-container">
-            <el-button type="primary" class="sure-btn" @click="onFinishInput">确定</el-button>
+        <div class="dialog-body">
+            <div class="item">
+                <span>请输入待分析字符串：</span>
+                <el-input v-model="inputString" placeholder="请使用空格分隔每个token" clearable class="input-area" />
+            </div>
+            <div class="item">
+                <span>请选择首个非终结符：</span>
+                <el-select v-model="value" placeholder="请选择">
+                    <el-option v-for="item in nonTerminal" :key="item" :label="item" :value="item" />
+                </el-select>
+            </div>
+            <div class="btn-container">
+                <el-button type="primary" class="sure-btn" @click="onFinishInput">确定</el-button>
+            </div>
         </div>
     </el-dialog>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
-import lucy from "lucy-compiler";
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-const router = useRouter();
-const emit = defineEmits(["saveInput"]);
+const emit = defineEmits(["saveInput", "onClose"]);
 
 const store = useStore();
-const inputString = ref('');
-const value = ref('');
+const inputString = ref(props.data?.inputString ?? '');
+const value = ref(props.data?.value ?? '');
 
 const onClose = () => {
-    router.push('/');
+    emit('onClose');
 }
 
 const nonTerminal = computed(() => {
@@ -50,6 +49,10 @@ const props = defineProps({
     },
     type: {
         type: String,
+    },
+    data: {
+        type: Object,
+        default: {},
     }
 })
 
@@ -58,8 +61,8 @@ const props = defineProps({
 
 <style scoped lang="less">
 .dialog {
-    :global(.el-dialog__body) {
 
+    .dialog-body {
         display: flex;
         flex-direction: column;
         gap: 15px;

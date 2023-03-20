@@ -1,22 +1,24 @@
 <template>
     <el-dialog v-model="props.dialogVisible" title="预处理" class="dialog" @close="onClose">
-        <div class="content">该文法存在{{ showText }}，是否需要进行预处理？</div>
-        <el-checkbox-group v-model="checkList" class="checkbox">
-            <el-checkbox v-for="item in props.needHandle" :key="item" :label="handleItems[item].handleText"
-                size="large" />
-        </el-checkbox-group>
-        <div class="handle">
-            <el-popover placement="top" :width="250" trigger="click">
-                <ul class="support-grammers-list">
-                    <li v-for="item in showPreview()" :key="item">{{ item }}</li>
-                </ul>
-                <template #reference>
-                    <span class="preview">预览处理结果</span>
-                </template>
-            </el-popover>
-            <div class="btn-container">
-                <el-button @click="onClose">直接保存</el-button>
-                <el-button type="primary" @click="handleGrammar">确定</el-button>
+        <div class="dialog-body">
+            <div class="content">该文法存在{{ showText }}，是否需要进行预处理？</div>
+            <el-checkbox-group v-model="checkList" class="checkbox">
+                <el-checkbox v-for="item in props.needHandle" :key="item" :label="handleItems[item].handleText"
+                    size="large" />
+            </el-checkbox-group>
+            <div class="handle">
+                <el-popover placement="top" :width="250" trigger="click">
+                    <ul class="support-grammers-list">
+                        <li v-for="item in showPreview()" :key="item">{{ item }}</li>
+                    </ul>
+                    <template #reference>
+                        <span class="preview">预览处理结果</span>
+                    </template>
+                </el-popover>
+                <div class="btn-container">
+                    <el-button @click="onClose">直接保存</el-button>
+                    <el-button type="primary" @click="handleGrammar">确定</el-button>
+                </div>
             </div>
         </div>
     </el-dialog>
@@ -117,7 +119,7 @@ onMounted(() => {
 
 <style scoped lang="less">
 .dialog {
-    :global(.el-dialog__body) {
+    .dialog-body {
         margin: 0 50px;
     }
 }

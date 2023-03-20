@@ -6,6 +6,7 @@ const state = {
     terminal: [],
     customMode: false,
     LL1ParserString: '',
+    startNonTerminal: '',
 }
 
 const getters = {
@@ -34,6 +35,9 @@ const getters = {
     getLL1ParserString: (state) => {
         return state.LL1ParserString;
     },
+    getStartNonTerminal: (state) => {
+        return state.startNonTerminal;
+    },
 }
 
 const mutations = {
@@ -51,6 +55,9 @@ const mutations = {
     },
     updateLL1ParserString: (state, string) => {
         state.LL1ParserString = string;
+    },
+    updateStartNonTerminal: (state, value) => {
+        state.startNonTerminal = value;
     }
 }
 
