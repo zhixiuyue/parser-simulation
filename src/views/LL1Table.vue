@@ -21,7 +21,7 @@
             </el-table>
             <div class="first">FIRST&FOLLOW</div>
             <el-table :data="fistData" stripe style="width: 100%" border>
-                <el-table-column prop="nonTerminal" label="" align="center" />
+                <el-table-column prop="nonTerminal" label="" align="center" width="150" />
                 <el-table-column prop="FIRST" label="FIRST" align="center" />
                 <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
             </el-table>
@@ -140,7 +140,7 @@ const showData = () => {
 
         .table-data {
             background: none;
-            width: 100%;
+            // width: 100%;
 
             ul {
                 padding: 0;

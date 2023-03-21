@@ -1,7 +1,7 @@
 <template>
     <el-dialog v-model="props.dialogVisible" title="提示" class="dialog" @close="onClose" width="500px">
         <div class="dialog-body">
-            <div class="item">
+            <div class="item" v-if="!props.notShowInput">
                 <span>请输入待分析字符串：</span>
                 <el-input v-model="inputString" placeholder="请使用空格分隔每个token" clearable class="input-area" />
             </div>
@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 const emit = defineEmits(["saveInput", "onClose"]);
 
@@ -36,7 +36,7 @@ const nonTerminal = computed(() => {
 })
 
 const onFinishInput = () => {
-    if (!inputString.value || !value.value) {
+    if (!value.value || (!inputString.value && !props.notShowInput)) {
         return;
     }
     emit('saveInput', inputString.value, value.value);
@@ -53,9 +53,12 @@ const props = defineProps({
     data: {
         type: Object,
         default: {},
-    }
+    },
+    notShowInput: {
+        type: Boolean,
+        default: false,
+    },
 })
-
 
 </script>
 

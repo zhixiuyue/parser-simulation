@@ -55,7 +55,7 @@
             </div>
             <div class="step-unfinish" :class="{ 'active-step': step === 2 }">Step2 请选择分析过程：</div>
             <div class="analysis" :class="{ 'link-unfinish': step < 2 }">
-                <a v-for="item in analysisItems" @click="jump(item.route)" :key="item.text">
+                <a v-for="item in analysisItems" @click="jump(item.route, item.params)" :key="item.text">
                     {{ item.text }}
                 </a>
             </div>
@@ -188,16 +188,18 @@ const mode = reactive({
 
 const analysisItems = reactive([
     {
-        text: "LR(0)自动机构造",
-        route: '/Automaton',
-    },
-    {
         text: "LL(1)分析表构造",
         route: '/LL1Table',
     },
     {
         text: "LR(0)分析表构造",
         route: '/LR0Table',
+        params: { type: 'LR0' }
+    },
+    {
+        text: "SLR(1)分析表构造",
+        route: 'LR0Table',
+        params: { type: 'SLR1' }
     },
     {
         text: "LL(1)预测分析",
@@ -206,7 +208,17 @@ const analysisItems = reactive([
     {
         text: "LR(0)模拟分析",
         route: '/LR0Analysis',
-    }
+        params: { type: 'LR0' }
+    },
+    {
+        text: "SLR(1)模拟分析",
+        route: '/LR0Analysis',
+        params: { type: 'SLR1' }
+    },
+    {
+        text: "LR(0)自动机构造",
+        route: '/Automaton',
+    },
 ])
 
 const InputNoneTerRef = ref();
@@ -415,7 +427,7 @@ const handleGrammar = () => {
     }
 }
 
-const jump = (route) => {
+const jump = (route, params) => {
     if (!route) {
         return;
     }
@@ -427,7 +439,7 @@ const jump = (route) => {
         inputRef.value && inputRef.value.focus();
         return;
     }
-    router.push(route);
+    router.push({ path: route, query: params })
 }
 
 </script>    
@@ -566,7 +578,7 @@ const jump = (route) => {
             margin-left: 110px;
             display: grid;
             grid-gap: 10px;
-            grid-template-columns: 200px 200px;
+            grid-template-columns: 200px 200px 200px;
 
             a {
                 text-decoration: underline;

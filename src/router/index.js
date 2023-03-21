@@ -26,6 +26,7 @@ const router = createRouter({
           path: '/LR0Table',
           name: 'LR0Table',
           component: () => import('@/views/LR0Table.vue'),
+          props: true
         },
         {
           path: '/Automaton',
@@ -41,6 +42,7 @@ const router = createRouter({
           path: '/LR0Analysis',
           name: 'LR0Analysis',
           component: () => import('@/views/LR0Analysis.vue'),
+          props: true
         },
       ]
     },
