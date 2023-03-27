@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/Home.vue';
+import store from '../store';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,11 @@ const router = createRouter({
           path: '/',
           name: 'Input',
           component: () => import('@/views/InputGrammar.vue'),
+        },
+        {
+          path: '/LL1Grammar',
+          name: 'LL1Grammar',
+          component: () => import('@/views/GrammarJudge.vue'),
         },
         {
           path: '/LL1Table',
@@ -48,5 +54,18 @@ const router = createRouter({
     },
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.path == '/') {
+    next();
+  } else {
+    if (!store.state.grammarStore.grammar.length) {
+      next('/');
+    }
+    else {
+      next();
+    }
+  }
+});
 
 export default router

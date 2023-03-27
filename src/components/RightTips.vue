@@ -2,29 +2,33 @@
     <div class="right-contant-container">
         <div class="fold-btn" @click="toggleFold">
             <el-icon :size="20">
-                <DArrowRight v-if="unfold" />
-                <DArrowLeft v-else />
+                <DArrowLeft v-if="unfold" />
+                <DArrowRight v-else />
             </el-icon>
         </div>
         <div class="right-contant" v-if="unfold">
-            <div v-if="type === 'examples'">
+            <div v-if="type === 'examples'" class="examples">
+                <div class="mode">{{ mode[props.mode].text }}</div>
+                <div class="statement">
+                    {{ mode[props.mode].statement }}
+                </div>
                 <div class="support-grammers">
                     <span class="support-grammers-title">支持的文法输入格式</span>
                     <ul class="support-grammers-list">
-                        <li v-for="item in GRAMMERS" :key="item">{{ item }}</li>
+                        <li v-for="item in mode[props.mode].grammars" :key="item">{{ item }}</li>
                     </ul>
                 </div>
                 <div class="support-grammers">
                     <span class="support-grammers-title">例子</span>
                     <ul class="support-grammers-list">
-                        <li v-for="item in EXAMPLES" :key="item">{{ item }}</li>
+                        <li v-for="item in mode[props.mode].examples" :key="item">{{ item }}</li>
                     </ul>
                 </div>
             </div>
             <div v-if="type === 'grammar'">
                 <div class="title">
                     <span class="support-grammers-title">文法</span>
-                    <el-icon class="icon">
+                    <el-icon class="icon" @click="goBack">
                         <Edit />
                     </el-icon>
                 </div>
@@ -39,11 +43,14 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useStore } from 'vuex';
+import { mode } from '@/dataList.js';
+import { useRouter } from 'vue-router';
 const store = useStore();
+const router = useRouter();
 
 const unfold = ref(true);
 const grammar = computed(() => {
-    return store.state.grammarStore.grammar;
+    return store.getters["grammarStore/getGrammar"];
 })
 
 const props = defineProps({
@@ -56,72 +63,12 @@ const props = defineProps({
     },
 })
 
-const GRAMMERS_SIMPLE = [
-    "A => A c | A a d | b d | ε",
-    `A => A c
-            | A a d
-            | b d
-            | ε`,
-    `S => A a | b
-            A => A c | S d | ε`,
-    "(Copy ε to input if needed)",
-    "(All tokens must be separated by space characters)"
-];
-
-const GRAMMERS_CUSTOM = [
-    'bterm => bterm  bfactor | bterm  a d | b d | ϵ',
-    `bterm  => bterm  bfactor
-                | bterm  a d
-                | b d
-                | ϵ`,
-    'S => bterm  a | b',
-    'bterm  => bterm  bfactor | S d | ϵ',
-    "(Copy ε to input if needed)",
-    "(All tokens must be separated by space characters)"
-];
-
-const GRAMMERS = computed(() => {
-    switch (props.mode) {
-        case "simple":
-            return GRAMMERS_SIMPLE;
-        case 'custom':
-            return GRAMMERS_CUSTOM;
-        default:
-            return '';
-    }
-})
-
-const EXAMPLES_SIMPLE = [
-    "S => S S + | S S * | a",
-    "S => 0 S 1 | 0 1",
-    "S => + S S | * S S | a",
-    "S => S ( S ) S | ε",
-    "S => S + S | S S | ( S ) | S * | a",
-    "S => ( L ) | a L => L , S | S",
-    "S => a S b S | b S a S | ε",
-]
-
-const EXAMPLES_CUSTOM = [
-    'bexpr => bexpr or bterm | bterm',
-    `bterm => bterm and bfactor
-            | bfactor` ,
-    `bfactor => not bfactor | ( bexpr )
-            | true | false`,
-]
-
-const EXAMPLES = computed(() => {
-    switch (props.mode) {
-        case "simple":
-            return EXAMPLES_SIMPLE;
-        case 'custom':
-            return EXAMPLES_CUSTOM;
-        default:
-            return '';
-    }
-})
-
 const toggleFold = () => {
     unfold.value = !unfold.value;
+}
+
+const goBack = () => {
+    router.push({ path: '/', query: { step: 1 } })
 }
 
 </script>
@@ -130,7 +77,7 @@ const toggleFold = () => {
 .right-contant-container {
     background-color: #fff;
     position: relative;
-    border-left: 1px solid rgb(219, 219, 219);
+    border-right: 1px solid rgb(219, 219, 219);
 
     .fold-btn {
         position: absolute;
@@ -141,7 +88,7 @@ const toggleFold = () => {
         justify-content: center;
         background: #fff;
         bottom: 5px;
-        left: -26px;
+        right: -26px;
         cursor: pointer;
     }
 
@@ -150,6 +97,22 @@ const toggleFold = () => {
         width: 280px;
         padding: 15px;
         overflow: auto;
+
+        .examples {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mode {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .statement {
+            font-size: 14px;
+            padding: 5px 10px;
+        }
 
         .support-grammers {
 

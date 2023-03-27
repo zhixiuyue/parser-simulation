@@ -1,11 +1,8 @@
 <template>
     <div class="analysis-container">
+        <RightTips type="grammar" />
         <div class="analysis">
-            <el-page-header :icon="ArrowLeft" title="返回" @back="goBack">
-                <template #content>
-                    <span class="title">{{ type=== 'LR0' ? 'LR(0)' : 'SLR(1)'}}分析</span>
-                </template>
-            </el-page-header>
+            <CustomHeader :step=3 type="LR0" />
             <div class="content">
                 <div class="input-string">
                     <span>输入串：{{ parserString }}</span>
@@ -23,27 +20,23 @@
                 </el-table>
             </div>
         </div>
-        <RightTips type="grammar" />
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
-            @onClose="onClose" />
+            :notShowNonTer=notShowNonTer @onClose="onClose" />
     </div>
 </template>
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
+import CustomHeader from '@/components/Header.vue';
 import InputString from '../components/InputString.vue';
-import lucy from "lucy-compiler";
 import { ref, computed, watch, reactive, onMounted } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import { LRRoute } from '@/dataList.js';
 
 const router = useRouter();
 const store = useStore();
-const goBack = () => {
-    router.push('/');
-}
-
 const type = computed(() => {
     return router.currentRoute.value.query.type;
 })
@@ -51,64 +44,27 @@ const type = computed(() => {
 const passData = reactive({});
 
 const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getStartNonTerminal"];
+    return store.getters["grammarStore/getLRStartNonTerminal"];
 })
 
+const notShowNonTer = ref(true);
+
 const saveInput = (string, value) => {
-    store.commit("grammarStore/updateLL1ParserString", string);
-    store.commit("grammarStore/updateStartNonTerminal", value);
+    store.commit("grammarStore/updateLRParsingString", string);
+    !notShowNonTer && store.commit("grammarStore/updateLRStartNonTerminal", value);
     showDialog.value = false;
 }
 
 const parserString = computed(() => {
-    return store.getters["grammarStore/getLL1ParserString"];
+    return store.getters["grammarStore/getLRParsingString"];
 })
-
-const predictTable = computed(() => {
-    const ll1Parser = store.getters["grammarStore/getParser"];
-    const firstSet = ll1Parser.getFirstSet();
-    const followSet = ll1Parser.getFollowSet(firstSet);
-    const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
-    return predictTable;
-})
-
-const terminal = computed(() => {
-    return [...store.getters["grammarStore/getTerminal"], '$'];
-})
-
-const tableData = computed(() => {
-    if (!predictTable.value.length) {
-        return [];
-    }
-    const arr = predictTable.value.map((item) => {
-        const { nonTerminal = '', terminal2Derivation = {} } = item;
-        terminal2Derivation.forEach((value, key) => {
-            const { derivations = [], nonTerminal = '' } = value;
-            const newStrArr = derivations.map((val) => {
-                if (!val.length) return '';
-                return `${nonTerminal} => ${val.join(' ')}`;
-            })
-            terminal2Derivation.set(key, newStrArr);
-        })
-        return {
-            nonTerminal,
-            ...Object.fromEntries(terminal2Derivation.entries()),
-        }
-    })
-    return arr;
-})
-
 
 const parserData = computed(() => {
     if (!parserString.value || !nonTerminal.value) {
         return [];
     }
-    const lRParser = new lucy.LRParser();
-    const grammar = store.getters["grammarStore/getGrammar"];
-    const nonTerminals = store.getters["grammarStore/getNonTerminal"];
-    const terminal = store.getters["grammarStore/getTerminal"];;
-    lRParser.generateState(grammar, nonTerminal.value, nonTerminals, terminal);
-    const predictTable = lRParser.generateSLR1PredictTable();
+    const lRParser = store.getters["grammarStore/getLRParser"];
+    const predictTable = store.getters["grammarStore/getLRPredictTable"];
     // TODO
     const predictResult = lRParser.predictInput(parserString.value, predictTable);
     const data = predictResult.map((value, index) => {
@@ -127,13 +83,14 @@ const showDialog = ref(false);
 
 const onClose = () => {
     if (!parserString.value || !nonTerminal.value) {
-        router.push('/');
+        router.push(LRRoute[2].route);
     } else {
         showDialog.value = false;
     }
 }
 
 const modifyInput = () => {
+    notShowNonTer.value = false;
     showDialog.value = true;
     passData['inputString'] = parserString;
     passData['value'] = nonTerminal;
@@ -158,13 +115,8 @@ watch(() => parserString, (newValue) => {
 
     .analysis {
         flex: 1;
-        padding: 20px;
+        padding: 20px 8%;
         width: 0;
-
-        .title {
-            font-weight: 600;
-            font-size: 14px;
-        }
 
         .content {
             padding: 10px 20px;

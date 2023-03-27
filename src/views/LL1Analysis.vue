@@ -1,11 +1,8 @@
 <template>
     <div class="analysis-container">
+        <RightTips type="grammar" />
         <div class="analysis">
-            <el-page-header :icon="ArrowLeft" title="返回" @back="goBack">
-                <template #content>
-                    <span class="title">LL(1)分析</span>
-                </template>
-            </el-page-header>
+            <CustomHeader :step=3 type="LL1" />
             <div class="content">
                 <div class="input-string">
                     <span>输入串：{{ parserString }}</span>
@@ -35,7 +32,6 @@
                 </el-table>
             </div>
         </div>
-        <RightTips type="grammar" />
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
             @onClose="onClose" />
     </div>
@@ -43,27 +39,27 @@
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
+import CustomHeader from '@/components/Header.vue';
 import InputString from '../components/InputString.vue';
-import { ref, computed, watch, reactive } from 'vue';
+import { ref, computed, watch, reactive, onMounted } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import { LLRoute } from '@/dataList.js';
+import lucy from "lucy-compiler";
 
 const router = useRouter();
 const store = useStore();
-const goBack = () => {
-    router.push('/');
-}
 
-const passData = reactive({});
+let passData = reactive({});
 
 const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getStartNonTerminal"];
+    return store.getters["grammarStore/getLL1StartNonTerminal"];
 })
 
 const saveInput = (string, value) => {
     store.commit("grammarStore/updateLL1ParserString", string);
-    store.commit("grammarStore/updateStartNonTerminal", value);
+    store.commit("grammarStore/updateLL1StartNonTerminal", value);
     showDialog.value = false;
 }
 
@@ -72,9 +68,9 @@ const parserString = computed(() => {
 })
 
 const predictTable = computed(() => {
-    const ll1Parser = store.getters["grammarStore/getParser"];
-    const firstSet = ll1Parser.getFirstSet();
-    const followSet = ll1Parser.getFollowSet(firstSet);
+    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
+    const firstSet = store.getters["grammarStore/getFirstSet"];
+    const followSet = store.getters["grammarStore/getFollowSet"];
     const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
     return predictTable;
 })
@@ -105,12 +101,13 @@ const tableData = computed(() => {
     return arr;
 })
 
+const parserData = ref([]);
 
-const parserData = computed(() => {
+const generateResult = () => {
     if (!parserString.value || !nonTerminal.value) {
         return [];
     }
-    const ll1Parser = store.getters["grammarStore/getParser"];
+    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
     const predictResult = ll1Parser.getPredictProcess(
         parserString.value,
         nonTerminal.value,
@@ -124,14 +121,14 @@ const parserData = computed(() => {
             Action: value.parseAction
         }
     })
-    return data;
-})
+    parserData.value = data;
+}
 
 const showDialog = ref(false);
 
 const onClose = () => {
     if (!parserString.value || !nonTerminal.value) {
-        router.push('/');
+        router.push(LLRoute[2].route);
     } else {
         showDialog.value = false;
     }
@@ -143,14 +140,19 @@ const modifyInput = () => {
     passData['value'] = nonTerminal;
 }
 
-watch(() => parserString, (newValue) => {
-    if (!newValue.value) {
+watch([() => parserString.value, nonTerminal], ([string, nonTer], [preString, preNonTer]) => {
+    if (!string || !nonTer) {
         showDialog.value = true;
+    } else {
+        generateResult();
     }
-}, {
-    immediate: true,
-    deep: true
-})
+},
+    {
+        immediate: true,
+        deep: true
+    }
+);
+
 
 </script>
 
@@ -162,13 +164,8 @@ watch(() => parserString, (newValue) => {
 
     .analysis {
         flex: 1;
-        padding: 20px;
+        padding: 20px 8%;
         width: 0;
-
-        .title {
-            font-weight: 600;
-            font-size: 14px;
-        }
 
         .content {
             padding: 10px 20px;

@@ -5,7 +5,7 @@
                 <span>请输入待分析字符串：</span>
                 <el-input v-model="inputString" placeholder="请使用空格分隔每个token" clearable class="input-area" />
             </div>
-            <div class="item">
+            <div class="item" v-if="!props.notShowNonTer">
                 <span>请选择首个非终结符：</span>
                 <el-select v-model="value" placeholder="请选择">
                     <el-option v-for="item in nonTerminal" :key="item" :label="item" :value="item" />
@@ -36,7 +36,7 @@ const nonTerminal = computed(() => {
 })
 
 const onFinishInput = () => {
-    if (!value.value || (!inputString.value && !props.notShowInput)) {
+    if ((!value.value && !props.notShowNonTer) || (!inputString.value && !props.notShowInput)) {
         return;
     }
     emit('saveInput', inputString.value, value.value);
@@ -55,6 +55,10 @@ const props = defineProps({
         default: {},
     },
     notShowInput: {
+        type: Boolean,
+        default: false,
+    },
+    notShowNonTer: {
         type: Boolean,
         default: false,
     },

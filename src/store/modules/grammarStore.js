@@ -1,12 +1,30 @@
-import lucy from "lucy-compiler";
-
-const state = {
+const grammarState = {
     grammar: [],
     nonTerminal: [],
     terminal: [],
     customMode: false,
+}
+
+const LL1State = {
     LL1ParserString: '',
-    startNonTerminal: '',
+    LL1StartNonTerminal: '',
+    ll1Parser: {},
+    firstSet: [],
+    followSet: [],
+    LL1PredictTable: [],
+}
+
+const LRState = {
+    LRParsingString: '',
+    LRStartNonTerminal: '',
+    LRPredictTable: [],
+    lRParser: {},
+}
+
+const state = {
+    ...grammarState,
+    ...LL1State,
+    ...LRState,
 }
 
 const getters = {
@@ -24,20 +42,36 @@ const getters = {
     getCustomMode: (state) => {
         return state.customMode;
     },
-    getParser: (state) => {
-        const ll1Parser = new lucy.LL1Parser(
-            state.terminal,
-            state.nonTerminal,
-            state.grammar
-        );
-        return ll1Parser;
-    },
     getLL1ParserString: (state) => {
         return state.LL1ParserString;
     },
-    getStartNonTerminal: (state) => {
-        return state.startNonTerminal;
+    getLL1StartNonTerminal: (state) => {
+        return state.LL1StartNonTerminal;
     },
+    getLL1Parser: (state) => {
+        return state.ll1Parser;
+    },
+    getFirstSet: (state) => {
+        return state.firstSet;
+    },
+    getFollowSet: (state) => {
+        return state.followSet;
+    },
+    getLL1PredictTable: (state) => {
+        return state.LL1PredictTable;
+    },
+    getLRParsingString: (state) => {
+        return state.LRParsingString;
+    },
+    getLRStartNonTerminal: (state) => {
+        return state.LRStartNonTerminal;
+    },
+    getLRPredictTable: (state) => {
+        return state.LRPredictTable;
+    },
+    getLRParser: (state) => {
+        return state.lRParser;
+    }
 }
 
 const mutations = {
@@ -56,8 +90,32 @@ const mutations = {
     updateLL1ParserString: (state, string) => {
         state.LL1ParserString = string;
     },
-    updateStartNonTerminal: (state, value) => {
-        state.startNonTerminal = value;
+    updateLL1StartNonTerminal: (state, value) => {
+        state.LL1StartNonTerminal = value;
+    },
+    updateLL1Parser: (state, value) => {
+        state.ll1Parser = value;
+    },
+    updateFirstSet: (state, value) => {
+        state.firstSet = value;
+    },
+    updateFollowSet: (state, value) => {
+        state.followSet = value;
+    },
+    updateLL1PredictTable: (state, value) => {
+        state.LL1PredictTable = value;
+    },
+    updateLRParsingString: (state, value) => {
+        state.LRParsingString = value;
+    },
+    updateLRStartNonTerminal: (state, value) => {
+        state.LRStartNonTerminal = value;
+    },
+    updateLRPredictTable: (state, value) => {
+        state.LRPredictTable = value;
+    },
+    updateLRParser: (state, value) => {
+        state.lRParser = value;
     }
 }
 

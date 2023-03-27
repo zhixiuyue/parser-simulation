@@ -1,11 +1,8 @@
 <template>
     <div class="table-container">
+        <RightTips type="grammar" />
         <div class="table" @click="showData">
-            <el-page-header :icon="ArrowLeft" title="返回" @back="goBack">
-                <template #content>
-                    <span class="title">LL(1)分析表构造</span>
-                </template>
-            </el-page-header>
+            <CustomHeader :step=2 type="LL1" />
             <el-table :data="tableData" max-height="600" border class="table-data">
                 <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
                 </el-table-column>
@@ -26,27 +23,17 @@
                 <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
             </el-table>
         </div>
-        <RightTips type="grammar" />
     </div>
 </template>
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
+import CustomHeader from '@/components/Header.vue';
 import { computed } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
-import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
-const router = useRouter();
-const goBack = () => {
-    router.push('/');
-}
-
 const store = useStore();
-
-const ll1Parser = computed(() => {
-    return store.getters["grammarStore/getParser"];
-})
 
 const nonTerminal = computed(() => {
     return store.getters["grammarStore/getNonTerminal"];
@@ -57,15 +44,16 @@ const terminal = computed(() => {
 })
 
 const firstSet = computed(() => {
-    return ll1Parser.value.getFirstSet();
-})
+    return store.getters["grammarStore/getFirstSet"];
+});
 
 const followSet = computed(() => {
-    return ll1Parser.value.getFollowSet(firstSet.value);
-})
+    return store.getters["grammarStore/getFollowSet"];
+});
 
 const tableData = computed(() => {
-    const predictTable = ll1Parser.value.getPredictTable(firstSet.value, followSet.value);
+    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
+    const predictTable = ll1Parser.getPredictTable(firstSet.value, followSet.value);
     if (!predictTable.length) {
         return [];
     }
@@ -84,6 +72,7 @@ const tableData = computed(() => {
             ...Object.fromEntries(terminal2Derivation.entries()),
         }
     })
+    console.log(arr);
     return arr;
 })
 
@@ -107,36 +96,23 @@ const fistData = computed(() => {
     return arr;
 })
 
-// TODO
-const showData = () => {
-    console.log(ll1Parser.value.getPredictTable(firstSet.value, followSet.value))
-}
 </script>
 
 <style scoped lang="less">
 .table-container {
-    // height: 91%;
-    // justify-content: space-between;
-    // flex-direction: column;
-
     display: flex;
     gap: 10px;
     height: 100%;
 
     .table {
         flex: 1;
-        padding: 20px;
+        padding: 20px 8%;
         width: 0;
         display: flex;
         flex-direction: column;
         gap: 10px;
         // height: 0;
         // overflow: auto;
-
-        .title {
-            font-weight: 600;
-            font-size: 14px;
-        }
 
         .table-data {
             background: none;

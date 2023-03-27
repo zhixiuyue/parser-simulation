@@ -3,13 +3,6 @@ import { ref, onMounted, reactive } from 'vue';
 import * as d3 from "d3"
 import "@hpcc-js/wasm"
 import "d3-graphviz";
-import lucy from "lucy-compiler";
-defineProps({
-  msg: {
-    type: String,
-    required: true
-  }
-})
 let graphviz;
 onMounted(() => {
   d3.select("#graph").graphviz()
@@ -134,62 +127,15 @@ function render() {
       render();
     });
 }
-
-const testCase = {
-  nonTerminals: ["E'", "E", "T'", "T", "F"],
-  terminals: [
-    ["ε", /^ε/],
-    ["int", /^(0|[1-9][0-9]*)/],
-    ["+", /^\+/],
-    ["*", /^\*/],
-    ["(", /^\(/],
-    [")", /^\)/],
-  ],
-  grammers: [
-    "E  =>  T E'",
-    "E' =>  + T E' | ε",
-    "T  =>  F T'",
-    "T' =>  * F T' | ε",
-    "F  => ( E ) | int",
-  ],
-};
-const ll1Parser = new lucy.LL1Parser(
-  testCase.terminals,
-  testCase.nonTerminals,
-  testCase.grammers
-);
-const firstSet = ll1Parser.getFirstSet();
-console.log(firstSet);
 </script>
 
 <template>
   <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
     <div id="graph"></div>
-    <!-- <h3>
-      You’ve successfully created a project with
-      <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
-    </h3> -->
   </div>
 </template>
 
 <style scoped>
-h1 {
-  font-weight: 500;
-  font-size: 2.6rem;
-  top: -10px;
-}
-
-h3 {
-  font-size: 1.2rem;
-}
-
-.greetings h1,
-.greetings h3 {
-  text-align: center;
-}
-
 @media (min-width: 1024px) {
 
   .greetings h1,
