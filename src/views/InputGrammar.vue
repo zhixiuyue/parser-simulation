@@ -178,11 +178,10 @@ const saveGrammar = (garmmar) => {
         }
     }
     store.commit("grammarStore/updateGrammar", garmmar);
+    store.commit("grammarStore/updateCustomMode", radioMode.value === 'custom');
+    isModify.value = true;
 }
 
-const saveMode = () => {
-    store.commit("grammarStore/updateCustomMode", radioMode.value === 'custom');
-}
 
 const saveNonTerminal = (value) => {
     store.commit("grammarStore/updateNonTerminal", value);
@@ -223,6 +222,8 @@ const handleInputGrammar = () => {
     noneTer.values = nonTerminal.value;
     Ter.values = terminal.value;
 }
+
+const isModify = ref(false);
 
 const handleGrammar = () => {
     if (!inputGrammar.value.trim()) {
@@ -288,7 +289,6 @@ const handleGrammar = () => {
     }
     console.log(grammars);
     saveGrammar(grammars);
-    saveMode();
     finishInput();
 }
 
@@ -305,19 +305,23 @@ const jump = (item) => {
         inputRef.value?.textarea?.focus();
         return;
     }
-    if (key === 'LL1') {
-        const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
-        const firstSet = ll1Parser.getFirstSet();
-        const followSet = ll1Parser.getFollowSet(firstSet);
-        // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
-        store.commit("grammarStore/updateLL1Parser", ll1Parser);
-        store.commit("grammarStore/updateFirstSet", firstSet);
-        store.commit("grammarStore/updateFollowSet", followSet);
-        // store.commit("grammarStore/updateLL1PredictTable", predictTable);
-    } else if (key === 'LR0') {
-        const lRParser = new lucy.LRParser();
-        store.commit("grammarStore/updateLRParser", lRParser);
+    const lR = store.getters["grammarStore/getLRParser"];
+    const ll1 = store.getters["grammarStore/getLL1Parser"];
+    if (isModify.value || !ll1 || !lR) {
+        if (key === 'LL1') {
+            const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
+            const firstSet = ll1Parser.getFirstSet();
+            const followSet = ll1Parser.getFollowSet(firstSet);
+            // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
+            store.commit("grammarStore/updateLL1Parser", ll1Parser);
+            store.commit("grammarStore/updateFirstSet", firstSet);
+            store.commit("grammarStore/updateFollowSet", followSet);
+        } else if (key === 'LR0') {
+            const lRParser = new lucy.LRParser();
+            store.commit("grammarStore/updateLRParser", lRParser);
+        }
     }
+
     router.push({ path: route, query: params })
 }
 
@@ -347,6 +351,7 @@ watch(
         flex-direction: column;
         gap: 10px;
         flex: 1;
+        overflow: auto;
 
         .step {
             font-size: 18px;

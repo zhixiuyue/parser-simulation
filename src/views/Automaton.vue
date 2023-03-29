@@ -6,7 +6,7 @@
             <div id="graph"></div>
         </div>
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            notShowInput="true" @onClose="onClose" />
+            :notShowInput="true" @onClose="onClose" />
     </div>
 </template>
 
@@ -15,8 +15,7 @@ import RightTips from '@/components/RightTips.vue';
 import CustomHeader from '@/components/Header.vue';
 import InputString from '@/components/InputString.vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
-import lucy from "lucy-compiler";
-import { ref, computed, reactive, watch, onMounted } from 'vue';
+import { ref, computed, reactive, watch, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { LRRoute } from '@/dataList.js';
@@ -49,32 +48,116 @@ const onClose = () => {
 
 const graphviz = ref();
 
-const showGraph = () => {
-
+const dfs = (edges, fromNodeId) => {
+    if (!edges.length) {
+        return [];
+    }
+    let result = [];
+    edges.forEach((edgeItem) => {
+        const { next = {}, tocken } = edgeItem;
+        const { id: preId, items, edges: nextEdges } = next;
+        let id = preId;
+        if (id == undefined) {
+            return;
+        }
+        let str = '';
+        if (id === -1) {
+            id = '';
+            str = str + `id${id} [label="Accept" shape="none" style="none" ] `;
+        } else {
+            str = str + `id${id} [label="S${id}\n${items.join('\n')}"] `;
+        }
+        if (fromNodeId != undefined) {
+            str = str + `id${fromNodeId} -> id${id} [ xlabel="${tocken}"] `;
+        }
+        result = [...result, str, ...dfs(nextEdges, id)];
+    })
+    return result;
 }
 
-let stateNode = reactive({});
+const generateDots = (stateNodeValue) => {
+    const edges = [
+        {
+            next: stateNodeValue
+        }
+    ]
+    return dfs(edges);
+}
+
+onUnmounted(() => {
+    graphviz.value = '';
+})
+
 
 const generateData = () => {
     const lRParser = store.getters["grammarStore/getLRParser"];
     const grammar = store.getters["grammarStore/getGrammar"];
     const nonTerminals = store.getters["grammarStore/getNonTerminal"];
     const terminal = store.getters["grammarStore/getTerminal"];
-    const startNonTerminal = store.getters["grammarStore/getLRStartNonTerminal"]
-    lRParser.generateState(grammar, startNonTerminal, nonTerminals, terminal);
+    lRParser.generateState(grammar, startNonTerminal.value, nonTerminals, terminal);
     const stateNodeValue = lRParser.stateGraph;
-    console.log(stateNodeValue);
-    stateNode = stateNodeValue;
+    // const disgraph = `digraph  { graph [rankdir = LR splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
+    // fontname = "Microsoft Yahei", fontsize = 14 margin=0.2 ]
+    //  ${generateDots(stateNodeValue).join('')} }`;
+    const graph = generateDots(stateNodeValue);
+    store.commit("grammarStore/updateGraph", graph);
 }
 
-watch(() => startNonTerminal, (newValue) => {
+const graph = computed(() => {
+    return store.getters["grammarStore/getGraph"];
+})
+
+const dotIndex = ref(0);
+
+const render = () => {
+    if (graph.value?.length) {
+        function render() {
+            const arr = graph.value.slice(0, dotIndex.value);
+            const disGraph = `digraph  { graph [rankdir = LR splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
+                fontname = "Microsoft Yahei", fontsize = 14 margin=0.2 ]
+                ${arr.join('')} }`;
+            graphviz.value.renderDot(disGraph)
+                .on("end", function () {
+                    dotIndex.value = dotIndex.value + 1;
+                    if (dotIndex.value <= graph.value.length) {
+                        render();
+                    }
+                });
+        }
+        // d3.select("#graph")?.graphviz("#graph").width("100%").height("100%")
+        //     .renderDot(graph.value);
+        graphviz.value = d3.select("#graph").graphviz().width("100%").height("100%").transition(function () {
+            return d3.transition("main")
+                .ease(d3.easeLinear)
+                .delay(500)
+                .duration(1500);
+        }).on("initEnd", render);
+    }
+}
+
+onMounted(() => {
+    render();
+})
+
+watch(() => startNonTerminal, (newValue, preValue) => {
     if (!newValue.value) {
         showDialog.value = true;
     } else {
-        generateData();
+        if (preValue) {
+            generateData();
+        }
     }
 }, {
     immediate: true,
+    deep: true
+})
+
+watch(() => graph, (newValue) => {
+    if (newValue.value) {
+        render();
+    }
+}, {
+    // immediate: true,
     deep: true
 })
 </script>
@@ -90,6 +173,13 @@ watch(() => startNonTerminal, (newValue) => {
         flex: 1;
         padding: 20px 8%;
         width: 0;
+        overflow: auto;
+
+        #graph {
+            width: 100%;
+            height: 90%;
+            margin-top: 10px;
+        }
     }
 }
 </style>

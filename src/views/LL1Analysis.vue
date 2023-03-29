@@ -67,11 +67,14 @@ const parserString = computed(() => {
     return store.getters["grammarStore/getLL1ParserString"];
 })
 
+const ll1Parser = computed(() => {
+    return store.getters["grammarStore/getLL1Parser"];
+});
+
 const predictTable = computed(() => {
-    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
     const firstSet = store.getters["grammarStore/getFirstSet"];
     const followSet = store.getters["grammarStore/getFollowSet"];
-    const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
+    const predictTable = ll1Parser.value.getPredictTable(firstSet, followSet);
     return predictTable;
 })
 
@@ -107,8 +110,7 @@ const generateResult = () => {
     if (!parserString.value || !nonTerminal.value) {
         return [];
     }
-    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
-    const predictResult = ll1Parser.getPredictProcess(
+    const predictResult = ll1Parser.value.getPredictProcess(
         parserString.value,
         nonTerminal.value,
         predictTable.value
@@ -166,6 +168,7 @@ watch([() => parserString.value, nonTerminal], ([string, nonTer], [preString, pr
         flex: 1;
         padding: 20px 8%;
         width: 0;
+        overflow: auto;
 
         .content {
             padding: 10px 20px;

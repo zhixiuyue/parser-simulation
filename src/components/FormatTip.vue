@@ -58,10 +58,6 @@ const handleGrammar = () => {
 }
 
 const props = defineProps({
-    dialogVisible: {
-        type: Boolean,
-        required: true
-    },
     needHandle: {
         type: Array,
         required: true,

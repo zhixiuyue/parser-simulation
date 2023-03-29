@@ -129,6 +129,7 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         gap: 20px;
+        overflow: auto;
 
         .rules {
             background-color: #fff;

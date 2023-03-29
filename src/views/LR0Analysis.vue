@@ -117,6 +117,7 @@ watch(() => parserString, (newValue) => {
         flex: 1;
         padding: 20px 8%;
         width: 0;
+        overflow: auto;
 
         .content {
             padding: 10px 20px;

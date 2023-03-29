@@ -72,7 +72,6 @@ const tableData = computed(() => {
             ...Object.fromEntries(terminal2Derivation.entries()),
         }
     })
-    console.log(arr);
     return arr;
 })
 
@@ -111,8 +110,7 @@ const fistData = computed(() => {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        // height: 0;
-        // overflow: auto;
+        overflow: auto;
 
         .table-data {
             background: none;

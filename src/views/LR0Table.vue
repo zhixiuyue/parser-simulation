@@ -30,7 +30,7 @@
             </el-table>
         </div>
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            notShowInput="true" @onClose="onClose" />
+            :notShowInput="true" @onClose="onClose" />
     </div>
 </template>
 
@@ -133,6 +133,7 @@ const passData = reactive({});
         display: flex;
         flex-direction: column;
         gap: 10px;
+        overflow: auto;
 
         .table-data {
 

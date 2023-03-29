@@ -8,17 +8,17 @@ const grammarState = {
 const LL1State = {
     LL1ParserString: '',
     LL1StartNonTerminal: '',
-    ll1Parser: {},
+    ll1Parser: "",
     firstSet: [],
     followSet: [],
-    LL1PredictTable: [],
 }
 
 const LRState = {
     LRParsingString: '',
     LRStartNonTerminal: '',
     LRPredictTable: [],
-    lRParser: {},
+    lRParser: "",
+    graph: [],
 }
 
 const state = {
@@ -57,9 +57,6 @@ const getters = {
     getFollowSet: (state) => {
         return state.followSet;
     },
-    getLL1PredictTable: (state) => {
-        return state.LL1PredictTable;
-    },
     getLRParsingString: (state) => {
         return state.LRParsingString;
     },
@@ -71,12 +68,26 @@ const getters = {
     },
     getLRParser: (state) => {
         return state.lRParser;
-    }
+    },
+    getGraph: (state) => {
+        return state.graph;
+    },
+}
+
+const clearData = (state) => {
+    state.LL1ParserString = '';
+    state.LL1StartNonTerminal = '';
+    state.LRParsingString = '';
+    state.LRStartNonTerminal = '';
+    state.LRPredictTable = [];
+    state.graph = [];
 }
 
 const mutations = {
+
     updateGrammar: (state, grammar) => {
         state.grammar = grammar;
+        clearData(state);
     },
     updateNonTerminal: (state, nonTerminal) => {
         state.nonTerminal = nonTerminal;
@@ -102,9 +113,6 @@ const mutations = {
     updateFollowSet: (state, value) => {
         state.followSet = value;
     },
-    updateLL1PredictTable: (state, value) => {
-        state.LL1PredictTable = value;
-    },
     updateLRParsingString: (state, value) => {
         state.LRParsingString = value;
     },
@@ -116,6 +124,9 @@ const mutations = {
     },
     updateLRParser: (state, value) => {
         state.lRParser = value;
+    },
+    updateGraph: (state, value) => {
+        state.graph = value;
     }
 }
 
