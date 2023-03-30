@@ -67,40 +67,50 @@ const onClose = () => {
 
 const graphviz = ref();
 
-const dfs = (edges, fromNodeId) => {
-    if (!edges.length) {
-        return [];
-    }
-    let result = [];
-    edges.forEach((edgeItem) => {
-        const { next = {}, tocken } = edgeItem;
-        const { id: preId, items, edges: nextEdges } = next;
-        let id = preId;
-        if (id == undefined) {
-            return;
-        }
-        let str = '';
-        if (id === -1) {
-            id = '';
-            str = str + `id${id} [label="Accept" shape="none" style="none" ] `;
-        } else {
-            str = str + `id${id} [label="S${id}\n${items.join('\n')}"] `;
-        }
-        if (fromNodeId != undefined) {
-            str = str + `id${fromNodeId} -> id${id} [ xlabel="${tocken}"] `;
-        }
-        result = [...result, str, ...dfs(nextEdges, id)];
-    })
-    return result;
-}
+const graphArr = ref([]);
+
+// const dfs = (edges, fromNodeId) => {
+//     if (!edges.length) {
+//         return;
+//     }
+//     edges.forEach((edgeItem) => {
+//         if (edgeItem?.next?.id == undefined) {
+//             return;
+//         }
+
+//         let str = edgeItem?.next?.id === -1 ? `id${edgeItem?.next?.id} [label="Accept" shape="none" style="none" ] ` : `id${edgeItem?.next?.id} [label="S${edgeItem?.next?.id}\n${edgeItem?.next?.items.join('\n')}"] `;
+//         if (fromNodeId != undefined) {
+//             str += `id${fromNodeId} -> id${edgeItem?.next?.id} [ xlabel="${edgeItem?.tocken}"] `;
+//         }
+//         graphArr.value = [...graphArr.value, str];
+//         setTimeout(() => {
+//             dfs(edgeItem?.next?.edges, edgeItem?.next?.id);
+//         }, 0);
+//     })
+// }
+
+const stateValue = ref([]);
 
 const generateDots = (stateNodeValue) => {
-    const edges = [
-        {
-            next: stateNodeValue
+    let newArr = [];
+    if (!stateNodeValue?.length) {
+        return;
+    }
+    stateNodeValue.forEach((item) => {
+        if (!item?.edges?.length) {
+            return;
         }
-    ]
-    return dfs(edges);
+        item.edges.forEach((edgeItem) => {
+            graphArr.value = [...graphArr.value,
+            edgeItem?.next?.id === -1 ?
+                `id [label="Accept" shape="none" style="none" ] id${item.id} -> id [ xlabel="${edgeItem?.tocken}"]` :
+                `id${edgeItem?.next?.id} [label="S${edgeItem?.next?.id}\n${edgeItem?.next?.items.join('\n')}"] id${item.id} -> id${edgeItem?.next?.id} [ xlabel="${edgeItem?.tocken}"]`];
+            if (edgeItem?.next) {
+                newArr = [...newArr, edgeItem?.next];
+            }
+        })
+    })
+    stateValue.value = newArr;
 }
 
 onUnmounted(() => {
@@ -122,8 +132,20 @@ const generateData = () => {
     // const disgraph = `digraph  { graph [rankdir = LR splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
     // fontname = "Microsoft Yahei", fontsize = 14 margin=0.2 ]
     //  ${generateDots(stateNodeValue).join('')} }`;
-    const graph = generateDots(stateNodeValue);
-    store.commit("grammarStore/updateGraph", graph);
+    console.log(stateNodeValue);
+    // const graph = generateDots(stateNodeValue);
+    // generateDots(stateNodeValue);
+    graphArr.value = [`id${stateNodeValue?.id} [label="S${stateNodeValue?.id}\n${stateNodeValue?.items.join('\n')}"] `];
+    stateValue.value = [stateNodeValue];
+    let number = 0;
+    while (stateValue.value.length) {
+        if (number >= 5) {
+            break;
+        }
+        generateDots(stateValue.value);
+        number += 1;
+    }
+    store.commit("grammarStore/updateGraph", graphArr.value);
 }
 
 const graph = computed(() => {
@@ -141,7 +163,7 @@ const render = () => {
         function render() {
             const arr = graph.value.slice(0, dotIndex.value);
             const disGraph = `digraph  { graph [rankdir = LR splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
-                fontname = "Microsoft Yahei", fontsize = 14 margin=0.2 ]
+                 fontsize = 14 margin=0.2 ]
                 ${arr.join('')} }`;
             graphviz.value.renderDot(disGraph)
                 .on("end", function () {
