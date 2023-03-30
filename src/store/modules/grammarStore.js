@@ -19,6 +19,7 @@ const LRState = {
     LRPredictTable: [],
     lRParser: "",
     graph: [],
+    argument: "",
 }
 
 const state = {
@@ -72,6 +73,9 @@ const getters = {
     getGraph: (state) => {
         return state.graph;
     },
+    getArgument: (state) => {
+        return state.argument;
+    }
 }
 
 const clearData = (state) => {
@@ -81,6 +85,7 @@ const clearData = (state) => {
     state.LRStartNonTerminal = '';
     state.LRPredictTable = [];
     state.graph = [];
+    state.argument = "";
 }
 
 const mutations = {
@@ -127,6 +132,9 @@ const mutations = {
     },
     updateGraph: (state, value) => {
         state.graph = value;
+    },
+    updateArgument: (state, value) => {
+        state.argument = value;
     }
 }
 

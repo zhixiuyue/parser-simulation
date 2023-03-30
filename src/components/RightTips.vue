@@ -36,6 +36,15 @@
                     <li v-for="item in grammar" :key="item">{{ item }}</li>
                 </ul>
             </div>
+            <div v-if="showArgument">
+                <div class="argument-title">增广文法</div>
+                <div class="argument-statement">假定文法G是一个以S为开始符号的文法，构造一个新的文法G‘,称G'是G的增广文法，G'定义如下：</div>
+                <ul class="argument-ul">
+                    <li>只增加一个新的非终结符S’(G‘的开始符号)；</li>
+                    <li>增加一个新的产生式S’->S；</li>
+                    <li>增广文法会有一个仅含项目S'->S·的状态，这是唯一的接受态；</li>
+                </ul>
+            </div>
         </div>
     </div>
 </template>
@@ -61,6 +70,9 @@ const props = defineProps({
     mode: {
         type: String,
     },
+    showArgument: {
+        type: Boolean,
+    }
 })
 
 const toggleFold = () => {
@@ -134,6 +146,23 @@ const goBack = () => {
 
             .icon {
                 cursor: pointer;
+            }
+        }
+
+        .argument-title {
+            font-weight: 600;
+        }
+
+        .argument-statement {
+            font-size: 14px;
+            margin: 10px;
+        }
+
+        .argument-ul {
+            font-size: 14px;
+
+            li+li {
+                margin-top: 10px;
             }
         }
     }

@@ -1,8 +1,27 @@
 <template>
     <div class="dfa-container">
-        <RightTips type="grammar" />
+        <RightTips type="grammar" :showArgument="true" />
         <div class="analysis">
             <CustomHeader :step=1 type="LR0" />
+            <div class="argument">
+                <span>增广语法产生式：{{ argument }}</span>
+                <el-dropdown @command="handleCommand">
+                    <span class="el-dropdown-link">
+                        {{ selectItems[selectedItem] }}
+                        <el-icon class="el-icon--right">
+                            <arrow-down />
+                        </el-icon>
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item v-for="(item, index) in selectItems" :key="item" :command="index"
+                                :disabled="selectedItem === index">{{
+                                    item
+                                }}</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </div>
             <div id="graph"></div>
         </div>
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
@@ -88,14 +107,18 @@ onUnmounted(() => {
     graphviz.value = '';
 })
 
+const nonTerminals = computed(() => {
+    return store.getters["grammarStore/getNonTerminal"];
+});
+
 
 const generateData = () => {
     const lRParser = store.getters["grammarStore/getLRParser"];
     const grammar = store.getters["grammarStore/getGrammar"];
-    const nonTerminals = store.getters["grammarStore/getNonTerminal"];
     const terminal = store.getters["grammarStore/getTerminal"];
-    lRParser.generateState(grammar, startNonTerminal.value, nonTerminals, terminal);
+    lRParser.generateState(grammar, startNonTerminal.value, nonTerminals.value, terminal);
     const stateNodeValue = lRParser.stateGraph;
+    store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
     // const disgraph = `digraph  { graph [rankdir = LR splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
     // fontname = "Microsoft Yahei", fontsize = 14 margin=0.2 ]
     //  ${generateDots(stateNodeValue).join('')} }`;
@@ -105,6 +128,10 @@ const generateData = () => {
 
 const graph = computed(() => {
     return store.getters["grammarStore/getGraph"];
+})
+
+const argument = computed(() => {
+    return store.getters["grammarStore/getArgument"];
 })
 
 const dotIndex = ref(0);
@@ -129,7 +156,7 @@ const render = () => {
         graphviz.value = d3.select("#graph").graphviz().width("100%").height("100%").transition(function () {
             return d3.transition("main")
                 .ease(d3.easeLinear)
-                .delay(500)
+                // .delay(500)
                 .duration(1500);
         }).on("initEnd", render);
     }
@@ -139,9 +166,21 @@ onMounted(() => {
     render();
 })
 
+const handleCommand = (command) => {
+    selectedItem.value = command;
+}
+
+const selectItems = ["自动播放", "手动播放", "不播放"];
+const selectedItem = ref(0);
+
 watch(() => startNonTerminal, (newValue, preValue) => {
     if (!newValue.value) {
-        showDialog.value = true;
+        if (nonTerminals.value.length === 1) {
+            store.commit("grammarStore/updateLRStartNonTerminal", nonTerminals.value[0]);
+        }
+        else {
+            showDialog.value = true;
+        }
     } else {
         if (preValue) {
             generateData();
@@ -175,9 +214,22 @@ watch(() => graph, (newValue) => {
         width: 0;
         overflow: auto;
 
+        .argument {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .el-dropdown-link {
+                cursor: pointer;
+                color: var(--el-color-primary);
+                display: flex;
+                align-items: center;
+            }
+        }
+
         #graph {
             width: 100%;
-            height: 90%;
+            height: 89%;
             margin-top: 10px;
         }
     }
