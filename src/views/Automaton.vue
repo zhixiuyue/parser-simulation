@@ -113,9 +113,9 @@ const generateDots = (stateNodeValue) => {
     stateValue.value = newArr;
 }
 
-onUnmounted(() => {
-    graphviz.value = '';
-})
+// onUnmounted(() => {
+//     graphviz.value = '';
+// })
 
 const nonTerminals = computed(() => {
     return store.getters["grammarStore/getNonTerminal"];
@@ -160,27 +160,28 @@ const dotIndex = ref(0);
 
 const render = () => {
     if (graph.value?.length) {
-        function render() {
-            const arr = graph.value.slice(0, dotIndex.value);
+        function renderData(type) {
+            const arr = type === 2 ? graph.value : graph.value.slice(0, dotIndex.value);
             const disGraph = `digraph  { graph [rankdir = LR splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
                  fontsize = 14 margin=0.2 ]
                 ${arr.join('')} }`;
-            graphviz.value.renderDot(disGraph)
+            graphviz.value?.renderDot(disGraph)
                 .on("end", function () {
+                    if (type !== 0) {
+                        return;
+                    }
                     dotIndex.value = dotIndex.value + 1;
                     if (dotIndex.value <= graph.value.length) {
                         render();
                     }
                 });
         }
-        // d3.select("#graph")?.graphviz("#graph").width("100%").height("100%")
-        //     .renderDot(graph.value);
-        graphviz.value = d3.select("#graph").graphviz().width("100%").height("100%").transition(function () {
+        graphviz.value = d3.select("#graph")?.graphviz().width("100%").height("100%").transition(function () {
             return d3.transition("main")
                 .ease(d3.easeLinear)
                 // .delay(500)
                 .duration(1500);
-        }).on("initEnd", render);
+        }).on("initEnd", renderData(selectedItem.value));
     }
 }
 
@@ -193,7 +194,7 @@ const handleCommand = (command) => {
 }
 
 const selectItems = ["自动播放", "手动播放", "不播放"];
-const selectedItem = ref(0);
+const selectedItem = ref(2);
 
 watch(() => startNonTerminal, (newValue, preValue) => {
     if (!newValue.value) {
@@ -204,8 +205,12 @@ watch(() => startNonTerminal, (newValue, preValue) => {
             showDialog.value = true;
         }
     } else {
-        if (preValue) {
+        if (preValue != undefined) {
             generateData();
+        } else {
+            setTimeout(() => {
+                render();
+            }, 1000);
         }
     }
 }, {
@@ -213,14 +218,17 @@ watch(() => startNonTerminal, (newValue, preValue) => {
     deep: true
 })
 
-watch(() => graph, (newValue) => {
-    if (newValue.value) {
+watch([() => graph.value, selectedItem], ([graph, item], [preGraph, preItem]) => {
+    if (graph && (item != undefined)) {
+        dotIndex.value = 0;
         render();
     }
-}, {
-    // immediate: true,
-    deep: true
-})
+},
+    {
+        // immediate: true,
+        deep: true
+    }
+);
 </script>
 
 <style scoped lang="less">

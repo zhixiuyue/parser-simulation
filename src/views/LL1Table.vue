@@ -59,17 +59,18 @@ const tableData = computed(() => {
     }
     const arr = predictTable.map((item) => {
         const { nonTerminal = '', terminal2Derivation = {} } = item;
+        const resMap = new Map();
         terminal2Derivation.forEach((value, key) => {
             const { derivations = [], nonTerminal = '' } = value;
             const newStrArr = derivations.map((val) => {
                 if (!val.length) return '';
                 return `${nonTerminal} => ${val.join(' ')}`;
             })
-            terminal2Derivation.set(key, newStrArr);
+            resMap.set(key, newStrArr);
         })
         return {
             nonTerminal,
-            ...Object.fromEntries(terminal2Derivation.entries()),
+            ...Object.fromEntries(resMap.entries()),
         }
     })
     return arr;

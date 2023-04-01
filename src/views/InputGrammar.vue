@@ -152,7 +152,7 @@ const saveGrammar = (garmmar) => {
                 message: '存在非法字符，请检查或切换自定义模式',
                 type: 'error',
             });
-            return;
+            throw new Error('Error');
         }
     } else {
         if (noneTer.values) {
@@ -307,21 +307,18 @@ const jump = (item) => {
     }
     const lR = store.getters["grammarStore/getLRParser"];
     const ll1 = store.getters["grammarStore/getLL1Parser"];
-    if (isModify.value || !ll1 || !lR) {
-        if (key === 'LL1') {
-            const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
-            const firstSet = ll1Parser.getFirstSet();
-            const followSet = ll1Parser.getFollowSet(firstSet);
-            // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
-            store.commit("grammarStore/updateLL1Parser", ll1Parser);
-            store.commit("grammarStore/updateFirstSet", firstSet);
-            store.commit("grammarStore/updateFollowSet", followSet);
-        } else if (key === 'LR0') {
-            const lRParser = new lucy.LRParser();
-            store.commit("grammarStore/updateLRParser", lRParser);
-        }
+    if (key === 'LL1' && (isModify.value || !ll1)) {
+        const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
+        const firstSet = ll1Parser.getFirstSet();
+        const followSet = ll1Parser.getFollowSet(firstSet);
+        // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
+        store.commit("grammarStore/updateLL1Parser", ll1Parser);
+        store.commit("grammarStore/updateFirstSet", firstSet);
+        store.commit("grammarStore/updateFollowSet", followSet);
+    } else if (key === 'LR0' && (isModify.value || !lR)) {
+        const lRParser = new lucy.LRParser();
+        store.commit("grammarStore/updateLRParser", lRParser);
     }
-
     router.push({ path: route, query: params })
 }
 
