@@ -23,6 +23,15 @@
                 </el-dropdown>
             </div>
             <div id="graph"></div>
+            <div class="control-btn" v-show="selectedItem === 1"><el-button text :icon="ArrowLeft" @click="goBack"
+                    :disabled="dotIndex <= 1">上一步</el-button>
+                <el-button text @click="goForward" :disabled="dotIndex >= graph.length">
+                    下一步<el-icon class="el-icon--right">
+                        <ArrowRight />
+                    </el-icon>
+                </el-button>
+                {{ dotIndex }} / {{ graph.length }}
+            </div>
         </div>
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" />
@@ -156,7 +165,7 @@ const argument = computed(() => {
     return store.getters["grammarStore/getArgument"];
 })
 
-const dotIndex = ref(0);
+const dotIndex = ref(1);
 
 const render = () => {
     if (graph.value?.length) {
@@ -183,6 +192,20 @@ const render = () => {
                 .duration(1500);
         }).on("initEnd", renderData(selectedItem.value));
     }
+}
+
+const goBack = () => {
+    if (dotIndex.value <= 0) return;
+    dotIndex.value = dotIndex.value - 1;
+    render();
+}
+
+const goForward = () => {
+    if (dotIndex.value >= graph.value.length) {
+        return;
+    }
+    dotIndex.value = dotIndex.value + 1;
+    render();
 }
 
 onMounted(() => {
@@ -220,7 +243,7 @@ watch(() => startNonTerminal, (newValue, preValue) => {
 
 watch([() => graph.value, selectedItem], ([graph, item], [preGraph, preItem]) => {
     if (graph && (item != undefined)) {
-        dotIndex.value = 0;
+        dotIndex.value = 1;
         render();
     }
 },
@@ -243,6 +266,7 @@ watch([() => graph.value, selectedItem], ([graph, item], [preGraph, preItem]) =>
         padding: 20px 8%;
         width: 0;
         overflow: auto;
+        position: relative;
 
         .argument {
             display: flex;
@@ -261,6 +285,13 @@ watch([() => graph.value, selectedItem], ([graph, item], [preGraph, preItem]) =>
             width: 100%;
             height: 89%;
             margin-top: 10px;
+        }
+
+        .control-btn {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translate(-50%);
         }
     }
 }

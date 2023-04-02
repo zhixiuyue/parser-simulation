@@ -28,6 +28,12 @@
                     </el-table-column>
                 </el-table-column>
             </el-table>
+            <el-drawer v-model="drawer" title="I am the title" direction="ltr">
+                <span>Hi, there!</span>
+            </el-drawer>
+            <el-button class="open-dfa" @click="drawer = true">
+                查看自动机
+            </el-button>
         </div>
         <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" />
@@ -50,6 +56,8 @@ const type = computed(() => {
 })
 
 const store = useStore();
+
+const drawer = ref(false)
 
 const showDialog = ref(false);
 
@@ -148,6 +156,10 @@ const passData = reactive({});
             // :global(.el-table .cell) {
             //     padding: 0;
             // }
+        }
+
+        .open-dfa {
+            width: fit-content;
         }
     }
 
