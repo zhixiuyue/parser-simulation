@@ -44,14 +44,15 @@ const type = computed(() => {
 const passData = reactive({});
 
 const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getLRStartNonTerminal"];
+    // return store.getters["grammarStore/getLRStartNonTerminal"];
+    return store.getters["grammarStore/getStartTNonTer"];
 })
 
 const notShowNonTer = ref(true);
 
 const saveInput = (string, value) => {
     store.commit("grammarStore/updateLRParsingString", string);
-    !notShowNonTer && store.commit("grammarStore/updateLRStartNonTerminal", value);
+    // !notShowNonTer && store.commit("grammarStore/updateLRStartNonTerminal", value);
     showDialog.value = false;
 }
 

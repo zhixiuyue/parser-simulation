@@ -11,16 +11,14 @@ export const mode = {
                     | ε`,
             `S => A a | b
                     A => A c | S d | ε`,
-            "(Copy ε to input if needed)",
-            "(All tokens must be separated by space characters)"
+            "首个文法表达式左边的非终结符将作为文法分析的开始符号",
+            "（如果需要，复制ε）",
+            "（所有token需要用空格分开）"
         ],
         examples: [
-            "S => S S + | S S * | a",
-            "S => 0 S 1 | 0 1",
-            "S => + S S | * S S | a",
-            "S => S ( S ) S | ε",
-            "S => S + S | S S | ( S ) | S * | a",
-            "S => ( L ) | a L => L , S | S",
+            "A => A'' | b d A''",
+            "A' => c | a d",
+            "A'' => A' A'' | ε",
         ],
     },
     custom: {
@@ -34,8 +32,9 @@ export const mode = {
                         | ϵ`,
             'S => bterm  a | b',
             'bterm  => bterm  bfactor | S d | ϵ',
-            "(Copy ε to input if needed)",
-            "(All tokens must be separated by space characters)"
+            "首个文法表达式左边的非终结符将作为文法分析的开始符号",
+            "（如果需要，复制ε）",
+            "（所有token需要用空格分开）"
         ],
         examples: [
             'bexpr => bexpr or bterm | bterm',
@@ -46,41 +45,6 @@ export const mode = {
         ]
     }
 }
-
-// export const analysisItems = [
-//     {
-//         text: "LL(1)分析表构造",
-//         route: '/LL1Table',
-//     },
-//     {
-//         text: "LR(0)分析表构造",
-//         route: '/LR0Table',
-//         params: { type: 'LR0' }
-//     },
-//     {
-//         text: "SLR(1)分析表构造",
-//         route: 'LR0Table',
-//         params: { type: 'SLR1' }
-//     },
-//     {
-//         text: "LL(1)预测分析",
-//         route: '/LL1Analysis',
-//     },
-//     {
-//         text: "LR(0)模拟分析",
-//         route: '/LR0Analysis',
-//         params: { type: 'LR0' }
-//     },
-//     {
-//         text: "SLR(1)模拟分析",
-//         route: '/LR0Analysis',
-//         params: { type: 'SLR1' }
-//     },
-//     {
-//         text: "LR(0)自动机构造",
-//         route: '/Automaton',
-//     },
-// ]
 
 export const LLRoute = [
     {

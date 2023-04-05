@@ -54,12 +54,13 @@ const store = useStore();
 let passData = reactive({});
 
 const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getLL1StartNonTerminal"];
+    return store.getters["grammarStore/getStartTNonTer"];
+    // return store.getters["grammarStore/getLL1StartNonTerminal"];
 })
 
 const saveInput = (string, value) => {
     store.commit("grammarStore/updateLL1ParserString", string);
-    store.commit("grammarStore/updateLL1StartNonTerminal", value);
+    // store.commit("grammarStore/updateLL1StartNonTerminal", value);
     showDialog.value = false;
 }
 
@@ -111,11 +112,16 @@ const generateResult = () => {
     if (!parserString.value || !nonTerminal.value) {
         return [];
     }
-    const predictResult = ll1Parser.value.getPredictProcess(
-        parserString.value,
-        nonTerminal.value,
-        predictTable.value
-    );
+    let predictResult;
+    try {
+        predictResult = ll1Parser.value.getPredictProcess(
+            parserString.value,
+            nonTerminal.value,
+            predictTable.value
+        );
+    } catch (error) {
+        console.log(error);
+    }
     const data = predictResult.map((value, index) => {
         return {
             Step: index + 1,

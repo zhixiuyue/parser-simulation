@@ -5,12 +5,12 @@
                 <span>请输入待分析字符串：</span>
                 <el-input v-model="inputString" placeholder="请使用空格分隔每个token" clearable class="input-area" />
             </div>
-            <div class="item" v-if="!props.notShowNonTer">
+            <!-- <div class="item" v-if="!props.notShowNonTer">
                 <span>请选择首个非终结符：</span>
                 <el-select v-model="value" placeholder="请选择">
                     <el-option v-for="item in nonTerminal" :key="item" :label="item" :value="item" />
                 </el-select>
-            </div>
+            </div> -->
             <div class="btn-container">
                 <el-button type="primary" class="sure-btn" @click="onFinishInput">确定</el-button>
             </div>
@@ -36,9 +36,12 @@ const nonTerminal = computed(() => {
 })
 
 const onFinishInput = () => {
-    if ((!value.value && !props.notShowNonTer) || (!inputString.value && !props.notShowInput)) {
+    if (!inputString.value && !props.notShowInput) {
         return;
     }
+    // if ((!value.value && !props.notShowNonTer) || (!inputString.value && !props.notShowInput)) {
+    //     return;
+    // }
     emit('saveInput', inputString.value, value.value);
 }
 

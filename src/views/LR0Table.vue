@@ -28,15 +28,15 @@
                     </el-table-column>
                 </el-table-column>
             </el-table>
-            <el-drawer v-model="drawer" title="I am the title" direction="ltr">
-                <span>Hi, there!</span>
+            <el-drawer v-model="drawer" title="LR(0)自动机" direction="ltr" size="30%">
+                <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
             </el-drawer>
-            <el-button class="open-dfa" @click="drawer = true">
+            <el-button class="open-dfa" @click="openDrawer">
                 查看自动机
             </el-button>
         </div>
-        <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            :notShowInput="true" @onClose="onClose" />
+        <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
+            :notShowInput="true" @onClose="onClose" /> -->
     </div>
 </template>
 
@@ -44,7 +44,8 @@
 import RightTips from '@/components/RightTips.vue';
 import CustomHeader from '@/components/Header.vue';
 import InputString from '../components/InputString.vue';
-import { computed, watch, ref, reactive } from 'vue';
+import D3Graph from '@/components/D3Graph.vue';
+import { computed, watch, ref, reactive, onMounted } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -54,6 +55,8 @@ const router = useRouter();
 const type = computed(() => {
     return router.currentRoute.value.query.type;
 })
+
+const D3GrapghRef = ref(null);
 
 const store = useStore();
 
@@ -69,10 +72,18 @@ const terminal = computed(() => {
     return [...store.getters["grammarStore/getTerminal"], '$'];
 })
 
-const saveInput = (string, value) => {
-    store.commit("grammarStore/updateLRStartNonTerminal", value);
-    showDialog.value = false;
+const graph = computed(() => {
+    return store.getters["grammarStore/getGraph"];
+})
+
+const openDrawer = () => {
+    drawer.value = true;
 }
+
+// const saveInput = (string, value) => {
+//     store.commit("grammarStore/updateLRStartNonTerminal", value);
+//     showDialog.value = false;
+// }
 
 const LRPredictTable = computed(() => {
     const lRParser = store.getters["grammarStore/getLRParser"];
@@ -104,7 +115,7 @@ const tableData = computed(() => {
 })
 
 const startNonTerminal = computed(() => {
-    return store.getters["grammarStore/getLRStartNonTerminal"];
+    return store.getters["grammarStore/getStartTNonTer"];
 })
 
 const onClose = () => {
@@ -115,12 +126,25 @@ const onClose = () => {
     }
 }
 
-watch(() => startNonTerminal, (newValue) => {
+watch(() => startNonTerminal, (newValue, preValue) => {
     if (!newValue.value) {
-        showDialog.value = true;
+        router.push(LRRoute[1].route);
+        // showDialog.value = true;
     }
 }, {
     immediate: true,
+    deep: true
+})
+
+watch(() => D3GrapghRef, (newValue, preValue) => {
+    if (newValue.value) {
+        D3GrapghRef.value?.render(2);
+        setTimeout(() => {
+            D3GrapghRef.value?.render(2);
+        }, 100);
+    }
+}, {
+    // immediate: true,
     deep: true
 })
 

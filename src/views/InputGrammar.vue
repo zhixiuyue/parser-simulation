@@ -308,7 +308,8 @@ const jump = (item) => {
     const lR = store.getters["grammarStore/getLRParser"];
     const ll1 = store.getters["grammarStore/getLL1Parser"];
     if (key === 'LL1' && (isModify.value || !ll1)) {
-        const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
+        const terminal = store.state.grammarStore.terminal;
+        const ll1Parser = new lucy.LL1Parser(terminal, nonTerminal.value, grammar.value);
         const firstSet = ll1Parser.getFirstSet();
         const followSet = ll1Parser.getFollowSet(firstSet);
         // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
@@ -319,7 +320,7 @@ const jump = (item) => {
         const lRParser = new lucy.LRParser();
         store.commit("grammarStore/updateLRParser", lRParser);
     }
-    router.push({ path: route, query: params })
+    router.push({ path: route, query: params });
 }
 
 watch(

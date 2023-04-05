@@ -75,6 +75,9 @@ const getters = {
     },
     getArgument: (state) => {
         return state.argument;
+    },
+    getStartTNonTer: (state) => {
+        return state.grammar[0].split(" => ")[0];
     }
 }
 
