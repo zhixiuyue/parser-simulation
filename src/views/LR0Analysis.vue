@@ -6,12 +6,13 @@
             <div class="content">
                 <div class="input-string">
                     <span>输入串：{{ parserString }}</span>
-                    <span>首个非终结符：{{ nonTerminal }}</span>
+                    <!-- <span>首个非终结符：{{ nonTerminal }}</span> -->
                     <el-icon class="icon" @click="modifyInput">
                         <Edit />
                     </el-icon>
                 </div>
-                <el-table :data="parserData" stripe style="width: 100%" border class="table">
+                <div v-if="!parserData.length">字符串规约失败</div>
+                <el-table v-else :data="parserData" stripe style="width: 100%" border class="table">
                     <el-table-column prop="Step" label="Step" header-align="center" />
                     <el-table-column prop="Stack" label="Stack" header-align="center" />
                     <el-table-column prop="Symbols" label="symbols" header-align="center" />
@@ -66,8 +67,12 @@ const parserData = computed(() => {
     }
     const lRParser = store.getters["grammarStore/getLRParser"];
     const predictTable = store.getters["grammarStore/getLRPredictTable"];
-    // TODO
-    const predictResult = lRParser.predictInput(parserString.value, predictTable);
+    let predictResult = [];
+    try {
+        predictResult = lRParser.predictInput(parserString.value, predictTable);
+    } catch (error) {
+        console.error(error);
+    }
     const data = predictResult.map((value, index) => {
         return {
             Step: index + 1,

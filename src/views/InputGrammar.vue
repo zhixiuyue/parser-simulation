@@ -54,9 +54,16 @@
             </div>
             <div class="step-unfinish" :class="{ 'active-step': step === 2 }">Step2 请选择分析过程：</div>
             <div class="analysis" :class="{ 'link-unfinish': step < 2 }">
-                <a v-for="item in analysisItems" @click="jump(item)" :key="item.text">
-                    {{ item.text }}
-                </a>
+                <div v-for="item in analysisItems" :key="item.text">
+                    <span class="jump" @click="jump(item)">{{ item.text }}</span>
+                    <span class="enter-route" v-if="item.key === 'LR0'">
+                        （ 跳转至：
+                        <el-select v-model="LREnterRoute" placeholder="Select" size="small">
+                            <el-option v-for="item in options" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select>&nbsp;）
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -71,7 +78,18 @@ import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { Edit } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
-import { mode, analysisItems } from '@/dataList.js';
+import { mode, analysisItems, LRRoute } from '@/dataList.js';
+
+const options = [
+    {
+        value: LRRoute[1].route,
+        label: LRRoute[1].text,
+    },
+    {
+        value: LRRoute[2].route,
+        label: LRRoute[2].text,
+    },
+]
 
 const store = useStore();
 const router = useRouter();
@@ -94,6 +112,8 @@ const Ter = reactive({
     inputVisible: false,
 })
 
+const LREnterRoute = ref(LRRoute[1].route);
+
 const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
 })
@@ -106,7 +126,7 @@ const terminal = computed(() => {
     return store.getters["grammarStore/getTerminal"];
 })
 
-const specialChar = ['(', ')', '[', ']', '{', '}', '/', '\\', '.', '*', '?', '+', '^', '$',];
+const specialChar = ['(', ')', '[', ']', '{', '}', '/', '\\', '.', '*', '?', '+', '^', '$'];
 
 const finishInput = () => {
     step.value++;
@@ -320,7 +340,7 @@ const jump = (item) => {
         const lRParser = new lucy.LRParser();
         store.commit("grammarStore/updateLRParser", lRParser);
     }
-    router.push({ path: route, query: params });
+    router.push({ path: key === 'LR0' ? LREnterRoute.value : route, query: params });
 }
 
 watch(
@@ -474,13 +494,19 @@ watch(
             width: fit-content;
             gap: 10px;
 
-            a {
+            .jump {
                 text-decoration: underline;
                 cursor: pointer;
 
                 &:hover {
                     color: #409eff;
                 }
+            }
+
+            .enter-route {
+                margin-left: 20px;
+                display: inline-flex;
+                align-items: center;
             }
         }
 

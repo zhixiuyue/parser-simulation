@@ -28,7 +28,7 @@
                     </el-table-column>
                 </el-table-column>
             </el-table>
-            <el-drawer v-model="drawer" title="LR(0)自动机" direction="ltr" size="30%">
+            <el-drawer v-model="drawer" title="LR(0)自动机" direction="ltr" size="33%">
                 <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
             </el-drawer>
             <el-button class="open-dfa" @click="openDrawer">

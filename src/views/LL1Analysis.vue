@@ -6,7 +6,7 @@
             <div class="content">
                 <div class="input-string">
                     <span>输入串：{{ parserString }}</span>
-                    <span>首个非终结符：{{ nonTerminal }}</span>
+                    <!-- <span>首个非终结符：{{ nonTerminal }}</span> -->
                     <el-icon class="icon" @click="modifyInput">
                         <Edit />
                     </el-icon>
@@ -120,12 +120,17 @@ const generateResult = () => {
             predictTable.value
         );
     } catch (error) {
-        console.log(error);
+        predictResult = [...error.value, {
+            parseStack: error.value[error.value.length - 1].parseStack?.slice(0, -1),
+            remainingInput: error.value[error.value.length - 1].remainingInput?.slice(1),
+            parseAction: "match failed"
+        }];
+        console.error(error);
     }
     const data = predictResult.map((value, index) => {
         return {
             Step: index + 1,
-            Stack: value.parseStack.reverse().join(''),
+            Stack: value.parseStack?.slice().reverse().join(''),
             Input: value.remainingInput + '$',
             Action: value.parseAction
         }
