@@ -17,7 +17,7 @@ specifiers:
   less-loader: ^11.1.0
   lucy-compiler: 1.0.14
   prettier: ^2.7.1
-  vite: ^4.0.0
+  vite: ^4.2.1
   vue: ^3.2.45
   vue-router: ^4.1.6
   vuex: ^4.1.0
