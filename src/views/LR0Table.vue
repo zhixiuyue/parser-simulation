@@ -1,6 +1,5 @@
 <template>
     <div class="table-container">
-        <RightTips type="grammar" />
         <div class="table" @click="test">
             <CustomHeader :step=2 type="LR0" />
             <el-table :data="tableData" class="table-data" stripe>
@@ -35,6 +34,7 @@
                 查看自动机
             </el-button>
         </div>
+        <RightTips type="grammar" />
         <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
     </div>

@@ -1,30 +1,41 @@
 <template>
     <div class="right-contant-container">
-        <div class="fold-btn" @click="toggleFold">
-            <el-icon :size="20">
-                <DArrowLeft v-if="unfold" />
-                <DArrowRight v-else />
-            </el-icon>
-        </div>
+        <el-icon class="fold-icon" @click="toggleFold">
+            <Expand v-if="unfold" />
+            <Fold v-else />
+        </el-icon>
         <div class="right-contant" v-if="unfold">
-            <div v-if="type === 'examples'" class="examples">
-                <div class="mode">{{ mode[props.mode].text }}</div>
-                <div class="statement">
-                    {{ mode[props.mode].statement }}
-                </div>
-                <div class="support-grammers">
-                    <span class="support-grammers-title">支持的文法输入格式</span>
-                    <ul class="support-grammers-list">
-                        <li v-for="item in mode[props.mode].grammars" :key="item">{{ item }}</li>
-                    </ul>
-                </div>
-                <div class="support-grammers">
-                    <span class="support-grammers-title">例子</span>
-                    <ul class="support-grammers-list">
-                        <li v-for="item in mode[props.mode].examples" :key="item">{{ item }}</li>
-                    </ul>
-                </div>
-            </div>
+            <el-steps direction="vertical" :active="activeStep" class="steps">
+                <el-step title="文法定义" :class="activeStep === 1 ? 'active-step' : 'step'">
+                    <template v-slot:description>
+                        <div v-if="activeStep === 1" class="examples">
+                            <div class="mode-title">
+                                <span class="mode">{{ mode[Number(openCustomMode)]?.text }}</span>
+                                <el-switch v-model="openCustomMode" inline-prompt active-text="自定义"
+                                    inactive-text="默认" />
+                            </div>
+                            <div class="statement">
+                                {{ mode[Number(openCustomMode)]?.statement }}
+                            </div>
+                            <div class="support-grammers">
+                                <span class="support-grammers-title">支持的文法输入格式</span>
+                                <ul class="support-grammers-list">
+                                    <li v-for="item in mode[Number(openCustomMode)]?.grammars" :key="item">{{ item }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="support-grammers">
+                                <span class="support-grammers-title">例子</span>
+                                <ul class="support-grammers-list">
+                                    <li v-for="item in mode[Number(openCustomMode)]?.examples" :key="item">{{ item }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </template>
+                </el-step>
+                <el-step title="分析算法选择" :class="activeStep === 2 ? 'active-step' : 'step'" />
+            </el-steps>
             <div v-if="type === 'grammar'">
                 <div class="title">
                     <span class="support-grammers-title">文法</span>
@@ -62,11 +73,10 @@ const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
 })
 
+const activeStep = ref(1);
+const openCustomMode = ref(false);
+
 const props = defineProps({
-    type: {
-        type: String,
-        required: true,
-    },
     mode: {
         type: String,
     },
@@ -89,53 +99,84 @@ const goBack = () => {
 .right-contant-container {
     background-color: #fff;
     position: relative;
-    border-right: 1px solid rgb(219, 219, 219);
+    // border-left: 1px solid rgb(219, 219, 219);
 
-    .fold-btn {
+    .fold-icon {
         position: absolute;
-        height: 30px;
-        width: 25px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fff;
-        bottom: 5px;
-        right: -26px;
+        right: 20px;
+        top: 15px;
+        font-size: 18px;
         cursor: pointer;
+        z-index: 1;
     }
 
     .right-contant {
         height: 100%;
-        width: 280px;
+        width: 400px;
         padding: 15px;
         overflow: auto;
 
-        .examples {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .steps {
+            max-height: 100%;
+            height: fit-content;
+            min-height: 20%;
 
-        .mode {
-            font-size: 18px;
-            font-weight: 600;
-        }
+            :global(.el-step__description) {
+                overflow: auto;
+                max-height: 95%;
+            }
 
-        .statement {
-            font-size: 14px;
-            padding: 5px 10px;
-        }
+            :global(.el-step__description.is-finish) {
+                color: #000;
+            }
 
-        .support-grammers {
-
-            &-title {
+            :global(.el-step__title) {
                 font-weight: 600;
             }
 
-            &-list {
-                white-space: pre-line;
-                font-size: 14px;
-                line-height: 1.5;
+            .active-step {
+                height: 0;
+                flex: 1;
+            }
+
+            .step {
+                flex: 0;
+            }
+
+            .examples {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+
+                .mode-title {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+
+                .mode {
+                    font-size: 18px;
+                    font-weight: 600;
+                }
+
+                .statement {
+                    font-size: 14px;
+                    padding: 5px 10px;
+                }
+
+                .support-grammers {
+
+                    &-title {
+                        font-weight: 600;
+                        font-size: 15px;
+                    }
+
+                    &-list {
+                        white-space: pre-line;
+                        font-size: 14px;
+                        line-height: 1.5;
+                    }
+                }
             }
         }
 

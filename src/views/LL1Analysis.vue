@@ -1,6 +1,5 @@
 <template>
   <div class="analysis-container">
-    <RightTips type="grammar" />
     <div class="analysis">
       <CustomHeader :step="3" type="LL1" />
       <div class="content">
@@ -34,6 +33,7 @@
       <h3>Ast Explore</h3>
       <div id="astNodeContainer"></div>
     </div>
+    <RightTips type="grammar" />
     <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
       @onClose="onClose" />
   </div>

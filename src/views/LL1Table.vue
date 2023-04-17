@@ -1,6 +1,5 @@
 <template>
     <div class="table-container">
-        <RightTips type="grammar" />
         <div class="table" @click="showData">
             <CustomHeader :step=2 type="LL1" />
             <el-table :data="tableData" max-height="600" border class="table-data">
@@ -23,6 +22,7 @@
                 <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
             </el-table>
         </div>
+        <RightTips type="grammar" />
     </div>
 </template>
 

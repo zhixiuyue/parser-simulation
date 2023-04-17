@@ -1,6 +1,5 @@
 <template>
     <div class="dfa-container">
-        <RightTips type="grammar" :showArgument="true" />
         <div class="analysis">
             <CustomHeader :step=1 type="LR0" />
             <div class="argument">
@@ -33,6 +32,7 @@
                 {{ dotIndex }} / {{ graph.length }}
             </div>
         </div>
+        <RightTips type="grammar" :showArgument="true" />
         <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
     </div>

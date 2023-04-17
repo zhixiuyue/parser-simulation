@@ -1,13 +1,12 @@
 <template>
     <div class="input-container">
-        <RightTips type="examples" :mode="radioMode" />
         <div class="input-grammar">
             <div class="step" :class="{ 'active-step': step === 1 }">Step1 请先完成文法定义：</div>
             <div class="wrapper" :class="{ 'wrapper-simple': radioMode === 'simple' }">
                 <span class="mode">模式选择</span>
                 <el-radio-group v-model="radioMode" class="radio">
-                    <el-radio label="simple">{{ mode.simple.text }}</el-radio>
-                    <el-radio label="custom">{{ mode.custom.text }}</el-radio>
+                    <el-radio label="simple">{{ mode[0].text }}</el-radio>
+                    <el-radio label="custom">{{ mode[1].text }}</el-radio>
                 </el-radio-group>
                 <span class="input-title-none" v-if="radioMode === 'custom'">{{ step=== 1 ? '输入' : ''}}非终结符</span>
                 <div class="input-none" v-if="radioMode === 'custom' && step === 1">
@@ -66,6 +65,7 @@
                 </div>
             </div>
         </div>
+        <RightTips type="examples" :mode="radioMode" />
     </div>
 </template>
 

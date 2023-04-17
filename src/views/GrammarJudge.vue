@@ -1,6 +1,5 @@
 <template>
     <div class="judge-container">
-        <RightTips type="grammar" />
         <div class="judge">
             <CustomHeader :step=1 type="LL1" />
             <div class="rules">
@@ -19,6 +18,7 @@
             </div>
             <FormatTips v-if="showHandleVisible" :needHandle="needHandle" @saveGrammar="saveGrammar" />
         </div>
+        <RightTips type="grammar" />
     </div>
 </template>
 
