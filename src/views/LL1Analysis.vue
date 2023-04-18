@@ -33,7 +33,7 @@
       <h3>Ast Explore</h3>
       <div id="astNodeContainer"></div>
     </div>
-    <RightTips type="grammar" />
+    <!-- <RightTips type="grammar" /> -->
     <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
       @onClose="onClose" />
   </div>

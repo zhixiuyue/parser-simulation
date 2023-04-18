@@ -5,7 +5,12 @@
         <span class="title">编译器语法分析模拟系统</span>
       </el-header>
       <el-container class="content-container">
-        <el-main><router-view></router-view></el-main>
+        <el-main>
+          <div class="content">
+            <router-view></router-view>
+          </div>
+          <RightTips type="examples" :mode="radioMode" />
+        </el-main>
         <!-- <el-main><router-view :key="$route.fullPath"></router-view></el-main> -->
       </el-container>
     </el-container>
@@ -13,6 +18,7 @@
 </template>
 
 <script setup>
+import RightTips from '@/components/RightTips.vue';
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -49,5 +55,15 @@
 .el-main {
   // background-color: #E9EEF3;
   padding: 0;
+  display: flex;
+  gap: 10px;
+  height: 100%;
+
+  .content {
+    flex: 1;
+    width: 0;
+    height: 100%;
+    overflow: auto;
+  }
 }
 </style>

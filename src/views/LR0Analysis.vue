@@ -1,6 +1,6 @@
 <template>
     <div class="analysis-container">
-        <RightTips type="grammar" />
+        <!-- <RightTips type="grammar" /> -->
         <div class="analysis">
             <CustomHeader :step=3 type="LR0" />
             <div class="content">

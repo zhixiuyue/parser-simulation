@@ -10,19 +10,22 @@ export const mode = [{
                     | ε`,
         `S => A a | b
                     A => A c | S d | ε`,
+        "注意",
         "首个文法表达式左边的非终结符将作为文法分析的开始符号",
-        "（如果需要，复制ε）",
-        "（所有token需要用空格分开）"
+        "所有token需要用空格分开"
     ],
     examples: [
         "A => A'' | b d A''",
         "A' => c | a d",
         "A'' => A' A'' | ε",
+        "注意",
+        "首个文法表达式左边的非终结符将作为文法分析的开始符号",
+        "所有token需要用空格分开"
     ],
 },
 {
     text: '自定义模式',
-    statement: '该模式支持自定义文法，需要输入自定义终结符和非终结符，请在文法下方输入自定义终结符和非终结符，如不需要自定义，请切换简单模式',
+    statement: '该模式下，需要自定义终结符和非终结符',
     grammars: [
         'bterm => bterm  bfactor | bterm  a d | b d | ϵ',
         `bterm  => bterm  bfactor
@@ -31,9 +34,9 @@ export const mode = [{
                         | ϵ`,
         'S => bterm  a | b',
         'bterm  => bterm  bfactor | S d | ϵ',
+        "注意",
         "首个文法表达式左边的非终结符将作为文法分析的开始符号",
-        "（如果需要，复制ε）",
-        "（所有token需要用空格分开）"
+        "所有token需要用空格分开"
     ],
     examples: [
         'bexpr => bexpr or bterm | bterm',
@@ -41,6 +44,9 @@ export const mode = [{
                     | bfactor` ,
         `bfactor => not bfactor | ( bexpr )
                     | true | false`,
+        "注意",
+        "首个文法表达式左边的非终结符将作为文法分析的开始符号",
+        "所有token需要用空格分开"
     ]
 }
 ]

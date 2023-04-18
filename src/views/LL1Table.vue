@@ -22,7 +22,7 @@
                 <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
             </el-table>
         </div>
-        <RightTips type="grammar" />
+        <!-- <RightTips type="grammar" /> -->
     </div>
 </template>
 

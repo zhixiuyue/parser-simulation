@@ -34,7 +34,7 @@
                 查看自动机
             </el-button>
         </div>
-        <RightTips type="grammar" />
+        <!-- <RightTips type="grammar" /> -->
         <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
     </div>

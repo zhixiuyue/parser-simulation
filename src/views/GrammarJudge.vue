@@ -18,7 +18,7 @@
             </div>
             <FormatTips v-if="showHandleVisible" :needHandle="needHandle" @saveGrammar="saveGrammar" />
         </div>
-        <RightTips type="grammar" />
+        <!-- <RightTips type="grammar" /> -->
     </div>
 </template>
 
