@@ -1,34 +1,31 @@
 <template>
-    <div class="analysis-container">
-        <!-- <RightTips type="grammar" /> -->
-        <div class="analysis">
-            <CustomHeader :step=3 type="LR0" />
-            <div class="content">
-                <div class="input-string">
-                    <span>输入串：{{ parserString }}</span>
-                    <!-- <span>首个非终结符：{{ nonTerminal }}</span> -->
-                    <el-icon class="icon" @click="modifyInput">
-                        <Edit />
-                    </el-icon>
-                </div>
-                <div v-if="!parserData.length">字符串规约失败</div>
-                <el-table v-else :data="parserData" stripe style="width: 100%" border class="table">
-                    <el-table-column prop="Step" label="Step" header-align="center" />
-                    <el-table-column prop="Stack" label="Stack" header-align="center" />
-                    <el-table-column prop="Symbols" label="symbols" header-align="center" />
-                    <el-table-column prop="Input" label="Input" align="right" header-align="center" />
-                    <el-table-column prop="Action" label="Action" header-align="center" />
-                </el-table>
+    <div class="analysis">
+        <!-- <CustomHeader :step=3 type="LR0" /> -->
+        <div class="content">
+            <div class="input-string">
+                <span>输入串：{{ parserString }}</span>
+                <!-- <span>首个非终结符：{{ nonTerminal }}</span> -->
+                <el-icon class="icon" @click="modifyInput">
+                    <Edit />
+                </el-icon>
             </div>
+            <div v-if="!parserData.length">字符串规约失败</div>
+            <el-table v-else :data="parserData" stripe style="width: 100%" border class="table">
+                <el-table-column prop="Step" label="Step" header-align="center" />
+                <el-table-column prop="Stack" label="Stack" header-align="center" />
+                <el-table-column prop="Symbols" label="symbols" header-align="center" />
+                <el-table-column prop="Input" label="Input" align="right" header-align="center" />
+                <el-table-column prop="Action" label="Action" header-align="center" />
+            </el-table>
         </div>
-        <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
-            :notShowNonTer=notShowNonTer @onClose="onClose" />
     </div>
+    <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
+        :notShowNonTer=notShowNonTer @onClose="onClose" />
 </template>
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
-import CustomHeader from '@/components/Header.vue';
+// import CustomHeader from '@/components/Header.vue';
 import InputString from '../components/InputString.vue';
 import { ref, computed, watch, reactive, onMounted } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
@@ -114,57 +111,47 @@ watch(() => parserString, (newValue) => {
 </script>
 
 <style scoped lang="less">
-.analysis-container {
-    display: flex;
-    gap: 10px;
-    height: 100%;
+.analysis {
 
-    .analysis {
-        flex: 1;
-        padding: 20px 8%;
-        width: 0;
-        overflow: auto;
+    .content {
+        padding: 10px 20px;
 
-        .content {
-            padding: 10px 20px;
+        .input-string {
+            display: flex;
+            gap: 20px;
+            align-items: center;
 
-            .input-string {
-                display: flex;
-                gap: 20px;
-                align-items: center;
+            svg {
+                cursor: pointer;
 
-                svg {
-                    cursor: pointer;
-
-                    &:hover {
-                        color: #409eff;
-                    }
+                &:hover {
+                    color: #409eff;
                 }
             }
-
-            div+div {
-                margin-top: 10px;
-            }
-
-            .table {
-                margin-top: 20px;
-            }
-
-            .table-data {
-                margin-top: 20px;
-                background: none;
-                width: 100%;
-
-                ul {
-                    padding: 0;
-                }
-
-                li {
-                    list-style-type: none;
-                }
-            }
-
         }
+
+        div+div {
+            margin-top: 10px;
+        }
+
+        .table {
+            margin-top: 20px;
+        }
+
+        .table-data {
+            margin-top: 20px;
+            background: none;
+            width: 100%;
+
+            ul {
+                padding: 0;
+            }
+
+            li {
+                list-style-type: none;
+            }
+        }
+
     }
 }
 </style>

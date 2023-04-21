@@ -1,48 +1,45 @@
 <template>
-    <div class="table-container">
-        <div class="table" @click="test">
-            <CustomHeader :step=2 type="LR0" />
-            <el-table :data="tableData" class="table-data" stripe>
-                <el-table-column prop="State" label="STATE" align="center" />
-                <el-table-column label="ACTION" align="center">
-                    <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
-                        <template #default="scope">
-                            <ul>
-                                <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                                    {{ item }}
-                                </li>
-                            </ul>
-                        </template>
-                    </el-table-column>
+    <div class="table" @click="test">
+        <!-- <CustomHeader :step=2 type="LR0" /> -->
+        <el-table :data="tableData" class="table-data" stripe>
+            <el-table-column prop="State" label="STATE" align="center" />
+            <el-table-column label="ACTION" align="center">
+                <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
+                    <template #default="scope">
+                        <ul>
+                            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </template>
                 </el-table-column>
-                <el-table-column label="GOTO" align="center">
-                    <el-table-column v-for="item in nonTerminal" :key="item" :prop="item" :label="item" align="center">
-                        <template #default="scope">
-                            <ul>
-                                <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                                    {{ item }}
-                                </li>
-                            </ul>
-                        </template>
-                    </el-table-column>
+            </el-table-column>
+            <el-table-column label="GOTO" align="center">
+                <el-table-column v-for="item in nonTerminal" :key="item" :prop="item" :label="item" align="center">
+                    <template #default="scope">
+                        <ul>
+                            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </template>
                 </el-table-column>
-            </el-table>
-            <el-drawer v-model="drawer" title="LR(0)自动机" direction="ltr" size="33%">
-                <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
-            </el-drawer>
-            <el-button class="open-dfa" @click="openDrawer">
-                查看自动机
-            </el-button>
-        </div>
-        <!-- <RightTips type="grammar" /> -->
-        <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            :notShowInput="true" @onClose="onClose" /> -->
+            </el-table-column>
+        </el-table>
+        <el-drawer v-model="drawer" title="LR(0)自动机" direction="ltr" size="33%">
+            <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
+        </el-drawer>
+        <el-button class="open-dfa" @click="openDrawer">
+            查看自动机
+        </el-button>
     </div>
+    <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
+            :notShowInput="true" @onClose="onClose" /> -->
 </template>
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
-import CustomHeader from '@/components/Header.vue';
+// import CustomHeader from '@/components/Header.vue';
 import InputString from '../components/InputString.vue';
 import D3Graph from '@/components/D3Graph.vue';
 import { computed, watch, ref, reactive, onMounted } from 'vue';
@@ -153,39 +150,28 @@ const passData = reactive({});
 </script>
 
 <style scoped lang="less">
-.table-container {
+.table {
     display: flex;
+    flex-direction: column;
     gap: 10px;
-    height: 100%;
 
-    .table {
-        flex: 1;
-        padding: 20px 8%;
-        width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        overflow: auto;
+    .table-data {
 
-        .table-data {
-
-            ul {
-                padding: 0;
-            }
-
-            li {
-                list-style-type: none;
-            }
-
-            // :global(.el-table .cell) {
-            //     padding: 0;
-            // }
+        ul {
+            padding: 0;
         }
 
-        .open-dfa {
-            width: fit-content;
+        li {
+            list-style-type: none;
         }
+
+        // :global(.el-table .cell) {
+        //     padding: 0;
+        // }
     }
 
+    .open-dfa {
+        width: fit-content;
+    }
 }
 </style>

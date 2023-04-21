@@ -1,5 +1,5 @@
 <template>
-    <el-collapse model-value="1" class="collapse">
+    <el-collapse :model-value=activeName class="collapse">
         <el-collapse-item title="文法定义" name="1">
             <div class="examples">
                 <div class="mode-title">
@@ -36,13 +36,9 @@
                             <el-input v-if="noneTer.inputVisible" class="input-none-ter" ref="InputNoneTerRef"
                                 v-model="noneTer.inputValue" @keyup.enter="handleInputConfirm(noneTer)"
                                 @blur="handleBlur(noneTer)" />
-                            <el-button v-else :icon="Plus" circle size="small" @click="showInputNoneTer" />
+                            <el-button v-else :icon="Plus" circle size="small" @click="showInputNoneTer"
+                                :disabled="activeStep > 1" />
                         </div>
-
-                        <!-- <div class="input-none" v-if="radioMode === 'custom' && step === 2">
-                            <span v-for="item in nonTerminal" :key="item">{{ item }}</span>
-                        </div> -->
-
                     </div>
 
                     <div class="input-symbol" v-if="openCustomMode">
@@ -55,25 +51,20 @@
                             <el-input v-if="Ter.inputVisible" class="input-none-ter" ref="InputTerRef"
                                 v-model="Ter.inputValue" @keyup.enter="handleInputConfirm(Ter)"
                                 @blur="handleBlur(Ter)" />
-                            <el-button v-else :icon="Plus" circle size="small" @click="showInputTer" />
+                            <el-button v-else :icon="Plus" circle size="small" @click="showInputTer"
+                                :disabled="activeStep > 1" />
                         </div>
-
-                        <!-- <div class="input-ter" v-if="radioMode === 'custom' && step === 2">
-                            <span v-for="item in terminal" :key="item">{{ item }}</span>
-                        </div> -->
                     </div>
 
                     <div>
                         <el-input class="input-area" type="textarea" :autosize="{ minRows: 11, maxRows: 13 }"
                             ref="inputRef" :placeholder="'例子\n' + mode[Number(openCustomMode)]?.examples.join('\n')"
-                            v-model="inputGrammar">
+                            v-model="inputGrammar" :disabled="activeStep > 1">
                         </el-input>
-                        <!-- <ol v-show="step === 2" class="input-area" style="margin-left: 17px;">
-                            <li v-for="item in grammar" :key="item" class="grammar-li">{{ item }}</li>
-                        </ol> -->
                     </div>
-                    <el-button class="btn-save" type="primary" plain @click="handleGrammar">确定</el-button>
-                    <!-- <el-button class="btn-save" :icon="Edit" @click="handleInputGrammar">重定义</el-button> -->
+                    <el-button v-if="activeStep === 1" class="btn-save" type="primary" plain
+                        @click="handleGrammar">确定</el-button>
+                    <el-button v-else class="btn-save" :icon="Edit" @click="reDefine">重定义</el-button>
                 </div>
             </div>
         </el-collapse-item>
@@ -82,12 +73,14 @@
 
 <script setup>
 import { mode } from '@/dataList.js';
-import { computed, ref, reactive, nextTick } from "vue";
+import { computed, ref, reactive, nextTick, watch } from "vue";
 import { Plus, Edit } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import lucy from "lucy-compiler";
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+const router = useRouter();
 const specialChar = ['(', ')', '[', ']', '{', '}', '/', '\\', '.', '*', '?', '+', '^', '$'];
 const store = useStore();
 const InputNoneTerRef = ref();
@@ -105,6 +98,8 @@ const Ter = reactive({
     inputVisible: false,
 })
 const isModify = ref(false);
+
+const activeName = ref('1');
 
 const handleClose = (tags, tag) => {
     tags.splice(tags.indexOf(tag), 1);
@@ -265,7 +260,28 @@ const handleGrammar = () => {
     }
     console.log(grammars);
     saveGrammar(grammars);
+    store.commit("grammarStore/updateStep", 2);
 }
+
+const activeStep = computed(() => {
+    return store.getters["grammarStore/getStep"];
+})
+
+const reDefine = () => {
+    store.commit("grammarStore/updateStep", 1);
+}
+
+watch(() => activeStep, (newValue) => {
+    if (newValue.value === 1) {
+        activeName.value = "1";
+        router.push('/');
+    } else if (newValue.value === 2) {
+        activeName.value = "";
+    }
+}, {
+    immediate: true,
+    deep: true
+})
 </script>
 
 <style scoped lang="less">
@@ -281,7 +297,7 @@ const handleGrammar = () => {
     }
 
     :global(.el-collapse-item__content) {
-        padding: 10px 0;
+        padding: 10px;
     }
 
     :global(.el-collapse-item__wrap) {

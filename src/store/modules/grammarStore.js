@@ -3,6 +3,7 @@ const grammarState = {
     nonTerminal: [],
     terminal: [],
     customMode: false,
+    initialGrammar: [],
 }
 
 const LL1State = {
@@ -26,11 +27,15 @@ const state = {
     ...grammarState,
     ...LL1State,
     ...LRState,
+    step: 1,
 }
 
 const getters = {
     getGrammar: (state) => {
         return state.grammar;
+    },
+    getInitialGrammar: (state) => {
+        return state.initialGrammar;
     },
     getNonTerminal: (state) => {
         return state.nonTerminal;
@@ -78,6 +83,9 @@ const getters = {
     },
     getStartTNonTer: (state) => {
         return state.grammar[0].split(" => ")[0];
+    },
+    getStep: (state) => {
+        return state.step;
     }
 }
 
@@ -96,6 +104,9 @@ const mutations = {
     updateGrammar: (state, grammar) => {
         state.grammar = grammar;
         clearData(state);
+    },
+    updateInitialGrammar: (state, grammar) => {
+        state.initialGrammar = grammar;
     },
     updateNonTerminal: (state, nonTerminal) => {
         state.nonTerminal = nonTerminal;
@@ -138,6 +149,9 @@ const mutations = {
     },
     updateArgument: (state, value) => {
         state.argument = value;
+    },
+    updateStep: (state, value) => {
+        state.step = value;
     }
 }
 

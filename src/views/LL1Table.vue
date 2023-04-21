@@ -1,34 +1,32 @@
 <template>
-    <div class="table-container">
-        <div class="table" @click="showData">
-            <CustomHeader :step=2 type="LL1" />
-            <el-table :data="tableData" max-height="600" border class="table-data">
-                <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
-                </el-table-column>
-                <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
-                    <template #default="scope">
-                        <ul>
-                            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                                {{ item }}
-                            </li>
-                        </ul>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="first">FIRST&FOLLOW</div>
-            <el-table :data="fistData" stripe style="width: 100%" border>
-                <el-table-column prop="nonTerminal" label="" align="center" width="150" />
-                <el-table-column prop="FIRST" label="FIRST" align="center" />
-                <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
-            </el-table>
-        </div>
-        <!-- <RightTips type="grammar" /> -->
+    <div class="table" @click="showData">
+        <!-- <CustomHeader :step=2 type="LL1" /> -->
+        <InputGrammar />
+        <el-table :data="tableData" max-height="600" border class="table-data">
+            <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
+            </el-table-column>
+            <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
+                <template #default="scope">
+                    <ul>
+                        <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+                            {{ item }}
+                        </li>
+                    </ul>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="first">FIRST&FOLLOW</div>
+        <el-table :data="fistData" stripe style="width: 100%" border>
+            <el-table-column prop="nonTerminal" label="" align="center" width="150" />
+            <el-table-column prop="FIRST" label="FIRST" align="center" />
+            <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
+        </el-table>
     </div>
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
-import CustomHeader from '@/components/Header.vue';
+// import CustomHeader from '@/components/Header.vue';
+import InputGrammar from '@/components/InputGrammar.vue';
 import { computed } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
@@ -99,37 +97,27 @@ const fistData = computed(() => {
 </script>
 
 <style scoped lang="less">
-.table-container {
+.table {
     display: flex;
+    flex-direction: column;
     gap: 10px;
-    height: 100%;
 
-    .table {
-        flex: 1;
-        padding: 20px 8%;
-        width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        overflow: auto;
+    .table-data {
+        background: none;
+        // width: 100%;
 
-        .table-data {
-            background: none;
-            // width: 100%;
-
-            ul {
-                padding: 0;
-            }
-
-            li {
-                list-style-type: none;
-            }
+        ul {
+            padding: 0;
         }
 
-        .first {
-            font-weight: 600;
-            margin-top: 10px;
+        li {
+            list-style-type: none;
         }
+    }
+
+    .first {
+        font-weight: 600;
+        margin-top: 10px;
     }
 }
 </style>

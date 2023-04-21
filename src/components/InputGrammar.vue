@@ -1,6 +1,11 @@
 <template>
     <div class="input-container">
-        <span class="input-title">文法</span>
+        <div class="title">
+            <span class="input-title">文法</span>
+            <el-icon class="icon" @click="goBack">
+                <Edit />
+            </el-icon>
+        </div>
         <div class="wrapper" :class="{ 'wrapper-simple': !isCustomMode }">
             <span class="input-title-none" v-if="isCustomMode">非终结符</span>
             <div class="input-none" v-if="isCustomMode">
@@ -20,16 +25,11 @@
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
-import lucy from "lucy-compiler";
-import { reactive, ref, nextTick, computed, watch } from 'vue';
-import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
+import { ref, computed } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const router = useRouter();
 
 const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
@@ -47,48 +47,31 @@ const isCustomMode = computed(() => {
     return store.getters["grammarStore/getCustomMode"];
 })
 
-const handleInputGrammar = () => {
-    step.value = 1;
-    let value = '';
-    inputRef.value?.textarea?.focus();
-    if (!grammar.value.length) {
-        return;
-    }
-    grammar.value.forEach((val) => {
-        value += val;
-        value += '\n';
-    })
-    inputGrammar.value = value;
-    noneTer.values = nonTerminal.value;
-    Ter.values = terminal.value;
+
+const goBack = () => {
+    store.commit("grammarStore/updateStep", 1);
 }
-
-const isModify = ref(false);
-
-watch(
-    () => router.currentRoute.value.query,
-    () => {
-        const { step } = router.currentRoute.value.query;
-        if (step === '1') {
-            handleInputGrammar();
-        }
-    },
-    { immediate: true, deep: true }
-);
 
 </script>    
 
 <style scoped lang="less">
 .input-container {
-    height: 100%;
-    padding: 20px 8%;
     display: flex;
     flex-direction: column;
     gap: 10px;
 
+    .title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        svg {
+            cursor: pointer;
+        }
+    }
+
     .input-title {
         font-size: 18px;
-        // font-weight: 600;
     }
 
     .wrapper {

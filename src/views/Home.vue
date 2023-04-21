@@ -64,6 +64,7 @@ import RightTips from '@/components/RightTips.vue';
     width: 0;
     height: 100%;
     overflow: auto;
+    padding: 20px 8%;
   }
 }
 </style>

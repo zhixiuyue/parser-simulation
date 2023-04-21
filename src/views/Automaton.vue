@@ -1,46 +1,43 @@
 <template>
-    <div class="dfa-container">
-        <div class="analysis">
-            <CustomHeader :step=1 type="LR0" />
-            <div class="argument">
-                <span>增广语法产生式：{{ argument }}</span>
-                <el-dropdown @command="handleCommand">
-                    <span class="el-dropdown-link">
-                        {{ selectItems[selectedItem] }}
-                        <el-icon class="el-icon--right">
-                            <arrow-down />
-                        </el-icon>
-                    </span>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item v-for="(item, index) in selectItems" :key="item" :command="index"
-                                :disabled="selectedItem === index">{{
-                                    item
-                                }}</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-            </div>
-            <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex"></D3Graph>
-            <div class="control-btn" v-show="selectedItem === 1"><el-button text :icon="ArrowLeft" @click="goBack"
-                    :disabled="dotIndex <= 1">上一步</el-button>
-                <el-button text @click="goForward" :disabled="dotIndex >= graph.length">
-                    下一步<el-icon class="el-icon--right">
-                        <ArrowRight />
+    <div class="analysis">
+        <!-- <CustomHeader :step=1 type="LR0" /> -->
+        <div class="argument">
+            <span>增广语法产生式：{{ argument }}</span>
+            <el-dropdown @command="handleCommand">
+                <span class="el-dropdown-link">
+                    {{ selectItems[selectedItem] }}
+                    <el-icon class="el-icon--right">
+                        <arrow-down />
                     </el-icon>
-                </el-button>
-                {{ dotIndex }} / {{ graph.length }}
-            </div>
+                </span>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item v-for="(item, index) in selectItems" :key="item" :command="index"
+                            :disabled="selectedItem === index">{{
+                                item
+                            }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
         </div>
-        <!-- <RightTips type="grammar" :showArgument="true" /> -->
-        <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            :notShowInput="true" @onClose="onClose" /> -->
+        <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex"></D3Graph>
+        <div class="control-btn" v-show="selectedItem === 1"><el-button text :icon="ArrowLeft" @click="goBack"
+                :disabled="dotIndex <= 1">上一步</el-button>
+            <el-button text @click="goForward" :disabled="dotIndex >= graph.length">
+                下一步<el-icon class="el-icon--right">
+                    <ArrowRight />
+                </el-icon>
+            </el-button>
+            {{ dotIndex }} / {{ graph.length }}
+        </div>
     </div>
+    <!-- <RightTips type="grammar" :showArgument="true" /> -->
+    <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
+            :notShowInput="true" @onClose="onClose" /> -->
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
-import CustomHeader from '@/components/Header.vue';
+// import CustomHeader from '@/components/Header.vue';
 import InputString from '@/components/InputString.vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import D3Graph from '@/components/D3Graph.vue';
@@ -222,38 +219,27 @@ watch([() => graph.value, selectedItem], ([graphs, item], [preGraph, preItem]) =
 </script>
 
 <style scoped lang="less">
-.dfa-container {
-    display: flex;
-    gap: 10px;
-    height: 100%;
+.analysis {
+    position: relative;
 
+    .argument {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-    .analysis {
-        flex: 1;
-        padding: 20px 8%;
-        width: 0;
-        overflow: auto;
-        position: relative;
-
-        .argument {
+        .el-dropdown-link {
+            cursor: pointer;
+            color: var(--el-color-primary);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-
-            .el-dropdown-link {
-                cursor: pointer;
-                color: var(--el-color-primary);
-                display: flex;
-                align-items: center;
-            }
         }
+    }
 
-        .control-btn {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translate(-50%);
-        }
+    .control-btn {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translate(-50%);
     }
 }
 </style>

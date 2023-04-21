@@ -4,7 +4,7 @@
             <Expand v-if="unfold" />
             <Fold v-else />
         </el-icon>
-        <div class="right-contant" v-if="unfold">
+        <div class="right-contant" v-show="unfold">
             <el-steps direction="vertical" :active="activeStep" class="steps">
                 <el-step :class="activeStep === 1 ? 'active-step' : 'step'">
                     <template #title>
@@ -13,26 +13,16 @@
                 </el-step>
                 <el-step :class="activeStep === 2 ? 'active-step' : 'step'">
                     <template #title>
-                        <el-collapse model-value="1" class="collapse">
+                        <el-collapse :model-value=activeName class="collapse">
                             <el-collapse-item title="分析算法选择" name="1">
-                                <div v-for="item in analysisItems" :key="item.text">
+                                <LL1 v-if="router.currentRoute.value.path !== '/'" />
+                                <div v-else v-for="item in analysisItems" :key="item.text">
                                     <span class="jump" @click="jump(item)">{{ item.text }}</span>
                                 </div>
                             </el-collapse-item>
                         </el-collapse>
                     </template></el-step>
             </el-steps>
-            <div v-if="type === 'grammar'">
-                <div class="title">
-                    <span class="support-grammers-title">文法</span>
-                    <el-icon class="icon" @click="goBack">
-                        <Edit />
-                    </el-icon>
-                </div>
-                <ul class="support-grammers-list">
-                    <li v-for="item in grammar" :key="item">{{ item }}</li>
-                </ul>
-            </div>
             <div v-if="showArgument">
                 <div class="argument-title">增广文法</div>
                 <div class="argument-statement">假定文法G是一个以S为开始符号的文法，构造一个新的文法G‘,称G'是G的增广文法，G'定义如下：</div>
@@ -47,11 +37,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import InputGrammar from '@/components/Right/InputGrammar.vue';
-import { mode, analysisItems, LRRoute } from '@/dataList.js';
+import LL1 from '@/components/Right/LL1.vue';
+import { mode, analysisItems } from '@/dataList.js';
+import lucy from "lucy-compiler";
 import { ElMessage } from 'element-plus';
 const store = useStore();
 const router = useRouter();
@@ -61,16 +53,13 @@ const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
 })
 
-const activeStep = ref(1);
+// const activeStep = ref(1);
 
-const props = defineProps({
-    mode: {
-        type: String,
-    },
-    showArgument: {
-        type: Boolean,
-    }
+const activeStep = computed(() => {
+    return store.getters["grammarStore/getStep"];
 })
+
+const activeName = ref('1');
 
 const toggleFold = () => {
     unfold.value = !unfold.value;
@@ -80,25 +69,32 @@ const goBack = () => {
     router.push({ path: '/', query: { step: 1 } })
 }
 
-// TODO
+const isModify = ref(true);
+
+const nonTerminal = computed(() => {
+    return store.getters["grammarStore/getNonTerminal"];
+})
+
+const terminal = computed(() => {
+    return store.state.grammarStore.terminal;
+})
+
 const jump = (item) => {
     const { route, params, key } = item;
     if (!route) {
         return;
     }
-    if (step.value < 2) {
+    if (activeStep.value < 2) {
         ElMessage({
             message: '请先输入文法',
             type: 'warning',
         });
-        // inputRef.value?.textarea?.focus();
         return;
     }
     const lR = store.getters["grammarStore/getLRParser"];
     const ll1 = store.getters["grammarStore/getLL1Parser"];
     if (key === 'LL1' && (isModify.value || !ll1)) {
-        const terminal = store.state.grammarStore.terminal;
-        const ll1Parser = new lucy.LL1Parser(terminal, nonTerminal.value, grammar.value);
+        const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
         const firstSet = ll1Parser.getFirstSet();
         const followSet = ll1Parser.getFollowSet(firstSet);
         // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
@@ -109,9 +105,25 @@ const jump = (item) => {
         const lRParser = new lucy.LRParser();
         store.commit("grammarStore/updateLRParser", lRParser);
     }
-    router.push({ path: key === 'LR0' ? LREnterRoute.value : route, query: params });
+    router.push({ path: route, query: params });
+    isModify.value = false;
 }
 
+watch(() => activeStep, (newValue) => {
+    if (newValue.value === 2) {
+        activeName.value = "1";
+    }
+}, {
+    immediate: true,
+    deep: true
+})
+
+watch([() => nonTerminal.value, terminal, grammar], () => {
+    isModify.value = true;
+}, {
+    deep: true
+}
+);
 </script>
 
 <style scoped lang="less">
@@ -119,10 +131,12 @@ const jump = (item) => {
     background-color: #fff;
     position: relative;
     // border-left: 1px solid rgb(219, 219, 219);
+    // box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 
     .fold-icon {
         position: absolute;
-        right: 20px;
+        right: 25px;
         top: 18px;
         font-size: 18px;
         cursor: pointer;
@@ -131,8 +145,8 @@ const jump = (item) => {
 
     .right-contant {
         height: 100%;
-        width: 400px;
-        padding: 15px;
+        width: 420px;
+        padding: 15px 20px;
         overflow: auto;
 
         .steps {
@@ -158,9 +172,15 @@ const jump = (item) => {
                 }
             }
 
+            :global(.el-step) {
+                min-height: 60px;
+                // padding-bottom: 10px;
+            }
+
             :global(.el-step__description) {
                 overflow: auto;
                 max-height: 95%;
+                padding-bottom: 10px;
             }
 
             :global(.el-step__description.is-finish) {

@@ -1,31 +1,21 @@
 <template>
-    <div class="judge-container">
-        <div class="judge">
-            <CustomHeader :step=1 type="LL1" />
-            <div class="rules">
-                <div>
-                    LL(1)文法规则
-                </div>
-                <div>
-                    1、对于每一个产生式 A → α1|α2|…|αn, FIRST(αi) ∩ FIRST(αj) = Φ, 对于所有的 i 和 j, 有1≤i, j ≤ n, i≠j
-                </div>
-                <div>
-                    2、对于每一个非终结符 A , 如果 FIRST(A) 包含 ε, FIRST(A) ∩ FOLLOW(A) = Φ
-                </div>
-            </div>
-            <div class="conclusion">
-                该文法{{ isLL1?'': '不' }}是LL1文法
-            </div>
-            <FormatTips v-if="showHandleVisible" :needHandle="needHandle" @saveGrammar="saveGrammar" />
+    <div class="judge">
+        <!-- <CustomHeader :step=1 type="LL1" /> -->
+        <InputGrammar />
+        <div class="conclusion">
+            <el-icon v-if="!isLL1">
+                <Warning />
+            </el-icon>
+            该文法{{ isLL1?'': '不' }}是LL1文法
         </div>
-        <!-- <RightTips type="grammar" /> -->
+        <FormatTips v-if="showHandleVisible" :needHandle="needHandle" @saveGrammar="saveGrammar" />
     </div>
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
 import FormatTips from '@/components/FormatTip.vue';
-import CustomHeader from '@/components/Header.vue';
+import InputGrammar from '@/components/InputGrammar.vue';
+// import CustomHeader from '@/components/Header.vue';
 import { computed, onMounted, ref } from 'vue';
 import lucy from "lucy-compiler";
 import { ArrowLeft } from '@element-plus/icons-vue';
@@ -91,6 +81,7 @@ const saveGrammar = (garmmar) => {
         const { nonTerminals, terminals } = lucy.getTockFromSimpleGrammers(garmmar);
         store.commit("grammarStore/updateNonTerminal", nonTerminals);
         store.commit("grammarStore/updateTerminal", terminals);
+        store.commit("grammarStore/updateInitialGrammar", grammars.value);
         store.commit("grammarStore/updateGrammar", garmmar);
         const ll1Parser = new lucy.LL1Parser(terminals, nonTerminals, garmmar);
         const firstSet = ll1Parser.getFirstSet();
@@ -117,32 +108,22 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-.judge-container {
+.judge {
     display: flex;
-    gap: 10px;
-    height: 100%;
+    flex-direction: column;
+    gap: 20px;
 
-    .judge {
-        flex: 1;
-        padding: 20px 8%;
-        width: 0;
+    .conclusion {
+        font-weight: 600;
         display: flex;
-        flex-direction: column;
-        gap: 20px;
-        overflow: auto;
+        align-items: center;
+        gap: 10px;
 
-        .rules {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .conclusion {
-            font-weight: 600;
+        i,
+        svg {
+            width: 20px;
+            height: 20px;
+            color: red;
         }
     }
 }

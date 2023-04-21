@@ -52,16 +52,16 @@ export const mode = [{
 ]
 
 export const LLRoute = [
-    {
-        text: "文法定义",
-        route: '/',
-    },
+    // {
+    //     text: "文法定义",
+    //     route: '/',
+    // },
     {
         text: "LL(1)文法判定",
         route: '/LL1Grammar',
     },
     {
-        text: "LL(1)分析表构造",
+        text: "LL(1)分析表构建",
         route: '/LL1Table',
     },
     {
@@ -71,10 +71,10 @@ export const LLRoute = [
 ]
 
 export const LRRoute = [
-    {
-        text: "文法定义",
-        route: '/',
-    },
+    // {
+    //     text: "文法定义",
+    //     route: '/',
+    // },
     {
         text: "LR(0)自动机构造",
         route: '/Automaton',
@@ -95,11 +95,11 @@ export const analysisItems = [
     {
         key: 'LL1',
         text: "LL(1)分析",
-        route: LLRoute[1].route,
+        route: LLRoute[0].route,
     },
     {
         key: 'LR0',
         text: "LR(0)分析",
-        route: LRRoute[1].route,
+        route: LRRoute[0].route,
     },
 ]

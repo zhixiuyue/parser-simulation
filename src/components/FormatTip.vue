@@ -6,6 +6,9 @@
                 size="large" />
         </el-checkbox-group>
         <div class="handle">
+            <div class="btn-container">
+                <el-button type="primary" @click="handleGrammar">确定</el-button>
+            </div>
             <el-popover placement="top" :width="250" trigger="hover">
                 <ul class="support-grammers-list">
                     <li v-for="item in showPreview()" :key="item">{{ item }}</li>
@@ -14,9 +17,6 @@
                     <span class="preview">预览处理结果</span>
                 </template>
             </el-popover>
-            <div class="btn-container">
-                <el-button type="primary" @click="handleGrammar">确定</el-button>
-            </div>
         </div>
     </div>
 </template>
@@ -130,10 +130,9 @@ onMounted(() => {
 
 .handle {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    gap: 20px;
     margin-top: 20px;
-    width: fit-content;
+    align-items: center;
 
     .preview {
         text-decoration: underline;
