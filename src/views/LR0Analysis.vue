@@ -1,13 +1,12 @@
 <template>
     <div class="analysis">
         <!-- <CustomHeader :step=3 type="LR0" /> -->
-        <div class="content">
+        <LR0Table />
+        <div class="content" ref="analysisRef">
             <div class="input-string">
-                <span>输入串：{{ parserString }}</span>
-                <!-- <span>首个非终结符：{{ nonTerminal }}</span> -->
-                <el-icon class="icon" @click="modifyInput">
-                    <Edit />
-                </el-icon>
+                <div class="first">LR(0)预测分析
+                    <span class="parser-string">{{ parserString }}</span>
+                </div>
             </div>
             <div v-if="!parserData.length">字符串规约失败</div>
             <el-table v-else :data="parserData" stripe style="width: 100%" border class="table">
@@ -19,15 +18,15 @@
             </el-table>
         </div>
     </div>
-    <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
-        :notShowNonTer=notShowNonTer @onClose="onClose" />
+    <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
+        :notShowNonTer=notShowNonTer @onClose="onClose" /> -->
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
 // import CustomHeader from '@/components/Header.vue';
+import LR0Table from "@/views/LR0Table.vue";
 import InputString from '../components/InputString.vue';
-import { ref, computed, watch, reactive, onMounted } from 'vue';
+import { ref, computed, watch, reactive, onMounted, nextTick } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -40,6 +39,8 @@ const type = computed(() => {
 })
 
 const passData = reactive({});
+
+const analysisRef = ref(null);
 
 const nonTerminal = computed(() => {
     // return store.getters["grammarStore/getLRStartNonTerminal"];
@@ -99,12 +100,21 @@ const modifyInput = () => {
     passData['value'] = nonTerminal;
 }
 
-watch(() => parserString, (newValue) => {
-    if (!newValue.value) {
-        showDialog.value = true;
-    }
+// watch(() => parserString, (newValue) => {
+//     if (!newValue.value) {
+//         showDialog.value = true;
+//     }
+// }, {
+//     immediate: true,
+//     deep: true
+// })
+
+watch(() => parserData, (newValue) => {
+    nextTick(() => {
+        analysisRef.value?.scrollIntoView({ behavior: "smooth" });
+    })
 }, {
-    immediate: true,
+    // immediate: true,
     deep: true
 })
 
@@ -114,7 +124,7 @@ watch(() => parserString, (newValue) => {
 .analysis {
 
     .content {
-        padding: 10px 20px;
+        padding: 10px 0;
 
         .input-string {
             display: flex;
@@ -126,6 +136,17 @@ watch(() => parserString, (newValue) => {
 
                 &:hover {
                     color: #409eff;
+                }
+            }
+
+            .first {
+                font-weight: 600;
+                margin-top: 10px;
+
+                .parser-string {
+                    margin-left: 20px;
+                    color: red;
+                    font-weight: 400;
                 }
             }
         }

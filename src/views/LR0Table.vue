@@ -26,11 +26,11 @@
                 </el-table-column>
             </el-table-column>
         </el-table>
-        <el-drawer v-model="drawer" title="LR(0)自动机" direction="ltr" size="33%">
+        <el-drawer v-model="drawer" title="LR(0)DFA" direction="ltr" size="33%">
             <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
         </el-drawer>
         <el-button class="open-dfa" @click="openDrawer">
-            查看自动机
+            查看DFA
         </el-button>
     </div>
     <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
@@ -38,7 +38,6 @@
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
 // import CustomHeader from '@/components/Header.vue';
 import InputString from '../components/InputString.vue';
 import D3Graph from '@/components/D3Graph.vue';

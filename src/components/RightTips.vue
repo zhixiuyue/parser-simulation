@@ -15,7 +15,8 @@
                     <template #title>
                         <el-collapse :model-value=activeName class="collapse">
                             <el-collapse-item title="分析算法选择" name="1">
-                                <LL1 v-if="router.currentRoute.value.path !== '/'" />
+                                <LL1 v-if="router.currentRoute.value.path.split('/')[1] === 'LL1'" />
+                                <LR0 v-else-if="router.currentRoute.value.path.split('/')[1] === 'LR0'" />
                                 <div v-else v-for="item in analysisItems" :key="item.text">
                                     <span class="jump" @click="jump(item)">{{ item.text }}</span>
                                 </div>
@@ -23,15 +24,6 @@
                         </el-collapse>
                     </template></el-step>
             </el-steps>
-            <div v-if="showArgument">
-                <div class="argument-title">增广文法</div>
-                <div class="argument-statement">假定文法G是一个以S为开始符号的文法，构造一个新的文法G‘,称G'是G的增广文法，G'定义如下：</div>
-                <ul class="argument-ul">
-                    <li>只增加一个新的非终结符S’(G‘的开始符号)；</li>
-                    <li>增加一个新的产生式S’->S；</li>
-                    <li>增广文法会有一个仅含项目S'->S·的状态，这是唯一的接受态；</li>
-                </ul>
-            </div>
         </div>
     </div>
 </template>
@@ -42,6 +34,7 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import InputGrammar from '@/components/Right/InputGrammar.vue';
 import LL1 from '@/components/Right/LL1.vue';
+import LR0 from '@/components/Right/LR0.vue';
 import { mode, analysisItems } from '@/dataList.js';
 import lucy from "lucy-compiler";
 import { ElMessage } from 'element-plus';

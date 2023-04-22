@@ -1,14 +1,15 @@
 <template>
   <div class="analysis">
     <!-- <CustomHeader :step="3" type="LL1" /> -->
-    <InputGrammar />
+    <LL1Table />
     <div class="content">
       <div class="input-string">
-        <span>输入串：{{ parserString }}</span>
-        <!-- <span>首个非终结符：{{ nonTerminal }}</span> -->
-        <el-icon class="icon" @click="modifyInput">
+        <div class="first">LL(1)预测分析
+          <span class="parser-string">{{ parserString }}</span>
+        </div>
+        <!-- <el-icon class="icon" @click="modifyInput">
           <Edit />
-        </el-icon>
+        </el-icon> -->
       </div>
       <el-table :data="parserData" stripe style="width: 100%" border class="table">
         <el-table-column prop="Step" label="Step" align="center" />
@@ -16,7 +17,7 @@
         <el-table-column prop="Input" label="Input" align="center" />
         <el-table-column prop="Action" label="Action" align="center" />
       </el-table>
-      <el-table :data="tableData" max-height="600" border class="table-data">
+      <!-- <el-table :data="tableData" max-height="600" border class="table-data">
         <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
         </el-table-column>
         <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
@@ -28,19 +29,19 @@
             </ul>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
     </div>
     <h3>Ast Explore</h3>
     <div id="astNodeContainer"></div>
   </div>
-  <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
-    @onClose="onClose" />
+  <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
+    @onClose="onClose" /> -->
 </template>
 
 <script setup>
 // import CustomHeader from "@/components/Header.vue";
-import InputGrammar from '@/components/InputGrammar.vue';
-import InputString from "../components/InputString.vue";
+import InputString from "@/components/InputString.vue";
+import LL1Table from "@/views/LL1Table.vue";
 import { ref, computed, watch, reactive, onMounted } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
@@ -152,11 +153,11 @@ const onClose = () => {
   }
 };
 
-const modifyInput = () => {
-  showDialog.value = true;
-  passData["inputString"] = parserString;
-  passData["value"] = nonTerminal;
-};
+// const modifyInput = () => {
+//   showDialog.value = true;
+//   passData["inputString"] = parserString;
+//   passData["value"] = nonTerminal;
+// };
 
 watch(
   [() => parserString.value, nonTerminal],
@@ -177,7 +178,7 @@ watch(
 <style scoped lang="less">
 .analysis {
   .content {
-    padding: 10px 20px;
+    padding: 10px 0;
 
     .input-string {
       display: flex;
@@ -189,6 +190,17 @@ watch(
 
         &:hover {
           color: #409eff;
+        }
+      }
+
+      .first {
+        font-weight: 600;
+        margin-top: 10px;
+
+        .parser-string {
+          margin-left: 20px;
+          color: red;
+          font-weight: 400;
         }
       }
     }

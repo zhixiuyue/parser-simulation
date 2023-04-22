@@ -1,20 +1,18 @@
 <template>
     <div class="judge">
         <!-- <CustomHeader :step=1 type="LL1" /> -->
-        <InputGrammar />
-        <div class="conclusion">
+        <div class="conclusion" v-show="showJudge">
             <el-icon v-if="!isLL1">
                 <Warning />
             </el-icon>
             该文法{{ isLL1?'': '不' }}是LL1文法
         </div>
-        <FormatTips v-if="showHandleVisible" :needHandle="needHandle" @saveGrammar="saveGrammar" />
+        <FormatTips v-if="showJudge && showHandleVisible" :needHandle="needHandle" @saveGrammar="saveGrammar" />
     </div>
 </template>
 
 <script setup>
 import FormatTips from '@/components/FormatTip.vue';
-import InputGrammar from '@/components/InputGrammar.vue';
 // import CustomHeader from '@/components/Header.vue';
 import { computed, onMounted, ref } from 'vue';
 import lucy from "lucy-compiler";
@@ -27,6 +25,7 @@ const store = useStore();
 
 const isLL1 = ref(true);
 const needHandle = ref([]);
+const showJudge = ref(true);
 
 const showHandleVisible = ref(false);
 
@@ -90,6 +89,7 @@ const saveGrammar = (garmmar) => {
         store.commit("grammarStore/updateLL1Parser", ll1Parser);
         store.commit("grammarStore/updateFirstSet", firstSet);
         store.commit("grammarStore/updateFollowSet", followSet);
+        showJudge.value = false;
     } catch (error) {
         ElMessage({
             message: '操作失败',

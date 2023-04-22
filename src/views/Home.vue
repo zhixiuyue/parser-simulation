@@ -7,9 +7,10 @@
       <el-container class="content-container">
         <el-main>
           <div class="content">
+            <InputGrammar />
             <router-view></router-view>
           </div>
-          <RightTips type="examples" :mode="radioMode" />
+          <RightTips />
         </el-main>
         <!-- <el-main><router-view :key="$route.fullPath"></router-view></el-main> -->
       </el-container>
@@ -19,6 +20,7 @@
 
 <script setup>
 import RightTips from '@/components/RightTips.vue';
+import InputGrammar from '@/components/InputGrammar.vue';
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -33,14 +35,17 @@ import RightTips from '@/components/RightTips.vue';
 
 .el-header,
 .el-footer {
-  background-color: #B3C0D1;
-  color: #333;
+  // background-color: #B3C0D1;
+  color: #18191C;
 }
 
 .el-header {
   height: 60px;
   display: flex;
   align-items: center;
+  // box-shadow: 0 2px 4px #00000014;
+  border-bottom: 1px solid #dcdfe6;
+  padding: 0 8%;
 
   .title {
     font-size: 22px;

@@ -1,7 +1,13 @@
 <template>
     <div class="table" @click="showData">
         <!-- <CustomHeader :step=2 type="LL1" /> -->
-        <InputGrammar />
+        <div class="first">First Set & Follow Set</div>
+        <el-table :data="fistData" stripe style="width: 100%" border>
+            <el-table-column prop="nonTerminal" label="" align="center" width="150" />
+            <el-table-column prop="FIRST" label="FIRST" align="center" />
+            <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
+        </el-table>
+        <div class="first">LL(1)分析表</div>
         <el-table :data="tableData" max-height="600" border class="table-data">
             <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
             </el-table-column>
@@ -15,18 +21,11 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class="first">FIRST&FOLLOW</div>
-        <el-table :data="fistData" stripe style="width: 100%" border>
-            <el-table-column prop="nonTerminal" label="" align="center" width="150" />
-            <el-table-column prop="FIRST" label="FIRST" align="center" />
-            <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
-        </el-table>
     </div>
 </template>
 
 <script setup>
 // import CustomHeader from '@/components/Header.vue';
-import InputGrammar from '@/components/InputGrammar.vue';
 import { computed } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';

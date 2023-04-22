@@ -97,7 +97,6 @@ const Ter = reactive({
     inputValue: '',
     inputVisible: false,
 })
-const isModify = ref(false);
 
 const activeName = ref('1');
 
@@ -193,7 +192,7 @@ const saveGrammar = (garmmar) => {
     }
     store.commit("grammarStore/updateGrammar", garmmar);
     store.commit("grammarStore/updateCustomMode", openCustomMode);
-    isModify.value = true;
+    store.commit("grammarStore/updateInitialGrammar", []);
 }
 
 const handleGrammar = () => {

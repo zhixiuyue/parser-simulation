@@ -31,7 +31,6 @@
             {{ dotIndex }} / {{ graph.length }}
         </div>
     </div>
-    <!-- <RightTips type="grammar" :showArgument="true" /> -->
     <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
 </template>
@@ -221,6 +220,7 @@ watch([() => graph.value, selectedItem], ([graphs, item], [preGraph, preItem]) =
 <style scoped lang="less">
 .analysis {
     position: relative;
+    height: 100%;
 
     .argument {
         display: flex;

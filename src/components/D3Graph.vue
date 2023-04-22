@@ -26,12 +26,16 @@ const props = defineProps({
 const dotIndexForGraph = ref(props.dotIndex || 1);
 const graphviz = ref();
 
+
+//  for(let tmp of IRParser.generateStateProgressive(grammers,"E",nonTerminals,terminals)) {
+// render IRParser.stateGraph
+
 const render = (selectedItem, graphs) => {
     const graph = graphs?.length ? graphs : props.graph;
     if (graph.length) {
         function renderData(type) {
             const arr = type === 2 ? graph : graph.slice(0, dotIndexForGraph.value);
-            const disGraph = `digraph  { graph [rankdir = ${props.defaultDirection ? "TB" : "LR"} splines = ortho bgcolor = "#E9EEF3"] node [ shape="box" style="rounded,filled" 
+            const disGraph = `digraph  { graph [rankdir = ${props.defaultDirection ? "TB" : "LR"} splines = ortho bgcolor = "#FFFFFF"] node [ shape="box" style="rounded,filled" 
                  fontsize = 14 margin=0.2 ]
                 ${arr.join('')} }`;
             graphviz.value?.renderDot(disGraph)
@@ -68,6 +72,6 @@ defineExpose({
 #graph {
     width: 100%;
     height: 89%;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 </style>

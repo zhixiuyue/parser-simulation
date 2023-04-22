@@ -6,19 +6,30 @@
                 <Edit />
             </el-icon>
         </div>
-        <div class="wrapper" :class="{ 'wrapper-simple': !isCustomMode }">
-            <span class="input-title-none" v-if="isCustomMode">非终结符</span>
-            <div class="input-none" v-if="isCustomMode">
-                <span v-for="item in nonTerminal" :key="item">{{ item }}</span>
+        <div class="grammar">
+            <div class="wrapper" :class="{ 'wrapper-simple': !isCustomMode }">
+                <span class="input-title-none" v-if="isCustomMode">非终结符</span>
+                <div class="input-none" v-if="isCustomMode">
+                    <span v-for="item in nonTerminal" :key="item">{{ item }}</span>
+                </div>
+                <span class="input-title-ter" v-if="isCustomMode">终结符</span>
+                <div class="input-ter" v-if="isCustomMode">
+                    <span v-for="item in terminal" :key="item">{{ item }}</span>
+                </div>
+                <ol v-if="grammar.length" class="input-area" style="margin-left: 17px;">
+                    <li v-for="item in (showInitail ? initialGrammar : grammar)" :key="item" class="grammar-li">{{
+                        item
+                    }}
+                    </li>
+                </ol>
+                <div v-else>请输入文法</div>
             </div>
-            <span class="input-title-ter" v-if="isCustomMode">终结符</span>
-            <div class="input-ter" v-if="isCustomMode">
-                <span v-for="item in terminal" :key="item">{{ item }}</span>
-            </div>
-            <ol v-if="grammar.length" class="input-area" style="margin-left: 17px;">
-                <li v-for="item in grammar" :key="item" class="grammar-li">{{ item }}</li>
-            </ol>
-            <div v-else>请输入文法</div>
+            <el-tooltip class="box-item" effect="dark" :content="showInitail ? '查看改写文法' : '查看原始文法'" placement="top"
+                v-if="initialGrammar.length">
+                <el-icon class="initial" @click="transfer">
+                    <RefreshRight />
+                </el-icon>
+            </el-tooltip>
         </div>
         <!-- <RightTips type="examples" :mode="radioMode" /> -->
     </div>
@@ -34,6 +45,16 @@ const store = useStore();
 const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
 })
+
+const initialGrammar = computed(() => {
+    return store.getters["grammarStore/getInitialGrammar"];
+})
+
+const showInitail = ref(false);
+
+const transfer = () => {
+    showInitail.value = !showInitail.value;
+}
 
 const nonTerminal = computed(() => {
     return store.getters["grammarStore/getNonTerminal"];
@@ -59,6 +80,7 @@ const goBack = () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-bottom: 20px;
 
     .title {
         display: flex;
@@ -72,6 +94,19 @@ const goBack = () => {
 
     .input-title {
         font-size: 18px;
+        font-weight: 600;
+    }
+
+    .grammar {
+        position: relative;
+
+
+        .initial {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
     }
 
     .wrapper {
@@ -82,6 +117,9 @@ const goBack = () => {
             "input-title-none input-none"
             "input-title-ter input-ter"
             ". input-area";
+        padding: 10px 15px 20px;
+        border: 1px solid rgba(0, 0, 0, 0.16);
+        border-radius: 5px;
 
         .input-title {
             grid-area: input-title;

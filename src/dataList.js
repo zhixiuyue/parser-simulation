@@ -58,15 +58,15 @@ export const LLRoute = [
     // },
     {
         text: "LL(1)文法判定",
-        route: '/LL1Grammar',
+        route: '/LL1/LL1Grammar',
     },
     {
         text: "LL(1)分析表构建",
-        route: '/LL1Table',
+        route: '/LL1/LL1Table',
     },
     {
         text: "LL(1)预测分析",
-        route: '/LL1Analysis',
+        route: '/LL1/LL1Analysis',
     }
 ]
 
@@ -76,17 +76,17 @@ export const LRRoute = [
     //     route: '/',
     // },
     {
-        text: "LR(0)自动机构造",
-        route: '/Automaton',
+        text: "LR(0)DFA构建",
+        route: '/LR0/Automaton',
     },
     {
-        text: "LR(0)分析表构造",
-        route: '/LR0Table',
+        text: "LR(0)分析表构建",
+        route: '/LR0/LR0Table',
         params: { type: 'LR0' }
     },
     {
         text: "LR(0)模拟分析",
-        route: '/LR0Analysis',
+        route: '/LR0/LR0Analysis',
         params: { type: 'LR0' }
     }
 ]
