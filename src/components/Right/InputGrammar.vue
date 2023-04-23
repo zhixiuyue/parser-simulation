@@ -97,6 +97,7 @@ const Ter = reactive({
     inputValue: '',
     inputVisible: false,
 })
+const inputRef = ref(null);
 
 const activeName = ref('1');
 

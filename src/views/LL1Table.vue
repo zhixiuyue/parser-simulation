@@ -14,8 +14,22 @@
             <el-table-column prop="FIRST" label="FIRST" align="center" />
             <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
         </el-table>
-        <div class="first">LL(1)分析表</div>
-        <el-table :data="tableData" max-height="600" border class="table-data">
+        <div class="first">LL(1)分析表
+            <el-tooltip class="box-item" effect="dark" content="播放" placement="top">
+                <el-icon @click="tablePlay">
+                    <VideoPlay />
+                </el-icon>
+            </el-tooltip>
+        </div>
+        <div v-if="rules.length" class="rules-container">
+            <span class="rules-title">规则:</span>
+            <ul class="rules">
+                <li v-for=" (item, index) in rules" :key="item" :class="{ 'high': selectedRuleIndex === index }">
+                    {{ item }}
+                </li>
+            </ul>
+        </div>
+        <el-table :data="tableData" max-height="600" border class="table-data" :cell-class-name="cellClassName">
             <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
             </el-table-column>
             <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
@@ -33,9 +47,10 @@
 
 <script setup>
 // import CustomHeader from '@/components/Header.vue';
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
+import _ from 'lodash';
 
 const store = useStore();
 
@@ -65,17 +80,14 @@ const followSet = computed(() => {
     return store.getters["grammarStore/getFollowSet"];
 });
 
-const tableData = computed(() => {
-    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
-    const predictTable = ll1Parser.getPredictTable(firstSet.value, followSet.value);
-    if (!predictTable.length) {
-        return [];
-    }
-    // TODO
-    for (let process of ll1Parser.getPredictTableProgressive(firstSet.value, followSet.value)) {
-        console.log(process);
-    }
-    const arr = predictTable.map((item) => {
+const tableData = ref([]);
+
+const ll1Parser = computed(() => {
+    return store.getters["grammarStore/getLL1Parser"];
+});
+
+const transferData = (table) => {
+    return table?.map((item) => {
         const { nonTerminal = '', terminal2Derivation = {} } = item;
         const resMap = new Map();
         terminal2Derivation.forEach((value, key) => {
@@ -91,7 +103,68 @@ const tableData = computed(() => {
             ...Object.fromEntries(resMap.entries()),
         }
     })
-    return arr;
+}
+
+const genTableData = () => {
+    const predictTable = ll1Parser.value.getPredictTable(firstSet.value, followSet.value);
+    if (!predictTable.length) {
+        return [];
+    }
+    tableData.value = transferData(predictTable);
+}
+
+onMounted(() => {
+    genTableData();
+})
+
+const rules = ref([]);
+
+const interval = ref();
+
+const judgeArrEqual = (a, b) => {
+    if (a?.length === b?.length && a.filter(t => !b.includes(t))) {
+        return true;
+    }
+    return false;
+}
+
+const diffArray = ref([]);
+const selectedRuleIndex = ref();
+
+const showArrayDiff = (a, b) => {
+    const diffArr = [];
+    for (let i = 0; i < a.length; i++) {
+        for (let val in a[i]) {
+            if ((Array.isArray(a[i][val]) && !judgeArrEqual(a[i][val], b[i][val])) || ((!Array.isArray(a[i][val]) && a[i][val] !== b[i][val]))) {
+                diffArr.push({
+                    [val]: a[i].nonTerminal,
+                });
+            }
+        }
+    }
+    return diffArr;
+}
+
+const tablePlay = () => {
+    clearInterval(interval.value);
+    const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
+    rules.value = genetator.next().value;
+    tableData.value = transferData(genetator.next().value?.result);
+    interval.value = setInterval(() => {
+        const data = genetator.next();
+        selectedRuleIndex.value = data.value?.ruleIndex
+        // console.log(data.value?.ruleIndex);
+        if (data.done) {
+            clearInterval(interval.value);
+        } else {
+            diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value)
+            tableData.value = transferData(data.value?.result);
+        }
+    }, 2000);
+}
+
+onUnmounted(() => {
+    clearInterval(interval.value);
 })
 
 const fistData = computed(() => {
@@ -114,6 +187,14 @@ const fistData = computed(() => {
     return arr;
 })
 
+const cellClassName = ({ row, column }) => {
+    for (let i = 0; i < diffArray.value.length; i++) {
+        if (column.rawColumnKey === Object.keys(diffArray.value[i])[0] && row.nonTerminal === Object.values(diffArray.value[i])[0]) {
+            return 'highlight';
+        }
+    }
+    return '';
+}
 </script>
 
 <style scoped lang="less">
@@ -122,9 +203,21 @@ const fistData = computed(() => {
     flex-direction: column;
     gap: 10px;
 
+    /deep/ .highlight {
+        background-color: #ddd;
+    }
+
+    .high {
+        background-color: #ddd;
+    }
+
     .table-data {
         background: none;
         // width: 100%;
+
+        td {
+            font-weight: 600;
+        }
 
         ul {
             padding: 0;
@@ -145,6 +238,22 @@ const fistData = computed(() => {
         svg {
             cursor: pointer;
         }
+    }
+
+    .rules-container {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+
+        .rules-title {
+            flex: 0 0 50px;
+            margin-top: 16px;
+        }
+    }
+
+    .rules {
+        list-style: none;
+        padding: 0;
     }
 }
 </style>

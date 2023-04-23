@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
 
@@ -68,10 +68,16 @@ const isCustomMode = computed(() => {
     return store.getters["grammarStore/getCustomMode"];
 })
 
-
 const goBack = () => {
     store.commit("grammarStore/updateStep", 1);
 }
+
+
+watch(() => grammar, (newValue) => {
+    showInitail.value = false;
+}, {
+    deep: true
+})
 
 </script>    
 
@@ -104,7 +110,7 @@ const goBack = () => {
         .initial {
             position: absolute;
             top: 10px;
-            right: 10px;
+            right: 0;
             cursor: pointer;
         }
     }
