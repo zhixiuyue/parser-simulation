@@ -8,10 +8,20 @@
             </el-tooltip>
         </div>
         <el-steps direction="vertical" :active="active" finish-status="success">
-            <el-step v-for="(item, index) in LLRoute" :key="item.text" :title="item.text" :icon="Finished"
-                class="el-step">
+            <el-step v-for="(item, index) in LLRoute" :key="item.text" :title="item.text" :icon="Finished">
+                <template #title>
+                    <div class="step-title">
+                        <span>{{ item.text }}</span>
+                        <el-tooltip v-if="index === 0" effect="dark" :content="ignoreGrammarJudge ? '展开此步骤' : '忽略此步骤'"
+                            placement="top">
+                            <el-icon @click="handleIgnore">
+                                <Remove />
+                            </el-icon>
+                        </el-tooltip>
+                    </div>
+                </template>
                 <template #description>
-                    <div v-if="index === 0">
+                    <div v-if="index === 0 && !ignoreGrammarJudge">
                         <div class="rules">
                             <span>LL(1)文法判断规则</span>
                             <span>
@@ -24,7 +34,14 @@
                         <el-button class="btn-save" type="primary" plain @click="jump(0)">自动判定</el-button>
                     </div>
                     <div v-if="index === 1">
-                        <div class="jump" @click="jump(1)">计算First Set和Follow Set</div>
+                        <div class="jump" @click="jump(1)">计算First Set和Follow Set
+                            <el-tooltip class="box-item" effect="dark" :content="ignoreSet ? '展开此步骤' : '忽略此步骤'"
+                                placement="top">
+                                <el-icon @click="handleIgnoreSet">
+                                    <Remove />
+                                </el-icon>
+                            </el-tooltip>
+                        </div>
                         <div class="jump" @click="jump(1)">LL(1)分析表构建</div>
                     </div>
                     <div v-if="index === 2">
@@ -49,6 +66,18 @@ const store = useStore();
 const active = ref(0);
 const router = useRouter();
 const inputString = ref('');
+const ignoreGrammarJudge = ref(false);
+const ignoreSet = ref(false);
+
+const handleIgnore = () => {
+    ignoreGrammarJudge.value = !ignoreGrammarJudge.value;
+}
+
+const handleIgnoreSet = (e) => {
+    e.stopPropagation();
+    ignoreSet.value = !ignoreSet.value;
+    store.commit("grammarStore/updateHideFirset", ignoreSet.value);
+}
 
 const jump = (index) => {
     active.value = index;
@@ -99,6 +128,16 @@ const toLR0 = () => {
         color: #000;
     }
 
+    .step-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        svg {
+            cursor: pointer;
+        }
+    }
+
     .rules {
         display: flex;
         flex-direction: column;
@@ -118,6 +157,10 @@ const toLR0 = () => {
         color: #409eff;
         font-weight: 400;
         font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: fit-content;
 
         &:hover {
             opacity: 0.8;

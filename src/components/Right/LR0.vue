@@ -8,8 +8,18 @@
             </el-tooltip>
         </div>
         <el-steps direction="vertical" :active="active" finish-status="success">
-            <el-step v-for="(item, index) in LRRoute" :key="item.text" :title="item.text" :icon="Finished"
-                class="el-step">
+            <el-step v-for="(item, index) in LRRoute" :key="item.text" :title="item.text" :icon="Finished">
+                <template #title>
+                    <div class="step-title">
+                        <span>{{ item.text }}</span>
+                        <el-tooltip v-if="index === 1" effect="dark" :content="ignoreLRTable ? '展开此步骤' : '忽略此步骤'"
+                            placement="top">
+                            <el-icon @click="handleIgnore">
+                                <Remove />
+                            </el-icon>
+                        </el-tooltip>
+                    </div>
+                </template>
                 <template #description>
                     <div v-if="index === 0">
                         <div class="rules">
@@ -23,7 +33,7 @@
                         </div>
                         <el-button class="btn-save" type="primary" plain @click="jump(0)">生成DFA</el-button>
                     </div>
-                    <div v-if="index === 1">
+                    <div v-if="index === 1 && !ignoreLRTable">
                         <div class="jump" @click="jump(1)">LR(0)分析表构建</div>
                     </div>
                     <div v-if="index === 2">
@@ -48,6 +58,11 @@ const store = useStore();
 const active = ref(0);
 const router = useRouter();
 const inputString = ref('');
+const ignoreLRTable = ref('');
+
+const handleIgnore = () => {
+    ignoreLRTable.value = !ignoreLRTable.value;
+}
 
 const jump = (index) => {
     active.value = index;
@@ -103,6 +118,17 @@ const toLL1 = () => {
             cursor: pointer;
         }
     }
+
+    .step-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        svg {
+            cursor: pointer;
+        }
+    }
+
 
     .step-icon {
         :global(.el-step__icon svg) {

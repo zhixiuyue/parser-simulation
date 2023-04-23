@@ -12,6 +12,7 @@ const LL1State = {
     ll1Parser: "",
     firstSet: [],
     followSet: [],
+    hideFirset: false,
 }
 
 const LRState = {
@@ -86,6 +87,9 @@ const getters = {
     },
     getStep: (state) => {
         return state.step;
+    },
+    getHideFirset: (state) => {
+        return state.hideFirset;
     }
 }
 
@@ -152,6 +156,9 @@ const mutations = {
     },
     updateStep: (state, value) => {
         state.step = value;
+    },
+    updateHideFirset: (state, value) => {
+        state.hideFirset = value;
     }
 }
 

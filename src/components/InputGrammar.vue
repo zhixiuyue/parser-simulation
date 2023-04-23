@@ -16,7 +16,7 @@
                 <div class="input-ter" v-if="isCustomMode">
                     <span v-for="item in terminal" :key="item">{{ item }}</span>
                 </div>
-                <ol v-if="grammar.length" class="input-area" style="margin-left: 17px;">
+                <ol v-if="grammar.length" class="input-area">
                     <li v-for="item in (showInitail ? initialGrammar : grammar)" :key="item" class="grammar-li">{{
                         item
                     }}
@@ -93,7 +93,7 @@ const goBack = () => {
     }
 
     .input-title {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
     }
 
@@ -118,8 +118,6 @@ const goBack = () => {
             "input-title-ter input-ter"
             ". input-area";
         padding: 10px 15px 20px;
-        border: 1px solid rgba(0, 0, 0, 0.16);
-        border-radius: 5px;
 
         .input-title {
             grid-area: input-title;
@@ -127,8 +125,13 @@ const goBack = () => {
 
         .input-area {
             grid-area: input-area;
-            padding: 0;
+            padding: 10px 10px 10px 40px;
             margin: 0;
+            border: 1px solid #dedfe6;
+            border-radius: 5px;
+            color: #a8abb2;
+            min-height: 100px;
+            max-width: 500px;
         }
 
         .grammar-li {

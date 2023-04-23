@@ -1,6 +1,7 @@
 <template>
     <div class="table" @click="test">
         <!-- <CustomHeader :step=2 type="LR0" /> -->
+        <h4 class="title">LR(0)分析表</h4>
         <el-table :data="tableData" class="table-data" stripe>
             <el-table-column prop="State" label="STATE" align="center" />
             <el-table-column label="ACTION" align="center">
@@ -153,6 +154,10 @@ const passData = reactive({});
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    .title {
+        margin: 10px 0;
+    }
 
     .table-data {
 

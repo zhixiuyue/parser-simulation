@@ -1,8 +1,15 @@
 <template>
     <div class="table" @click="showData">
         <!-- <CustomHeader :step=2 type="LL1" /> -->
-        <div class="first">First Set & Follow Set</div>
-        <el-table :data="fistData" stripe style="width: 100%" border>
+        <div class="first" v-if="!getHideFirset">First Set & Follow Set
+            <el-tooltip class="box-item" effect="dark" :content="hideSet ? '显示' : '隐藏'" placement="top">
+                <el-icon @click="handleSetDisplay">
+                    <View v-if="hideSet" />
+                    <Hide v-else />
+                </el-icon>
+            </el-tooltip>
+        </div>
+        <el-table :data="fistData" stripe style="width: 100%" border v-show="!hideSet && !getHideFirset">
             <el-table-column prop="nonTerminal" label="" align="center" width="150" />
             <el-table-column prop="FIRST" label="FIRST" align="center" />
             <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
@@ -26,11 +33,21 @@
 
 <script setup>
 // import CustomHeader from '@/components/Header.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
+
+const hideSet = ref(false);
+
+const handleSetDisplay = () => {
+    hideSet.value = !hideSet.value;
+}
+
+const getHideFirset = computed(() => {
+    return store.getters["grammarStore/getHideFirset"];
+})
 
 const nonTerminal = computed(() => {
     return store.getters["grammarStore/getNonTerminal"];
@@ -53,6 +70,10 @@ const tableData = computed(() => {
     const predictTable = ll1Parser.getPredictTable(firstSet.value, followSet.value);
     if (!predictTable.length) {
         return [];
+    }
+    // TODO
+    for (let process of ll1Parser.getPredictTableProgressive(firstSet.value, followSet.value)) {
+        console.log(process);
     }
     const arr = predictTable.map((item) => {
         const { nonTerminal = '', terminal2Derivation = {} } = item;
@@ -117,6 +138,13 @@ const fistData = computed(() => {
     .first {
         font-weight: 600;
         margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        svg {
+            cursor: pointer;
+        }
     }
 }
 </style>

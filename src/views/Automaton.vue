@@ -225,7 +225,8 @@ watch([() => graph.value, selectedItem], ([graphs, item], [preGraph, preItem]) =
     .argument {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        gap: 20px;
+        // justify-content: space-between;
 
         .el-dropdown-link {
             cursor: pointer;
