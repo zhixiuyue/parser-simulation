@@ -11,7 +11,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "@hpcc-js/wasm": "2.5.0",
-    "@widgetjs/tree": "^1.8.3",
+    "@widgetjs/tree": "1.8.3",
     "d3": "7.8.0",
     "d3-graphviz": "^5.0.2",
     "element-plus": "^2.2.35",

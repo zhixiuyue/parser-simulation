@@ -1,150 +1,182 @@
 <template>
-    <div class="table" @click="showData">
-        <!-- <CustomHeader :step=2 type="LL1" /> -->
-        <div class="first" v-if="!getHideFirset">First Set & Follow Set
-            <el-tooltip class="box-item" effect="dark" :content="hideSet ? '显示' : '隐藏'" placement="top">
-                <el-icon @click="handleSetDisplay">
-                    <View v-if="hideSet" />
-                    <Hide v-else />
-                </el-icon>
-            </el-tooltip>
-        </div>
-        <el-table :data="fistData" stripe style="width: 100%" border v-show="!hideSet && !getHideFirset">
-            <el-table-column prop="nonTerminal" label="" align="center" width="150" />
-            <el-table-column prop="FIRST" label="FIRST" align="center" />
-            <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
-        </el-table>
-        <div class="first">LL(1)分析表</div>
-        <el-table :data="tableData" max-height="600" border class="table-data">
-            <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
-            </el-table-column>
-            <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
-                <template #default="scope">
-                    <ul>
-                        <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                            {{ item }}
-                        </li>
-                    </ul>
-                </template>
-            </el-table-column>
-        </el-table>
+  <div class="table" @click="showData">
+    <!-- <CustomHeader :step=2 type="LL1" /> -->
+    <div class="first" v-if="!getHideFirset">
+      First Set & Follow Set
+      <el-tooltip
+        class="box-item"
+        effect="dark"
+        :content="hideSet ? '显示' : '隐藏'"
+        placement="top"
+      >
+        <el-icon @click="handleSetDisplay">
+          <View v-if="hideSet" />
+          <Hide v-else />
+        </el-icon>
+      </el-tooltip>
     </div>
+    <el-table
+      :data="fistData"
+      stripe
+      style="width: 100%"
+      border
+      v-show="!hideSet && !getHideFirset"
+    >
+      <el-table-column prop="nonTerminal" label="" align="center" width="150" />
+      <el-table-column prop="FIRST" label="FIRST" align="center" />
+      <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
+    </el-table>
+    <div class="first">LL(1)分析表</div>
+    <el-table :data="tableData" max-height="600" border class="table-data">
+      <el-table-column
+        fixed
+        prop="nonTerminal"
+        label=""
+        width="150"
+        align="center"
+      >
+      </el-table-column>
+      <el-table-column
+        v-for="item in terminal"
+        :key="item"
+        :prop="item"
+        :label="item"
+        align="center"
+      >
+        <template #default="scope">
+          <ul>
+            <li
+              v-for="item in scope.row[scope.column.rawColumnKey]"
+              :key="item"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script setup>
 // import CustomHeader from '@/components/Header.vue';
-import { computed, ref } from 'vue';
-import { ArrowLeft } from '@element-plus/icons-vue';
-import { useStore } from 'vuex';
+import { computed, ref } from "vue";
+import { ArrowLeft } from "@element-plus/icons-vue";
+import { useStore } from "vuex";
 
 const store = useStore();
 
 const hideSet = ref(false);
 
 const handleSetDisplay = () => {
-    hideSet.value = !hideSet.value;
-}
+  hideSet.value = !hideSet.value;
+};
 
 const getHideFirset = computed(() => {
-    return store.getters["grammarStore/getHideFirset"];
-})
+  return store.getters["grammarStore/getHideFirset"];
+});
 
 const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getNonTerminal"];
-})
+  return store.getters["grammarStore/getNonTerminal"];
+});
 
 const terminal = computed(() => {
-    return [...store.getters["grammarStore/getTerminal"], '$'];
-})
+  return [...store.getters["grammarStore/getTerminal"], "$"];
+});
 
 const firstSet = computed(() => {
-    return store.getters["grammarStore/getFirstSet"];
+  return store.getters["grammarStore/getFirstSet"];
 });
 
 const followSet = computed(() => {
-    return store.getters["grammarStore/getFollowSet"];
+  return store.getters["grammarStore/getFollowSet"];
 });
 
 const tableData = computed(() => {
-    const ll1Parser = store.getters["grammarStore/getLL1Parser"];
-    const predictTable = ll1Parser.getPredictTable(firstSet.value, followSet.value);
-    if (!predictTable.length) {
-        return [];
-    }
-    // TODO
-    for (let process of ll1Parser.getPredictTableProgressive(firstSet.value, followSet.value)) {
-        console.log(process);
-    }
-    const arr = predictTable.map((item) => {
-        const { nonTerminal = '', terminal2Derivation = {} } = item;
-        const resMap = new Map();
-        terminal2Derivation.forEach((value, key) => {
-            const { derivations = [], nonTerminal = '' } = value;
-            const newStrArr = derivations.map((val) => {
-                if (!val.length) return '';
-                return `${nonTerminal} => ${val.join(' ')}`;
-            })
-            resMap.set(key, newStrArr);
-        })
-        return {
-            nonTerminal,
-            ...Object.fromEntries(resMap.entries()),
-        }
-    })
-    return arr;
-})
+  const ll1Parser = store.getters["grammarStore/getLL1Parser"];
+  const predictTable = ll1Parser.getPredictTable(
+    firstSet.value,
+    followSet.value
+  );
+  if (!predictTable.length) {
+    return [];
+  }
+  // TODO
+  for (let process of ll1Parser.getPredictTableProgressive(
+    firstSet.value,
+    followSet.value
+  )) {
+    console.log(process);
+  }
+  const arr = predictTable.map((item) => {
+    const { nonTerminal = "", terminal2Derivation = {} } = item;
+    const resMap = new Map();
+    terminal2Derivation.forEach((value, key) => {
+      const { derivations = [], nonTerminal = "" } = value;
+      const newStrArr = derivations.map((val) => {
+        if (!val.length) return "";
+        return `${nonTerminal} => ${val.join(" ")}`;
+      });
+      resMap.set(key, newStrArr);
+    });
+    return {
+      nonTerminal,
+      ...Object.fromEntries(resMap.entries()),
+    };
+  });
+  return arr;
+});
 
 const fistData = computed(() => {
-    const firstSetMap = firstSet.value.reduce((acc, curr) => {
-        acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(' , ')} }`;
-        return acc;
-    }, {});
-    const followSetMap = followSet.value.reduce((acc, curr) => {
-        acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(' , ')} }`;
-        return acc;
-    }, {});
+  const firstSetMap = firstSet.value.reduce((acc, curr) => {
+    acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(" , ")} }`;
+    return acc;
+  }, {});
+  const followSetMap = followSet.value.reduce((acc, curr) => {
+    acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(" , ")} }`;
+    return acc;
+  }, {});
 
-    const arr = nonTerminal.value.map((val) => {
-        return {
-            nonTerminal: val,
-            FIRST: firstSetMap[val],
-            FOLLOW: followSetMap[val],
-        }
-    });
-    return arr;
-})
-
+  const arr = nonTerminal.value.map((val) => {
+    return {
+      nonTerminal: val,
+      FIRST: firstSetMap[val],
+      FOLLOW: followSetMap[val],
+    };
+  });
+  return arr;
+});
 </script>
 
 <style scoped lang="less">
 .table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .table-data {
+    background: none;
+    // width: 100%;
+
+    ul {
+      padding: 0;
+    }
+
+    li {
+      list-style-type: none;
+    }
+  }
+
+  .first {
+    font-weight: 600;
+    margin-top: 10px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 10px;
 
-    .table-data {
-        background: none;
-        // width: 100%;
-
-        ul {
-            padding: 0;
-        }
-
-        li {
-            list-style-type: none;
-        }
+    svg {
+      cursor: pointer;
     }
-
-    .first {
-        font-weight: 600;
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        svg {
-            cursor: pointer;
-        }
-    }
+  }
 }
 </style>
