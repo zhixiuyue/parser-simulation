@@ -43,8 +43,10 @@
                 查看DFA
             </el-button> -->
         </div>
-        <D3Graph v-show="play" ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true" class="graph">
-        </D3Graph>
+        <div class="graph" v-show="play">
+            <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true">
+            </D3Graph>
+        </div>
     </div>
     <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
@@ -193,6 +195,7 @@ const passData = reactive({});
 
 .graph {
     flex: 1;
+    height: 100%;
 }
 
 .table {

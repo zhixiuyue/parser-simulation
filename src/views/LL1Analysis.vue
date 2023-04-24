@@ -12,13 +12,7 @@
           <Edit />
         </el-icon> -->
       </div>
-      <el-table
-        :data="parserData"
-        stripe
-        style="width: 100%"
-        border
-        class="table"
-      >
+      <el-table :data="parserData" stripe style="width: 100%" border class="table">
         <el-table-column prop="Step" label="Step" align="center" />
         <el-table-column prop="Stack" label="Stack" align="center" />
         <el-table-column prop="Input" label="Input" align="center" />
@@ -214,7 +208,7 @@ watch(
       }
     }
 
-    div + div {
+    div+div {
       margin-top: 10px;
     }
 

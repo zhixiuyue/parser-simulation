@@ -34,8 +34,8 @@
                                 {{ tag }}
                             </el-tag>
                             <el-input v-if="noneTer.inputVisible" class="input-none-ter" ref="InputNoneTerRef"
-                                v-model="noneTer.inputValue" @keyup.enter="handleInputConfirm(noneTer)"
-                                @blur="handleBlur(noneTer)" />
+                                v-model="noneTer.inputValue" @keyup.enter="handleInputConfirm(noneTer, 1111)"
+                                @blur="handleBlur(noneTer, 'Non')" />
                             <el-button v-else :icon="Plus" circle size="small" @click="showInputNoneTer"
                                 :disabled="activeStep > 1" />
                         </div>
@@ -48,9 +48,13 @@
                                 size="large" @close="handleClose(Ter.values, tag)">
                                 {{ tag }}
                             </el-tag>
-                            <el-input v-if="Ter.inputVisible" class="input-none-ter" ref="InputTerRef"
-                                v-model="Ter.inputValue" @keyup.enter="handleInputConfirm(Ter)"
-                                @blur="handleBlur(Ter)" />
+                            <div v-if="Ter.inputVisible" @keyup.enter="handleInputConfirm(Ter)"
+                                @focusout="handleBlur(Ter)" tabindex="-2" class="input-container">
+                                <el-input class="input-none-ter" v-model="Ter.inputValue" ref="InputTerRef"
+                                    @input="showReg" placeholder="终止符" />
+                                <el-input class="input-none-ter" v-model="Ter.inputValueReg" ref="InputTerRegRef"
+                                    placeholder="正则" />
+                            </div>
                             <el-button v-else :icon="Plus" circle size="small" @click="showInputTer"
                                 :disabled="activeStep > 1" />
                         </div>
@@ -95,6 +99,7 @@ const noneTer = reactive({
 const Ter = reactive({
     values: [],
     inputValue: '',
+    inputValueReg: '',
     inputVisible: false,
 })
 const inputRef = ref(null);
@@ -105,15 +110,23 @@ const handleClose = (tags, tag) => {
     tags.splice(tags.indexOf(tag), 1);
 }
 
-const handleInputConfirm = (tags) => {
-    if (tags.inputValue.trim()) {
-        tags.values.push(tags.inputValue);
+const handleInputConfirm = (tags, index) => {
+    if (index === 'Non') {
+        if (tags.inputValue.trim()) {
+            tags.values.push(tags.inputValue);
+            tags.inputValue = '';
+        }
+    } else {
+        if (tags.inputValue.trim() && tags.inputValueReg) {
+            tags.values.push([tags.inputValue, tags.inputValueReg]);
+            tags.inputValue = '';
+            tags.inputValueReg = '';
+        }
     }
-    tags.inputValue = '';
 }
 
-const handleBlur = (tags) => {
-    handleInputConfirm(tags);
+const handleBlur = (tags, index) => {
+    handleInputConfirm(tags, index);
     tags.inputVisible = false;
 }
 
@@ -173,22 +186,22 @@ const saveGrammar = (garmmar) => {
             saveNonTerminal(noneTer.values);
         }
         if (Ter.values) {
-            const arr = Ter.values.map((item) => {
-                let regExp = '';
-                for (let i = 0; i < item.length; i++) {
-                    const value = item[i];
-                    if (specialChar.includes(value)) {
-                        regExp += `\\${value}`;
-                    } else {
-                        regExp += value;
-                    }
-                }
-                return [
-                    item,
-                    new RegExp(`^${regExp}`)
-                ]
-            })
-            saveTerminal(arr);
+            // const arr = Ter.values.map((item) => {
+            //     let regExp = '';
+            //     for (let i = 0; i < item.length; i++) {
+            //         const value = item[i];
+            //         if (specialChar.includes(value)) {
+            //             regExp += `\\${value}`;
+            //         } else {
+            //             regExp += value;
+            //         }
+            //     }
+            //     return [
+            //         item,
+            //         new RegExp(`^${regExp}`)
+            //     ]
+            // })
+            saveTerminal(Ter.values);
         }
     }
     store.commit("grammarStore/updateGrammar", garmmar);
@@ -282,6 +295,17 @@ watch(() => activeStep, (newValue) => {
     immediate: true,
     deep: true
 })
+
+const showReg = (value) => {
+    let regExp = '';
+    if (specialChar.includes(value)) {
+        regExp += `\\${value}`;
+    } else {
+        regExp += value;
+    }
+    Ter.inputValueReg = value.trim() ? new RegExp(`^${regExp}`) : '';
+}
+
 </script>
 
 <style scoped lang="less">
@@ -373,6 +397,11 @@ watch(() => activeStep, (newValue) => {
             background: none;
             resize: none;
             font-family: initial;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
         }
 
         .input-none-ter {

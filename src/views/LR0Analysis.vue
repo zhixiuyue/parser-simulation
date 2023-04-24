@@ -122,6 +122,7 @@ watch(() => parserData, (newValue) => {
 
 <style scoped lang="less">
 .analysis {
+    height: 100%;
 
     .content {
         padding: 10px 0;

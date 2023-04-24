@@ -169,8 +169,10 @@ const tablePlay = () => {
       play.value = false;
     } else {
       diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value);
-      selectedSet.value = {
-        [data.value?.ruleIndex === 0 ? 'FIRST' : 'FOLLOW']: Object.values(diffArray.value[0])[0]
+      if (diffArray.value[0]) {
+        selectedSet.value = {
+          [data.value?.ruleIndex === 0 ? 'FIRST' : 'FOLLOW']: Object.values(diffArray.value[0])[0]
+        }
       }
       tableData.value = transferData(data.value?.result);
     }
