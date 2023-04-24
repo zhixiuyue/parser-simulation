@@ -1,48 +1,48 @@
 <template>
-    <div class="table" @click="showData">
-        <!-- <CustomHeader :step=2 type="LL1" /> -->
-        <div class="first" v-if="!getHideFirset">First Set & Follow Set
-            <el-tooltip class="box-item" effect="dark" :content="hideSet ? '显示' : '隐藏'" placement="top">
-                <el-icon @click="handleSetDisplay">
-                    <View v-if="hideSet" />
-                    <Hide v-else />
-                </el-icon>
-            </el-tooltip>
-        </div>
-        <el-table :data="fistData" stripe style="width: 100%" border v-show="!hideSet && !getHideFirset">
-            <el-table-column prop="nonTerminal" label="" align="center" width="150" />
-            <el-table-column prop="FIRST" label="FIRST" align="center" />
-            <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
-        </el-table>
-        <div class="first">LL(1)分析表
-            <el-tooltip class="box-item" effect="dark" content="播放" placement="top">
-                <el-icon @click="tablePlay">
-                    <VideoPlay />
-                </el-icon>
-            </el-tooltip>
-        </div>
-        <div v-if="rules.length" class="rules-container">
-            <span class="rules-title">规则:</span>
-            <ul class="rules">
-                <li v-for=" (item, index) in rules" :key="item" :class="{ 'high': selectedRuleIndex === index }">
-                    {{ item }}
-                </li>
-            </ul>
-        </div>
-        <el-table :data="tableData" max-height="600" border class="table-data" :cell-class-name="cellClassName">
-            <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
-            </el-table-column>
-            <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
-                <template #default="scope">
-                    <ul>
-                        <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                            {{ item }}
-                        </li>
-                    </ul>
-                </template>
-            </el-table-column>
-        </el-table>
+  <div class="table" @click="showData">
+    <!-- <CustomHeader :step=2 type="LL1" /> -->
+    <div class="first" v-if="!getHideFirset">First Set & Follow Set
+      <el-tooltip class="box-item" effect="dark" :content="hideSet ? '显示' : '隐藏'" placement="top">
+        <el-icon @click="handleSetDisplay">
+          <View v-if="hideSet" />
+          <Hide v-else />
+        </el-icon>
+      </el-tooltip>
     </div>
+    <el-table :data="fistData" stripe style="width: 100%" border v-show="!hideSet && !getHideFirset">
+      <el-table-column prop="nonTerminal" label="" align="center" width="150" />
+      <el-table-column prop="FIRST" label="FIRST" align="center" />
+      <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
+    </el-table>
+    <div class="first">LL(1)分析表
+      <el-tooltip class="box-item" effect="dark" content="播放" placement="top">
+        <el-icon @click="tablePlay">
+          <VideoPlay />
+        </el-icon>
+      </el-tooltip>
+    </div>
+    <div v-if="rules.length" class="rules-container">
+      <span class="rules-title">规则:</span>
+      <ul class="rules">
+        <li v-for=" (item, index) in rules" :key="item" :class="{ 'high': selectedRuleIndex === index }">
+          {{ item }}
+        </li>
+      </ul>
+    </div>
+    <el-table :data="tableData" max-height="600" border class="table-data" :cell-class-name="cellClassName">
+      <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
+      </el-table-column>
+      <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
+        <template #default="scope">
+          <ul>
+            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+              {{ item }}
+            </li>
+          </ul>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script setup>
@@ -57,64 +57,64 @@ const store = useStore();
 const hideSet = ref(false);
 
 const handleSetDisplay = () => {
-    hideSet.value = !hideSet.value;
-}
+  hideSet.value = !hideSet.value;
+};
 
 const getHideFirset = computed(() => {
-    return store.getters["grammarStore/getHideFirset"];
-})
+  return store.getters["grammarStore/getHideFirset"];
+});
 
 const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getNonTerminal"];
-})
+  return store.getters["grammarStore/getNonTerminal"];
+});
 
 const terminal = computed(() => {
-    return [...store.getters["grammarStore/getTerminal"], '$'];
-})
+  return [...store.getters["grammarStore/getTerminal"], "$"];
+});
 
 const firstSet = computed(() => {
-    return store.getters["grammarStore/getFirstSet"];
+  return store.getters["grammarStore/getFirstSet"];
 });
 
 const followSet = computed(() => {
-    return store.getters["grammarStore/getFollowSet"];
+  return store.getters["grammarStore/getFollowSet"];
 });
 
 const tableData = ref([]);
 
 const ll1Parser = computed(() => {
-    return store.getters["grammarStore/getLL1Parser"];
+  return store.getters["grammarStore/getLL1Parser"];
 });
 
 const transferData = (table) => {
-    return table?.map((item) => {
-        const { nonTerminal = '', terminal2Derivation = {} } = item;
-        const resMap = new Map();
-        terminal2Derivation.forEach((value, key) => {
-            const { derivations = [], nonTerminal = '' } = value;
-            const newStrArr = derivations.map((val) => {
-                if (!val.length) return '';
-                return `${nonTerminal} => ${val.join(' ')}`;
-            })
-            resMap.set(key, newStrArr);
-        })
-        return {
-            nonTerminal,
-            ...Object.fromEntries(resMap.entries()),
-        }
+  return table?.map((item) => {
+    const { nonTerminal = '', terminal2Derivation = {} } = item;
+    const resMap = new Map();
+    terminal2Derivation.forEach((value, key) => {
+      const { derivations = [], nonTerminal = '' } = value;
+      const newStrArr = derivations.map((val) => {
+        if (!val.length) return '';
+        return `${nonTerminal} => ${val.join(' ')}`;
+      })
+      resMap.set(key, newStrArr);
     })
+    return {
+      nonTerminal,
+      ...Object.fromEntries(resMap.entries()),
+    }
+  })
 }
 
 const genTableData = () => {
-    const predictTable = ll1Parser.value.getPredictTable(firstSet.value, followSet.value);
-    if (!predictTable.length) {
-        return [];
-    }
-    tableData.value = transferData(predictTable);
+  const predictTable = ll1Parser.value.getPredictTable(firstSet.value, followSet.value);
+  if (!predictTable.length) {
+    return [];
+  }
+  tableData.value = transferData(predictTable);
 }
 
 onMounted(() => {
-    genTableData();
+  genTableData();
 })
 
 const rules = ref([]);
@@ -122,138 +122,163 @@ const rules = ref([]);
 const interval = ref();
 
 const judgeArrEqual = (a, b) => {
-    if (a?.length === b?.length && a.filter(t => !b.includes(t))) {
-        return true;
-    }
-    return false;
+  if (a?.length === b?.length && a.filter(t => !b.includes(t))) {
+    return true;
+  }
+  return false;
 }
 
 const diffArray = ref([]);
 const selectedRuleIndex = ref();
 
 const showArrayDiff = (a, b) => {
-    const diffArr = [];
-    for (let i = 0; i < a.length; i++) {
-        for (let val in a[i]) {
-            if ((Array.isArray(a[i][val]) && !judgeArrEqual(a[i][val], b[i][val])) || ((!Array.isArray(a[i][val]) && a[i][val] !== b[i][val]))) {
-                diffArr.push({
-                    [val]: a[i].nonTerminal,
-                });
-            }
-        }
+  const diffArr = [];
+  for (let i = 0; i < a.length; i++) {
+    for (let val in a[i]) {
+      if ((Array.isArray(a[i][val]) && !judgeArrEqual(a[i][val], b[i][val])) || ((!Array.isArray(a[i][val]) && a[i][val] !== b[i][val]))) {
+        diffArr.push({
+          [val]: a[i].nonTerminal,
+        });
+      }
     }
-    return diffArr;
+  }
+  return diffArr;
 }
 
 const tablePlay = () => {
-    clearInterval(interval.value);
-    const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
-    rules.value = genetator.next().value;
-    tableData.value = transferData(genetator.next().value?.result);
-    interval.value = setInterval(() => {
-        const data = genetator.next();
-        selectedRuleIndex.value = data.value?.ruleIndex
-        // console.log(data.value?.ruleIndex);
-        if (data.done) {
-            clearInterval(interval.value);
-        } else {
-            diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value)
-            tableData.value = transferData(data.value?.result);
-        }
-    }, 2000);
+  clearInterval(interval.value);
+  const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
+  rules.value = genetator.next().value;
+  tableData.value = transferData(genetator.next().value?.result);
+  interval.value = setInterval(() => {
+    const data = genetator.next();
+    selectedRuleIndex.value = data.value?.ruleIndex
+    // console.log(data.value?.ruleIndex);
+    if (data.done) {
+      clearInterval(interval.value);
+    } else {
+      diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value)
+      tableData.value = transferData(data.value?.result);
+    }
+  }, 2000);
 }
 
 onUnmounted(() => {
-    clearInterval(interval.value);
+  clearInterval(interval.value);
 })
 
 const fistData = computed(() => {
-    const firstSetMap = firstSet.value.reduce((acc, curr) => {
-        acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(' , ')} }`;
-        return acc;
-    }, {});
-    const followSetMap = followSet.value.reduce((acc, curr) => {
-        acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(' , ')} }`;
-        return acc;
-    }, {});
+  const firstSetMap = firstSet.value.reduce((acc, curr) => {
+    acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(" , ")} }`;
+    return acc;
+  }, {});
+  const followSetMap = followSet.value.reduce((acc, curr) => {
+    acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(" , ")} }`;
+    return acc;
+  }, {});
 
-    const arr = nonTerminal.value.map((val) => {
-        return {
-            nonTerminal: val,
-            FIRST: firstSetMap[val],
-            FOLLOW: followSetMap[val],
-        }
-    });
-    return arr;
-})
+  const arr = nonTerminal.value.map((val) => {
+    return {
+      nonTerminal: val,
+      FIRST: firstSetMap[val],
+      FOLLOW: followSetMap[val],
+    };
+  });
+  return arr;
+});
 
 const cellClassName = ({ row, column }) => {
-    for (let i = 0; i < diffArray.value.length; i++) {
-        if (column.rawColumnKey === Object.keys(diffArray.value[i])[0] && row.nonTerminal === Object.values(diffArray.value[i])[0]) {
-            return 'highlight';
-        }
+  for (let i = 0; i < diffArray.value.length; i++) {
+    if (column.rawColumnKey === Object.keys(diffArray.value[i])[0] && row.nonTerminal === Object.values(diffArray.value[i])[0]) {
+      return 'highlight';
     }
-    return '';
+  }
+  return '';
 }
 </script>
 
 <style scoped lang="less">
 .table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .table-data {
+    background: none;
+    // width: 100%;
+
+    ul {
+      padding: 0;
+    }
+
+    li {
+      list-style-type: none;
+    }
+  }
+
+  .first {
+    font-weight: 600;
+    margin-top: 10px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 10px;
 
     /deep/ .highlight {
-        background-color: #ddd;
+      background-color: #ddd;
     }
 
     .high {
-        background-color: #ddd;
+      background-color: #ddd;
     }
 
     .table-data {
-        background: none;
-        // width: 100%;
+      background: none;
+      // width: 100%;
 
-        td {
-            font-weight: 600;
-        }
+      td {
+        font-weight: 600;
+      }
 
-        ul {
-            padding: 0;
-        }
+      ul {
+        padding: 0;
+      }
 
-        li {
-            list-style-type: none;
-        }
+      li {
+        list-style-type: none;
+      }
     }
 
     .first {
-        font-weight: 600;
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+      font-weight: 600;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
 
-        svg {
-            cursor: pointer;
-        }
+      svg {
+        cursor: pointer;
+      }
     }
 
     .rules-container {
-        margin-top: 10px;
-        display: flex;
-        gap: 10px;
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
 
-        .rules-title {
-            flex: 0 0 50px;
-            margin-top: 16px;
-        }
+      .rules-title {
+        flex: 0 0 50px;
+        margin-top: 16px;
+      }
     }
 
     .rules {
-        list-style: none;
-        padding: 0;
+      list-style: none;
+      padding: 0;
     }
+
+    svg {
+      cursor: pointer;
+    }
+  }
 }
 </style>

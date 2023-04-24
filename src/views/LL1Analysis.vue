@@ -4,14 +4,21 @@
     <LL1Table />
     <div class="content">
       <div class="input-string">
-        <div class="first">LL(1)预测分析
+        <div class="first">
+          LL(1)预测分析
           <span class="parser-string">{{ parserString }}</span>
         </div>
         <!-- <el-icon class="icon" @click="modifyInput">
           <Edit />
         </el-icon> -->
       </div>
-      <el-table :data="parserData" stripe style="width: 100%" border class="table">
+      <el-table
+        :data="parserData"
+        stripe
+        style="width: 100%"
+        border
+        class="table"
+      >
         <el-table-column prop="Step" label="Step" align="center" />
         <el-table-column prop="Stack" label="Stack" align="center" />
         <el-table-column prop="Input" label="Input" align="center" />
@@ -120,9 +127,11 @@ const generateResult = () => {
       nonTerminal.value,
       predictTable.value
     );
-    console.log("ast", predictResult.astNode);
-    new Tree("#astNodeContainer", {
-      data: [predictResult.astNode],
+    onMounted(() => {
+      console.log("ast", predictResult.astNode);
+      const tree = new Tree("#astNodeContainer", {
+        data: [predictResult.astNode],
+      });
     });
   } catch (error) {
     // predictResult = [...error.value, {
@@ -205,7 +214,7 @@ watch(
       }
     }
 
-    div+div {
+    div + div {
       margin-top: 10px;
     }
 

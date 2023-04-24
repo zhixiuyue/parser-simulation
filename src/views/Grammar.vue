@@ -1,8 +1,7 @@
 <template>
-    <InputGrammar />
+  <InputGrammar />
 </template>
 
 <script setup>
-import InputGrammar from '@/components/InputGrammar.vue';
-
+import InputGrammar from "@/components/InputGrammar.vue";
 </script>    
