@@ -29,6 +29,7 @@ const state = {
     ...LL1State,
     ...LRState,
     step: 1,
+    unfold: true,
 }
 
 const getters = {
@@ -90,7 +91,10 @@ const getters = {
     },
     getHideFirset: (state) => {
         return state.hideFirset;
-    }
+    },
+    getUnFold: (state) => {
+        return state.unfold;
+    },
 }
 
 const clearData = (state) => {
@@ -159,7 +163,10 @@ const mutations = {
     },
     updateHideFirset: (state, value) => {
         state.hideFirset = value;
-    }
+    },
+    updateUnfold: (state, value) => {
+        state.unfold = value;
+    },
 }
 
 const actions = {

@@ -41,7 +41,10 @@ import { ElMessage } from 'element-plus';
 const store = useStore();
 const router = useRouter();
 
-const unfold = ref(true);
+const unfold = computed(() => {
+    return store.getters["grammarStore/getUnFold"];
+})
+// const unfold = ref(true);
 const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
 })
@@ -55,7 +58,8 @@ const activeStep = computed(() => {
 const activeName = ref('1');
 
 const toggleFold = () => {
-    unfold.value = !unfold.value;
+    store.commit("grammarStore/updateUnfold", !unfold.value);
+    // unfold.value = !unfold.value;
 }
 
 const goBack = () => {
