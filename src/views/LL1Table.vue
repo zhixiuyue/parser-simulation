@@ -9,15 +9,17 @@
         </el-icon>
       </el-tooltip>
     </div>
-    <el-table :data="fistData" stripe style="width: 100%" border v-show="!hideSet && !getHideFirset">
+    <el-table :data="fistData" style="width: 100%" border v-show="!hideSet && !getHideFirset"
+      :cell-class-name="setClassName">
       <el-table-column prop="nonTerminal" label="" align="center" width="150" />
       <el-table-column prop="FIRST" label="FIRST" align="center" />
       <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
     </el-table>
     <div class="first">LL(1)分析表
-      <el-tooltip class="box-item" effect="dark" content="播放" placement="top">
-        <el-icon @click="tablePlay">
-          <VideoPlay />
+      <el-tooltip class="box-item" effect="dark" :content="play ? '退出播放' : '播放'" placement="top">
+        <el-icon @click="hanlePlay">
+          <VideoPlay v-if="!play" />
+          <CircleClose v-else />
         </el-icon>
       </el-tooltip>
     </div>
@@ -47,7 +49,7 @@
 
 <script setup>
 // import CustomHeader from '@/components/Header.vue';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
 import _ from 'lodash';
@@ -129,6 +131,7 @@ const judgeArrEqual = (a, b) => {
 }
 
 const diffArray = ref([]);
+let selectedSet = ref({});
 const selectedRuleIndex = ref();
 
 const showArrayDiff = (a, b) => {
@@ -145,22 +148,34 @@ const showArrayDiff = (a, b) => {
   return diffArr;
 }
 
+const play = ref(false);
+
+const hanlePlay = () => {
+  play.value = !play.value;
+}
+
 const tablePlay = () => {
   clearInterval(interval.value);
   const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
   rules.value = genetator.next().value;
-  tableData.value = transferData(genetator.next().value?.result);
-  interval.value = setInterval(() => {
+  // tableData.value = transferData(genetator.next().value?.result);
+  const func = () => {
     const data = genetator.next();
-    selectedRuleIndex.value = data.value?.ruleIndex
-    // console.log(data.value?.ruleIndex);
+    selectedRuleIndex.value = data.value?.ruleIndex;
     if (data.done) {
       clearInterval(interval.value);
+      diffArray.value = [];
+      selectedSet.value = {};
     } else {
-      diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value)
+      diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value);
+      selectedSet.value = {
+        [data.value?.ruleIndex === 0 ? 'FIRST' : 'FOLLOW']: Object.values(diffArray.value[0])[0]
+      }
       tableData.value = transferData(data.value?.result);
     }
-  }, 2000);
+  };
+  func();
+  interval.value = setInterval(func, 2500);
 }
 
 onUnmounted(() => {
@@ -195,6 +210,28 @@ const cellClassName = ({ row, column }) => {
   }
   return '';
 }
+
+const setClassName = ({ row, column }) => {
+  if (column.label === Object.keys(selectedSet.value)[0] && row.nonTerminal === Object.values(selectedSet.value)[0]) {
+    return 'highlight';
+  }
+  return '';
+}
+
+watch(() => play, (newValue) => {
+  if (newValue.value) {
+    tablePlay();
+  } else {
+    clearInterval(interval.value);
+    diffArray.value = [];
+    selectedSet.value = {};
+    rules.value = [];
+    genTableData();
+  };
+}, {
+  deep: true
+})
+
 </script>
 
 <style scoped lang="less">
@@ -224,11 +261,11 @@ const cellClassName = ({ row, column }) => {
     gap: 10px;
 
     /deep/ .highlight {
-      background-color: #ddd;
+      background-color: #ecf5ff;
     }
 
     .high {
-      background-color: #ddd;
+      background-color: #ecf5ff;
     }
 
     .table-data {
@@ -267,13 +304,17 @@ const cellClassName = ({ row, column }) => {
 
       .rules-title {
         flex: 0 0 50px;
-        margin-top: 16px;
+        margin-top: 21px;
       }
     }
 
     .rules {
       list-style: none;
       padding: 0;
+
+      li {
+        padding: 5px 10px;
+      }
     }
 
     svg {

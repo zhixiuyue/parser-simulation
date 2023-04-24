@@ -1,38 +1,50 @@
 <template>
-    <div class="table" @click="test">
-        <!-- <CustomHeader :step=2 type="LR0" /> -->
-        <h4 class="title">LR(0)分析表</h4>
-        <el-table :data="tableData" class="table-data" stripe>
-            <el-table-column prop="State" label="STATE" align="center" />
-            <el-table-column label="ACTION" align="center">
-                <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
-                    <template #default="scope">
-                        <ul>
-                            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                                {{ item }}
-                            </li>
-                        </ul>
-                    </template>
+    <div class="table-container">
+        <div class="table" @click="test">
+            <!-- <CustomHeader :step=2 type="LR0" /> -->
+            <div class="first">
+                LR(0)分析表
+                <el-tooltip class="box-item" effect="dark" :content="play ? '隐藏DFA' : '显示DFA'" placement="top">
+                    <el-icon @click="hanlePlay">
+                        <View v-if="!play" />
+                        <Hide v-else />
+                    </el-icon>
+                </el-tooltip>
+            </div>
+            <el-table :data="tableData" class="table-data" stripe>
+                <el-table-column prop="State" label="STATE" align="center" />
+                <el-table-column label="ACTION" align="center">
+                    <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
+                        <template #default="scope">
+                            <ul>
+                                <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+                                    {{ item }}
+                                </li>
+                            </ul>
+                        </template>
+                    </el-table-column>
                 </el-table-column>
-            </el-table-column>
-            <el-table-column label="GOTO" align="center">
-                <el-table-column v-for="item in nonTerminal" :key="item" :prop="item" :label="item" align="center">
-                    <template #default="scope">
-                        <ul>
-                            <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
-                                {{ item }}
-                            </li>
-                        </ul>
-                    </template>
+                <el-table-column label="GOTO" align="center">
+                    <el-table-column v-for="item in nonTerminal" :key="item" :prop="item" :label="item" align="center">
+                        <template #default="scope">
+                            <ul>
+                                <li v-for=" item in scope.row[scope.column.rawColumnKey]" :key="item">
+                                    {{ item }}
+                                </li>
+                            </ul>
+                        </template>
+                    </el-table-column>
                 </el-table-column>
-            </el-table-column>
-        </el-table>
-        <el-drawer v-model="drawer" title="LR(0)DFA" direction="ltr" size="33%">
-            <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
-        </el-drawer>
-        <el-button class="open-dfa" @click="openDrawer">
-            查看DFA
-        </el-button>
+            </el-table>
+            <el-drawer v-model="drawer" title="LR(0)DFA" direction="rtl" size="33%">
+                <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
+            </el-drawer>
+            <!-- <el-button v-show="!play" class="open-dfa" @click="openDrawer">
+                查看DFA
+            </el-button> -->
+        </div>
+        <D3Graph v-show="play" ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true" class="graph">
+        </D3Graph>
     </div>
     <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
@@ -81,6 +93,16 @@ const openDrawer = () => {
 //     store.commit("grammarStore/updateLRStartNonTerminal", value);
 //     showDialog.value = false;
 // }
+
+const play = ref(false);
+
+const unfold = computed(() => {
+    return store.getters["grammarStore/getUnFold"];
+})
+
+const hanlePlay = () => {
+    play.value = !play.value;
+}
 
 const LRPredictTable = computed(() => {
     const lRParser = store.getters["grammarStore/getLRParser"];
@@ -145,15 +167,52 @@ watch(() => D3GrapghRef, (newValue, preValue) => {
     deep: true
 })
 
+const foldStatus = ref(store.state.grammarStore.unfold);
+
+watch(() => play, (newValue) => {
+    if (newValue.value) {
+        store.commit("grammarStore/updateUnfold", false);
+    } else {
+        store.commit("grammarStore/updateUnfold", foldStatus.value);
+    };
+}, {
+    deep: true
+})
+
+
 
 const passData = reactive({});
 </script>
 
 <style scoped lang="less">
+.table-container {
+    display: flex;
+    height: 100%;
+    gap: 10px;
+}
+
+.graph {
+    flex: 1;
+}
+
 .table {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex: 1;
+    width: 0;
+
+    .first {
+        font-weight: 600;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        svg {
+            cursor: pointer;
+        }
+    }
 
     .title {
         margin: 10px 0;

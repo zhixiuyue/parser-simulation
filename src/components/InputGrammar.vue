@@ -21,15 +21,15 @@
                         item
                     }}
                     </li>
+                    <el-tooltip class="box-item" effect="dark" :content="showInitail ? '查看改写文法' : '查看原始文法'"
+                        placement="top" v-if="initialGrammar.length">
+                        <el-icon class="initial" @click="transfer">
+                            <RefreshRight />
+                        </el-icon>
+                    </el-tooltip>
                 </ol>
                 <div v-else>请输入文法</div>
             </div>
-            <el-tooltip class="box-item" effect="dark" :content="showInitail ? '查看改写文法' : '查看原始文法'" placement="top"
-                v-if="initialGrammar.length">
-                <el-icon class="initial" @click="transfer">
-                    <RefreshRight />
-                </el-icon>
-            </el-tooltip>
         </div>
         <!-- <RightTips type="examples" :mode="radioMode" /> -->
     </div>
@@ -110,7 +110,7 @@ watch(() => grammar, (newValue) => {
         .initial {
             position: absolute;
             top: 10px;
-            right: 0;
+            right: 10px;
             cursor: pointer;
         }
     }
@@ -131,13 +131,14 @@ watch(() => grammar, (newValue) => {
 
         .input-area {
             grid-area: input-area;
-            padding: 10px 10px 10px 40px;
+            padding: 10px 25px 10px 40px;
             margin: 0;
             border: 1px solid #dedfe6;
             border-radius: 5px;
             color: #a8abb2;
             min-height: 100px;
             max-width: 500px;
+            position: relative;
         }
 
         .grammar-li {
