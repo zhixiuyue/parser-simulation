@@ -35,7 +35,7 @@ import InputGrammar from '@/components/InputGrammar.vue';
 
 .el-header,
 .el-footer {
-  // background-color: #B3C0D1;
+  background-color: #fff;
   color: #18191C;
 }
 
@@ -58,7 +58,7 @@ import InputGrammar from '@/components/InputGrammar.vue';
 }
 
 .el-main {
-  // background-color: #E9EEF3;
+  background-color: #fff;
   padding: 0;
   display: flex;
   gap: 10px;
