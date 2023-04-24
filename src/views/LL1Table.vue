@@ -166,6 +166,7 @@ const tablePlay = () => {
       clearInterval(interval.value);
       diffArray.value = [];
       selectedSet.value = {};
+      play.value = false;
     } else {
       diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value);
       selectedSet.value = {
@@ -240,9 +241,21 @@ watch(() => play, (newValue) => {
   flex-direction: column;
   gap: 10px;
 
+  /deep/ .highlight {
+    background-color: #ecf5ff;
+  }
+
+  .high {
+    background-color: #ecf5ff;
+  }
+
   .table-data {
     background: none;
     // width: 100%;
+
+    td {
+      font-weight: 600;
+    }
 
     ul {
       padding: 0;
@@ -260,66 +273,33 @@ watch(() => play, (newValue) => {
     align-items: center;
     gap: 10px;
 
-    /deep/ .highlight {
-      background-color: #ecf5ff;
-    }
-
-    .high {
-      background-color: #ecf5ff;
-    }
-
-    .table-data {
-      background: none;
-      // width: 100%;
-
-      td {
-        font-weight: 600;
-      }
-
-      ul {
-        padding: 0;
-      }
-
-      li {
-        list-style-type: none;
-      }
-    }
-
-    .first {
-      font-weight: 600;
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      svg {
-        cursor: pointer;
-      }
-    }
-
-    .rules-container {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-
-      .rules-title {
-        flex: 0 0 50px;
-        margin-top: 21px;
-      }
-    }
-
-    .rules {
-      list-style: none;
-      padding: 0;
-
-      li {
-        padding: 5px 10px;
-      }
-    }
-
     svg {
       cursor: pointer;
     }
+  }
+
+  .rules-container {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+
+    .rules-title {
+      flex: 0 0 50px;
+      margin-top: 21px;
+    }
+  }
+
+  .rules {
+    list-style: none;
+    padding: 0;
+
+    li {
+      padding: 5px 10px;
+    }
+  }
+
+  svg {
+    cursor: pointer;
   }
 }
 </style>
