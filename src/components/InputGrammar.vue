@@ -50,10 +50,14 @@ const initialGrammar = computed(() => {
     return store.getters["grammarStore/getInitialGrammar"];
 })
 
-const showInitail = ref(false);
+// const showInitail = ref(false);
+
+const showInitail = computed(() => {
+    return store.getters["grammarStore/getShowInitail"];
+})
 
 const transfer = () => {
-    showInitail.value = !showInitail.value;
+    store.commit("grammarStore/updateShowInitail", !showInitail.value);
 }
 
 const nonTerminal = computed(() => {
@@ -74,7 +78,7 @@ const goBack = () => {
 
 
 watch(() => grammar, (newValue) => {
-    showInitail.value = false;
+    store.commit("grammarStore/updateShowInitail", false);
 }, {
     deep: true
 })
@@ -135,7 +139,7 @@ watch(() => grammar, (newValue) => {
             margin: 0;
             border: 1px solid #dedfe6;
             border-radius: 5px;
-            color: #a8abb2;
+            // color: #a8abb2;
             min-height: 100px;
             max-width: 500px;
             position: relative;

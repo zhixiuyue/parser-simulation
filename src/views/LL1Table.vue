@@ -8,14 +8,16 @@
           <Hide v-else />
         </el-icon>
       </el-tooltip>
+      <span>计算First Set</span>
+      <span>计算Follow Set</span>
     </div>
-    <el-table :data="fistData" style="width: 100%" border v-show="!hideSet && !getHideFirset"
-      :cell-class-name="setClassName">
+    <el-table :data="fistData" border v-show="!hideSet && !getHideFirset" :cell-class-name="setClassName"
+      style="max-width: 700px">
       <el-table-column prop="nonTerminal" label="" align="center" width="150" />
       <el-table-column prop="FIRST" label="FIRST" align="center" />
       <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
     </el-table>
-    <div class="first">LL(1)分析表
+    <div class="first" v-show="type !== '0'">LL(1)分析表
       <el-tooltip class="box-item" effect="dark" :content="play ? '退出播放' : '播放'" placement="top">
         <el-icon @click="hanlePlay">
           <VideoPlay v-if="!play" />
@@ -23,7 +25,7 @@
         </el-icon>
       </el-tooltip>
     </div>
-    <div v-if="rules.length" class="rules-container">
+    <div v-if="rules.length && type !== '0'" class="rules-container">
       <span class="rules-title">规则:</span>
       <ul class="rules">
         <li v-for=" (item, index) in rules" :key="item" :class="{ 'high': selectedRuleIndex === index }">
@@ -31,7 +33,8 @@
         </li>
       </ul>
     </div>
-    <el-table :data="tableData" max-height="600" border class="table-data" :cell-class-name="cellClassName">
+    <el-table v-show="type !== '0'" :data="tableData" max-height="600" border class="table-data"
+      :cell-class-name="cellClassName" style="max-width: 700px">
       <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
       </el-table-column>
       <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
@@ -52,9 +55,14 @@
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
-import _ from 'lodash';
+import { useRouter } from 'vue-router';
 
 const store = useStore();
+const router = useRouter();
+
+const type = computed(() => {
+  return router.currentRoute.value.query.type;
+})
 
 const hideSet = ref(false);
 
@@ -87,6 +95,15 @@ const tableData = ref([]);
 const ll1Parser = computed(() => {
   return store.getters["grammarStore/getLL1Parser"];
 });
+
+onMounted(() => {
+  for (let process of ll1Parser.value.getFirstSetProgressive()) {
+    console.log(process);
+  }
+  for (let process of ll1Parser.value.getFollowSetProgressive(firstSet)) {
+    console.log(process);
+  }
+})
 
 const transferData = (table) => {
   return table?.map((item) => {
@@ -135,10 +152,13 @@ let selectedSet = ref({});
 const selectedRuleIndex = ref();
 
 const showArrayDiff = (a, b) => {
+  if (!a.length) {
+    return [];
+  }
   const diffArr = [];
   for (let i = 0; i < a.length; i++) {
     for (let val in a[i]) {
-      if ((Array.isArray(a[i][val]) && !judgeArrEqual(a[i][val], b[i][val])) || ((!Array.isArray(a[i][val]) && a[i][val] !== b[i][val]))) {
+      if (!b.length || (Array.isArray(a[i][val]) && !judgeArrEqual(a[i][val], b[i][val])) || ((!Array.isArray(a[i][val]) && a[i][val] !== b[i][val]))) {
         diffArr.push({
           [val]: a[i].nonTerminal,
         });
@@ -156,17 +176,18 @@ const hanlePlay = () => {
 
 const tablePlay = () => {
   clearInterval(interval.value);
+  tableData.value = [];
   const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
   rules.value = genetator.next().value;
   // tableData.value = transferData(genetator.next().value?.result);
   const func = () => {
     const data = genetator.next();
-    selectedRuleIndex.value = data.value?.ruleIndex;
     if (data.done) {
       clearInterval(interval.value);
       diffArray.value = [];
       selectedSet.value = {};
       play.value = false;
+      selectedRuleIndex.value = -1;
     } else {
       diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value);
       if (diffArray.value[0]) {
@@ -175,9 +196,9 @@ const tablePlay = () => {
         }
       }
       tableData.value = transferData(data.value?.result);
+      selectedRuleIndex.value = data.value?.ruleIndex;
     }
   };
-  func();
   interval.value = setInterval(func, 2500);
 }
 
@@ -243,8 +264,12 @@ watch(() => play, (newValue) => {
   flex-direction: column;
   gap: 10px;
 
-  /deep/ .highlight {
+  :deep(.highlight) {
     background-color: #ecf5ff;
+  }
+
+  :deep(.cell) {
+    color: #000;
   }
 
   .high {
@@ -278,6 +303,14 @@ watch(() => play, (newValue) => {
     svg {
       cursor: pointer;
     }
+
+    span {
+      text-decoration: underline;
+      color: #409eff;
+      font-weight: 400;
+      font-size: 14px;
+      cursor: pointer;
+    }
   }
 
   .rules-container {
@@ -294,6 +327,7 @@ watch(() => play, (newValue) => {
   .rules {
     list-style: none;
     padding: 0;
+    color: #000;
 
     li {
       padding: 5px 10px;

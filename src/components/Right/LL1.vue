@@ -34,7 +34,7 @@
                         <el-button class="btn-save" type="primary" plain @click="jump(0)">自动判定</el-button>
                     </div>
                     <div v-if="index === 1">
-                        <div class="jump" @click="jump(1)">计算First Set和Follow Set
+                        <div class="jump" @click="jump(1, { type: 0 })">计算First Set和Follow Set
                             <el-tooltip class="box-item" effect="dark" :content="ignoreSet ? '展开此步骤' : '忽略此步骤'"
                                 placement="top">
                                 <el-icon @click="handleIgnoreSet">
@@ -79,9 +79,13 @@ const handleIgnoreSet = (e) => {
     store.commit("grammarStore/updateHideFirset", ignoreSet.value);
 }
 
-const jump = (index) => {
+const jump = (index, params) => {
     active.value = index;
-    router.push(LLRoute[index].route);
+    if (params) {
+        router.push({ path: LLRoute[index].route, query: params });
+    } else {
+        router.push(LLRoute[index].route);
+    }
 }
 
 const onFinishInput = () => {

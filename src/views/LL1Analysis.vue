@@ -2,38 +2,35 @@
   <div class="analysis">
     <!-- <CustomHeader :step="3" type="LL1" /> -->
     <LL1Table />
-    <div class="content">
-      <div class="input-string">
-        <div class="first">
-          LL(1)预测分析
-          <span class="parser-string">{{ parserString }}</span>
-        </div>
-        <!-- <el-icon class="icon" @click="modifyInput">
+    <div class="container">
+      <div class="content">
+        <div class="input-string">
+          <div class="first">
+            LL(1)预测分析
+            <span class="parser-string">{{ parserString }}</span>
+            <el-tooltip class="box-item" effect="dark" :content="play ? '退出播放' : '播放'" placement="top">
+              <el-icon @click="hanlePlay">
+                <VideoPlay v-if="!play" />
+                <CircleClose v-else />
+              </el-icon>
+            </el-tooltip>
+          </div>
+          <!-- <el-icon class="icon" @click="modifyInput">
           <Edit />
         </el-icon> -->
+        </div>
+        <el-table :data="displayData" stripe style="width: 100%" border class="table">
+          <el-table-column prop="Step" label="Step" align="center" />
+          <el-table-column prop="Stack" label="Stack" align="center" />
+          <el-table-column prop="Input" label="Input" align="center" />
+          <el-table-column prop="Action" label="Action" align="center" />
+        </el-table>
       </div>
-      <el-table :data="parserData" stripe style="width: 100%" border class="table">
-        <el-table-column prop="Step" label="Step" align="center" />
-        <el-table-column prop="Stack" label="Stack" align="center" />
-        <el-table-column prop="Input" label="Input" align="center" />
-        <el-table-column prop="Action" label="Action" align="center" />
-      </el-table>
-      <!-- <el-table :data="tableData" max-height="600" border class="table-data">
-        <el-table-column fixed prop="nonTerminal" label="" width="150" align="center">
-        </el-table-column>
-        <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
-          <template #default="scope">
-            <ul>
-              <li v-for="item in scope.row[scope.column.rawColumnKey]" :key="item">
-                {{ item }}
-              </li>
-            </ul>
-          </template>
-        </el-table-column>
-      </el-table> -->
+      <div class="ast">
+        <h4>抽象语法树</h4>
+        <div id="astNodeContainer"></div>
+      </div>
     </div>
-    <h3>Ast Explore</h3>
-    <div id="astNodeContainer"></div>
   </div>
   <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
     @onClose="onClose" /> -->
@@ -43,7 +40,7 @@
 // import CustomHeader from "@/components/Header.vue";
 import InputString from "@/components/InputString.vue";
 import LL1Table from "@/views/LL1Table.vue";
-import { ref, computed, watch, reactive, onMounted } from "vue";
+import { ref, computed, watch, reactive, onMounted, onUnmounted } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -85,30 +82,9 @@ const terminal = computed(() => {
   return [...store.getters["grammarStore/getTerminal"], "$"];
 });
 
-const tableData = computed(() => {
-  if (!predictTable.value.length) {
-    return [];
-  }
-  const arr = predictTable.value.map((item) => {
-    const { nonTerminal = "", terminal2Derivation = {} } = item;
-    const resMap = new Map();
-    terminal2Derivation.forEach((value, key) => {
-      const { derivations = [], nonTerminal = "" } = value;
-      const newStrArr = derivations.map((val) => {
-        if (!val.length) return "";
-        return `${nonTerminal} => ${val.join(" ")}`;
-      });
-      resMap.set(key, newStrArr);
-    });
-    return {
-      nonTerminal,
-      ...Object.fromEntries(resMap.entries()),
-    };
-  });
-  return arr;
-});
-
 const parserData = ref([]);
+
+const displayData = ref([]);
 
 const generateResult = () => {
   if (!parserString.value || !nonTerminal.value) {
@@ -144,7 +120,47 @@ const generateResult = () => {
     };
   });
   parserData.value = data;
+  displayData.value = data;
 };
+
+
+const play = ref(false);
+
+const hanlePlay = () => {
+  play.value = !play.value;
+}
+
+const interval = ref();
+
+const analysisPlay = () => {
+  if (!parserData.value.length) {
+    return;
+  }
+  let times = 1;
+  interval.value = setInterval(() => {
+    displayData.value = parserData.value.slice(0, times);
+    if (times === parserData.value.length) {
+      clearInterval(interval.value);
+      play.value = false;
+    }
+    times += 1;
+  }, 2000);
+}
+
+watch(() => play, (newValue) => {
+  if (newValue.value) {
+    analysisPlay();
+  } else {
+    clearInterval(interval.value);
+    displayData.value = parserData.value;
+  };
+}, {
+  deep: true
+})
+
+onUnmounted(() => {
+  clearInterval(interval.value);
+})
 
 const showDialog = ref(false);
 
@@ -180,8 +196,25 @@ watch(
 
 <style scoped lang="less">
 .analysis {
+
+  .container {
+    display: flex;
+    gap: 50px;
+  }
+
+  .ast {
+    flex: 0 0 fit-content;
+  }
+
   .content {
+    // flex: 1;
+    // width: 0;
+    width: 700px;
     padding: 10px 0;
+
+    :deep(.cell) {
+      color: #000;
+    }
 
     .input-string {
       display: flex;
@@ -199,9 +232,12 @@ watch(
       .first {
         font-weight: 600;
         margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
 
         .parser-string {
-          margin-left: 20px;
+          // margin-left: 20px;
           color: red;
           font-weight: 400;
         }

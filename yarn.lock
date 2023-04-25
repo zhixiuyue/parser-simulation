@@ -692,7 +692,7 @@
   dependencies:
     vue-demi "*"
 
-"@widgetjs/tree@^1.8.3":
+"@widgetjs/tree@1.8.3":
   version "1.8.3"
   resolved "https://registry.npmjs.org/@widgetjs/tree/-/tree-1.8.3.tgz#a529e2fb210a1c437b5b6467465bab53a1e6d171"
   integrity sha512-P2Mh8FVodMBLSB2AGkQYCI8Kjra1b+uDwrS8V7o6EwbkAegqx/dhIyHnDQqhHmqfXyb7TuvQQd0c710EXPhftg==

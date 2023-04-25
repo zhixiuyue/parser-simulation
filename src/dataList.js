@@ -95,11 +95,11 @@ export const analysisItems = [
     {
         key: 'LL1',
         text: "LL(1)分析",
-        route: LLRoute[0].route,
+        route: '/LL1',
     },
     {
         key: 'LR0',
         text: "LR(0)分析",
-        route: LRRoute[0].route,
+        route: '/LR0',
     },
 ]

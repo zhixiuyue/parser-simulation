@@ -9,6 +9,11 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: Home,
+    },
+    {
+      path: "/LL1",
+      name: "LL1",
+      component: Home,
       children: [
         // route level code-splitting
         // this generates a separate chunk (About.[hash].js) for this route
@@ -24,6 +29,18 @@ const router = createRouter({
           component: () => import("@/views/LL1Table.vue"),
         },
         {
+          path: "/LL1/LL1Analysis",
+          name: "LL1Analysis",
+          component: () => import("@/views/LL1Analysis.vue"),
+        },
+      ],
+    },
+    {
+      path: "/LR0",
+      name: "LR0",
+      component: Home,
+      children: [
+        {
           path: "/LR0/LR0Table",
           name: "LR0Table",
           component: () => import("@/views/LR0Table.vue"),
@@ -35,17 +52,12 @@ const router = createRouter({
           component: () => import("@/views/Automaton.vue"),
         },
         {
-          path: "/LL1/LL1Analysis",
-          name: "LL1Analysis",
-          component: () => import("@/views/LL1Analysis.vue"),
-        },
-        {
           path: "/LR0/LR0Analysis",
           name: "LR0Analysis",
           component: () => import("@/views/LR0Analysis.vue"),
           props: true,
         },
-      ],
+      ]
     },
   ],
 });

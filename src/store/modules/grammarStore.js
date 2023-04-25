@@ -30,6 +30,7 @@ const state = {
     ...LRState,
     step: 1,
     unfold: true,
+    showInitail: false,
 }
 
 const getters = {
@@ -95,6 +96,9 @@ const getters = {
     getUnFold: (state) => {
         return state.unfold;
     },
+    getShowInitail: (state) => {
+        return state.showInitail;
+    }
 }
 
 const clearData = (state) => {
@@ -166,6 +170,9 @@ const mutations = {
     },
     updateUnfold: (state, value) => {
         state.unfold = value;
+    },
+    updateShowInitail: (state, value) => {
+        state.showInitail = value;
     },
 }
 
