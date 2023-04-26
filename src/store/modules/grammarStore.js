@@ -4,6 +4,9 @@ const grammarState = {
     terminal: [],
     customMode: false,
     initialGrammar: [],
+    startGrammar: [],
+    startNonTerminal: [],
+    startTerminal: [],
 }
 
 const LL1State = {
@@ -31,6 +34,7 @@ const state = {
     step: 1,
     unfold: true,
     showInitail: false,
+    showArgument: false,
 }
 
 const getters = {
@@ -45,6 +49,17 @@ const getters = {
     },
     getTerminal: (state) => {
         return state.terminal.map((value) => {
+            return value[0];
+        });
+    },
+    getStartGrammar: (state) => {
+        return state.startGrammar;
+    },
+    getStartNonTerminal: (state) => {
+        return state.startNonTerminal;
+    },
+    getStartTerminal: (state) => {
+        return state.startTerminal.map((value) => {
             return value[0];
         });
     },
@@ -85,7 +100,7 @@ const getters = {
         return state.argument;
     },
     getStartTNonTer: (state) => {
-        return state.grammar[0].split(" => ")[0];
+        return state.grammar[0]?.split(" => ")[0];
     },
     getStep: (state) => {
         return state.step;
@@ -98,6 +113,9 @@ const getters = {
     },
     getShowInitail: (state) => {
         return state.showInitail;
+    },
+    getShowArgument: (state) => {
+        return state.showArgument;
     }
 }
 
@@ -125,6 +143,15 @@ const mutations = {
     },
     updateTerminal: (state, terminal) => {
         state.terminal = terminal;
+    },
+    updateStartGrammar: (state, grammar) => {
+        state.startGrammar = grammar;
+    },
+    updateStartNonTerminal: (state, nonTerminal) => {
+        state.startNonTerminal = nonTerminal;
+    },
+    updateStartTerminal: (state, terminal) => {
+        state.startTerminal = terminal;
     },
     updateCustomMode: (state, mode) => {
         state.customMode = mode;
@@ -173,6 +200,9 @@ const mutations = {
     },
     updateShowInitail: (state, value) => {
         state.showInitail = value;
+    },
+    updateShowArgument: (state, value) => {
+        state.showArgument = value;
     },
 }
 

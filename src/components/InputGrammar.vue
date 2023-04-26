@@ -16,14 +16,14 @@
                 <div class="input-ter" v-if="isCustomMode">
                     <span v-for="item in terminal" :key="item">{{ item }}</span>
                 </div>
-                <ol v-if="grammar.length" class="input-area">
-                    <li v-for="item in (showInitail ? initialGrammar : grammar)" :key="item" class="grammar-li">{{
+                <ol v-if="showGrammar.length" class="input-area">
+                    <li v-for="item in showGrammar" :key="item" class="grammar-li">{{
                         item
                     }}
                     </li>
-                    <el-tooltip class="box-item" effect="dark" :content="showInitail ? '查看改写文法' : '查看原始文法'"
-                        placement="top" v-if="initialGrammar.length">
-                        <el-icon class="initial" @click="transfer">
+                    <el-tooltip class="box-item" effect="dark" :content="tooltip.content" placement="top"
+                        v-if="tooltip.if">
+                        <el-icon class="initial" @click="tooltip.click">
                             <RefreshRight />
                         </el-icon>
                     </el-tooltip>
@@ -39,6 +39,8 @@
 import { ref, computed, watch } from 'vue';
 import { Edit } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const store = useStore();
 
@@ -46,16 +48,60 @@ const grammar = computed(() => {
     return store.getters["grammarStore/getGrammar"];
 })
 
-const initialGrammar = computed(() => {
-    return store.getters["grammarStore/getInitialGrammar"];
-})
-
-// const showInitail = ref(false);
-
 const showInitail = computed(() => {
     return store.getters["grammarStore/getShowInitail"];
 })
 
+const initialGrammar = computed(() => {
+    return store.getters["grammarStore/getInitialGrammar"];
+})
+
+const showArgument = computed(() => {
+    return store.getters["grammarStore/getShowArgument"];
+})
+
+const path = computed(() => {
+    return router.currentRoute.value.path.split('/')[1];
+})
+
+const argument = computed(() => {
+    return store.getters["grammarStore/getArgument"];
+})
+
+const showGrammar = computed(() => {
+    if (path.value === 'LR0') {
+        const startGrammar = store.getters["grammarStore/getStartGrammar"];
+        return showArgument.value ? [argument.value, ...startGrammar] : startGrammar;
+    }
+    else if (path.value === 'LL1') {
+        return showInitail.value ? initialGrammar.value : grammar.value;
+    }
+    return grammar.value;
+})
+
+const tooltip = computed(() => {
+    if (path.value === 'LR0') {
+        return {
+            content: showArgument.value ? '查看原始文法' : '查看增广文法',
+            if: argument.value,
+            click: () => {
+                store.commit("grammarStore/updateShowArgument", !showArgument.value);
+            }
+        }
+    }
+    // else if (path.value === 'LL1') {
+    return {
+        content: showInitail.value ? '查看改写文法' : '查看原始文法',
+        if: initialGrammar.value.length,
+        click: () => {
+            store.commit("grammarStore/updateShowInitail", !showInitail.value);
+        }
+    }
+    // }
+    // return {}
+})
+
+// const showInitail = ref(false);
 const transfer = () => {
     store.commit("grammarStore/updateShowInitail", !showInitail.value);
 }

@@ -23,7 +23,7 @@
                 <template #description>
                     <div v-if="index === 0">
                         <div class="rules">
-                            <div>增广文法定义</div>
+                            <div class="jump" @click="showArgument">文法增广</div>
                             <div class="argument-statement">假定文法G是一个以S为开始符号的文法，构造一个新的文法G‘,称G'是G的增广文法，G'定义如下：</div>
                             <ul class="argument-ul">
                                 <li>只增加一个新的非终结符S’(G‘的开始符号)；</li>
@@ -31,7 +31,11 @@
                                 <li>增广文法会有一个仅含项目S'->S·的状态，这是唯一的接受态；</li>
                             </ul>
                         </div>
-                        <el-button class="btn-save" type="primary" plain @click="jump(0)">生成DFA</el-button>
+                        <div class="jump" @click="jump(0)">构造LR0自动机</div>
+                        <div class="switch-container">
+                            <el-switch v-model="genStep" active-text="分步构建" />
+                            <el-switch v-model="genAuto" active-text="自动分步" />
+                        </div>
                     </div>
                     <div v-if="index === 1 && !ignoreLRTable">
                         <div class="jump" @click="jump(1)">LR(0)分析表构建</div>
@@ -53,6 +57,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import lucy from "lucy-compiler";
+import { genLL1 } from '@/genParser.js';
 
 const store = useStore();
 const active = ref(0);
@@ -68,6 +73,20 @@ const jump = (index) => {
     active.value = index;
     router.push(LRRoute[index].route);
 }
+
+const showArgument = () => {
+    const argument = store.getters["gramsmarStore/getArgument"];
+    if (!argument) {
+        const lRParser = store.getters["grammarStore/getLRParser"];
+        if (!lRParser) return;
+        const stateNodeValue = lRParser.stateGraph;
+        store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
+    }
+    store.commit("grammarStore/updateShowArgument", true);
+}
+
+const genStep = ref(false);
+const genAuto = ref(false);
 
 const onFinishInput = () => {
     if (!inputString.value) {
@@ -92,15 +111,9 @@ const grammar = computed(() => {
 const toLL1 = () => {
     const ll1 = store.getters["grammarStore/getLL1Parser"];
     if (!ll1) {
-        const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
-        const firstSet = ll1Parser.getFirstSet();
-        const followSet = ll1Parser.getFollowSet(firstSet);
-        // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
-        store.commit("grammarStore/updateLL1Parser", ll1Parser);
-        store.commit("grammarStore/updateFirstSet", firstSet);
-        store.commit("grammarStore/updateFollowSet", followSet);
+        genLL1();
     }
-    router.push(LLRoute[0].route);
+    router.push('/LL1');
 }
 </script>
 
@@ -143,7 +156,6 @@ const toLL1 = () => {
 
     .rules {
         font-size: 14px;
-        padding: 10px 0;
 
         .argument-statement {
             margin: 10px;
@@ -155,6 +167,11 @@ const toLL1 = () => {
                 margin-top: 10px;
             }
         }
+    }
+
+    .switch-container {
+        display: flex;
+        flex-direction: column;
     }
 
     .btn-save {

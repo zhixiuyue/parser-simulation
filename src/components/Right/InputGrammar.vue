@@ -164,8 +164,16 @@ const saveNonTerminal = (value) => {
     store.commit("grammarStore/updateNonTerminal", value);
 }
 
+const saveStartNonTerminal = (value) => {
+    store.commit("grammarStore/updateStartNonTerminal", value);
+}
+
 const saveTerminal = (value) => {
     store.commit("grammarStore/updateTerminal", value);
+}
+
+const saveStartTerminal = (value) => {
+    store.commit("grammarStore/updateStartTerminal", value);
 }
 
 const saveGrammar = (garmmar) => {
@@ -173,7 +181,9 @@ const saveGrammar = (garmmar) => {
         try {
             const { nonTerminals, terminals } = lucy.getTockFromSimpleGrammers(garmmar);
             saveNonTerminal(nonTerminals);
+            saveStartNonTerminal(nonTerminals);
             saveTerminal(terminals);
+            saveStartTerminal(terminals);
         } catch (error) {
             ElMessage({
                 message: '存在非法字符，请检查或切换自定义模式',
@@ -184,6 +194,7 @@ const saveGrammar = (garmmar) => {
     } else {
         if (noneTer.values) {
             saveNonTerminal(noneTer.values);
+            saveStartNonTerminal(noneTer.values);
         }
         if (Ter.values) {
             // const arr = Ter.values.map((item) => {
@@ -202,9 +213,11 @@ const saveGrammar = (garmmar) => {
             //     ]
             // })
             saveTerminal(Ter.values);
+            saveStartTerminal(Ter.values);
         }
     }
     store.commit("grammarStore/updateGrammar", garmmar);
+    store.commit("grammarStore/updateStartGrammar", garmmar);
     store.commit("grammarStore/updateCustomMode", openCustomMode);
     store.commit("grammarStore/updateInitialGrammar", []);
 }

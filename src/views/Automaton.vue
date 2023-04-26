@@ -2,8 +2,8 @@
   <div class="analysis">
     <!-- <CustomHeader :step=1 type="LR0" /> -->
     <div class="argument">
-      <span>增广语法产生式：{{ argument }}</span>
-      <el-dropdown @command="handleCommand">
+      <div class="first">LR(0)自动机</div>
+      <!-- <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
           {{ selectItems[selectedItem] }}
           <el-icon class="el-icon--right">
@@ -12,26 +12,15 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item
-              v-for="(item, index) in selectItems"
-              :key="item"
-              :command="index"
-              :disabled="selectedItem === index"
-              >{{ item }}</el-dropdown-item
-            >
+            <el-dropdown-item v-for="(item, index) in selectItems" :key="item" :command="index"
+              :disabled="selectedItem === index">{{ item }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
-      </el-dropdown>
+      </el-dropdown> -->
     </div>
     <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex"></D3Graph>
     <div class="control-btn" v-show="selectedItem === 1">
-      <el-button
-        text
-        :icon="ArrowLeft"
-        @click="goBack"
-        :disabled="dotIndex <= 1"
-        >上一步</el-button
-      >
+      <el-button text :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1">上一步</el-button>
       <el-button text @click="goForward" :disabled="dotIndex >= graph.length">
         下一步<el-icon class="el-icon--right">
           <ArrowRight />
@@ -102,7 +91,7 @@ const graphArr = ref([]);
 
 const stateValue = ref([]);
 const graphSet = ref(new Set());
-const convertEdge = (edgeItem) => {};
+const convertEdge = (edgeItem) => { };
 
 const generateDots = (stateNodeValue) => {
   let newArr = [];
@@ -119,11 +108,9 @@ const generateDots = (stateNodeValue) => {
         ...graphArr.value,
         edgeItem?.next?.id === -1
           ? `id [label="Accept" shape="none" style="none" ] id${item.id} -> id [ xlabel="${edgeItem?.tocken}"]`
-          : `id${edgeItem?.next?.id} [label="S${
-              edgeItem?.next?.id
-            }\n${edgeItem?.next?.items.join("\n")}"] id${item.id} -> id${
-              edgeItem?.next?.id
-            } [ xlabel="${edgeItem?.tocken}"]`,
+          : `id${edgeItem?.next?.id} [label="S${edgeItem?.next?.id
+          }\n${edgeItem?.next?.items.join("\n")}"] id${item.id} -> id${edgeItem?.next?.id
+          } [ xlabel="${edgeItem?.tocken}"]`,
       ];
       if (edgeItem?.next && !graphSet.value.has(edgeItem.next.id)) {
         newArr.push(edgeItem.next);
@@ -137,22 +124,19 @@ const nonTerminals = computed(() => {
   return store.getters["grammarStore/getNonTerminal"];
 });
 
+const argument = computed(() => {
+  return store.getters["grammarStore/getArgument"];
+});
+
 const generateData = () => {
   const lRParser = store.getters["grammarStore/getLRParser"];
-  const grammar = store.getters["grammarStore/getGrammar"];
-  const terminal = store.getters["grammarStore/getTerminal"];
-  lRParser.generateState(
-    grammar,
-    startNonTerminal.value,
-    nonTerminals.value,
-    terminal
-  );
   const stateNodeValue = lRParser.stateGraph;
-  store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
+  if (!argument.value) {
+    store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
+  }
   console.log(stateNodeValue);
   graphArr.value = [
-    `id${stateNodeValue?.id} [label="S${
-      stateNodeValue?.id
+    `id${stateNodeValue?.id} [label="S${stateNodeValue?.id
     }\n${stateNodeValue?.items.join("\n")}"] `,
   ];
   stateValue.value = [stateNodeValue];
@@ -164,10 +148,6 @@ const generateData = () => {
 
 const graph = computed(() => {
   return store.getters["grammarStore/getGraph"];
-});
-
-const argument = computed(() => {
-  return store.getters["grammarStore/getArgument"];
 });
 
 const dotIndex = ref(1);
@@ -260,6 +240,18 @@ watch(
       color: var(--el-color-primary);
       display: flex;
       align-items: center;
+    }
+  }
+
+  .first {
+    font-weight: 600;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    svg {
+      cursor: pointer;
     }
   }
 

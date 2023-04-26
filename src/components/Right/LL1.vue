@@ -61,6 +61,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import lucy from "lucy-compiler";
+import { genLR0 } from '@/genParser.js';
 
 const store = useStore();
 const active = ref(0);
@@ -99,10 +100,9 @@ const onFinishInput = () => {
 const toLR0 = () => {
     const lR = store.getters["grammarStore/getLRParser"];
     if (!lR) {
-        const lRParser = new lucy.LRParser();
-        store.commit("grammarStore/updateLRParser", lRParser);
+        genLR0();
     }
-    router.push(LRRoute[0].route);
+    router.push('/LR0');
 }
 </script>
 

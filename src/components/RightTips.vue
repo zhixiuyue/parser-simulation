@@ -35,8 +35,8 @@ import { useRouter } from 'vue-router';
 import InputGrammar from '@/components/Right/InputGrammar.vue';
 import LL1 from '@/components/Right/LL1.vue';
 import LR0 from '@/components/Right/LR0.vue';
-import { mode, analysisItems } from '@/dataList.js';
-import lucy from "lucy-compiler";
+import { analysisItems } from '@/dataList.js';
+import { genLL1, genLR0 } from '@/genParser.js'
 import { ElMessage } from 'element-plus';
 const store = useStore();
 const router = useRouter();
@@ -91,16 +91,9 @@ const jump = (item) => {
     const lR = store.getters["grammarStore/getLRParser"];
     const ll1 = store.getters["grammarStore/getLL1Parser"];
     if (key === 'LL1' && (isModify.value || !ll1)) {
-        const ll1Parser = new lucy.LL1Parser(terminal.value, nonTerminal.value, grammar.value);
-        const firstSet = ll1Parser.getFirstSet();
-        const followSet = ll1Parser.getFollowSet(firstSet);
-        // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
-        store.commit("grammarStore/updateLL1Parser", ll1Parser);
-        store.commit("grammarStore/updateFirstSet", firstSet);
-        store.commit("grammarStore/updateFollowSet", followSet);
+        genLL1();
     } else if (key === 'LR0' && (isModify.value || !lR)) {
-        const lRParser = new lucy.LRParser();
-        store.commit("grammarStore/updateLRParser", lRParser);
+        genLR0();
     }
     router.push({ path: route, query: params });
     isModify.value = false;
