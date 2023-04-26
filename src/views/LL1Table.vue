@@ -8,14 +8,22 @@
           <Hide v-else />
         </el-icon>
       </el-tooltip>
-      <span>计算First Set</span>
-      <span>计算Follow Set</span>
+      <span @click="handlePlayStatus(1)">计算First Set</span>
+      <span @click="handlePlayStatus(2)">计算Follow Set</span>
     </div>
-    <el-table :data="fistData" border v-show="!hideSet && !getHideFirset" :cell-class-name="setClassName"
+    <div v-if="firstRules.length && playStatus !== 0" class="rules-container">
+      <span class="rules-title">规则:</span>
+      <ul class="rules">
+        <li v-for=" (item, index) in firstRules" :key="item" :class="{ 'high': selectedFirstRules === index }">
+          {{ item }}
+        </li>
+      </ul>
+    </div>
+    <el-table :data="displayData" border v-show="!hideSet && !getHideFirset" :cell-class-name="setClassName"
       style="max-width: 700px">
       <el-table-column prop="nonTerminal" label="" align="center" width="150" />
-      <el-table-column prop="FIRST" label="FIRST" align="center" />
-      <el-table-column prop="FOLLOW" label="FOLLOW" align="center" />
+      <el-table-column v-if="playStatus !== 2" prop="FIRST" label="FIRST" align="center" />
+      <el-table-column v-if="playStatus !== 1" prop="FOLLOW" label="FOLLOW" align="center" />
     </el-table>
     <div class="first" v-show="type !== '0'">LL(1)分析表
       <el-tooltip class="box-item" effect="dark" :content="play ? '退出播放' : '播放'" placement="top">
@@ -64,11 +72,92 @@ const type = computed(() => {
   return router.currentRoute.value.query.type;
 })
 
+let selectedSet = ref({});
+
 const hideSet = ref(false);
+
+const playStatus = ref(0);
+
+const play = ref(false);
+
+const displayData = ref([]);
+
+const handlePlayStatus = (params) => {
+  playStatus.value = params;
+}
 
 const handleSetDisplay = () => {
   hideSet.value = !hideSet.value;
 };
+
+const firstSet = computed(() => {
+  return store.getters["grammarStore/getFirstSet"];
+});
+
+const followSet = computed(() => {
+  return store.getters["grammarStore/getFollowSet"];
+});
+
+const interval = ref();
+const intervalFirst = ref();
+const firstRules = ref([]);
+const selectedFirstRules = ref();
+
+const showFirstArrayDiff = (a, b, params) => {
+  if (!a.length) {
+    return [];
+  }
+  const diffArr = [];
+  for (let i = 0; i < a.length; i++) {
+    if (!b.length || a[i][params] !== b[i]?.[params]) {
+      if (a[i][params]) {
+        diffArr.push(
+          a[i].nonTerminal
+        );
+      }
+    }
+  }
+  return diffArr;
+}
+
+const playFirstData = (params) => {
+  let data;
+  if (params === 'FIRST') {
+    data = ll1Parser.value.getFirstSetProgressive();
+  } else if (params === 'FOLLOW') {
+    data = ll1Parser.value.getFollowSetProgressive(firstSet.value);
+  }
+  if (!data) return;
+  displayData.value = [];
+  play.value = false;
+  firstRules.value = data?.next().value;
+  console.log(firstRules.value);
+
+  const func = () => {
+    const val = data.next();
+    if (val.done) {
+      playStatus.value = 0;
+    } else {
+      const firstSetMap = val.value.result?.reduce((acc, curr) => {
+        acc[curr.tocken] = [...curr.terminals.values()].length ? `{ ${[...curr.terminals.values()].sort().join(" , ")} }` : '';
+        return acc;
+      }, {});
+
+      const arr = Object.keys(firstSetMap).map((val) => {
+        return {
+          nonTerminal: val,
+          [params]: firstSetMap[val],
+        };
+      });
+      selectedSet.value = {
+        [params]: showFirstArrayDiff(arr, displayData.value, params)
+      }
+      displayData.value = arr;
+      selectedFirstRules.value = val.value?.ruleIndex;
+    }
+  };
+  intervalFirst.value = setInterval(func, 2500);
+}
 
 const getHideFirset = computed(() => {
   return store.getters["grammarStore/getHideFirset"];
@@ -82,28 +171,11 @@ const terminal = computed(() => {
   return [...store.getters["grammarStore/getTerminal"], "$"];
 });
 
-const firstSet = computed(() => {
-  return store.getters["grammarStore/getFirstSet"];
-});
-
-const followSet = computed(() => {
-  return store.getters["grammarStore/getFollowSet"];
-});
-
 const tableData = ref([]);
 
 const ll1Parser = computed(() => {
   return store.getters["grammarStore/getLL1Parser"];
 });
-
-onMounted(() => {
-  for (let process of ll1Parser.value.getFirstSetProgressive()) {
-    console.log(process);
-  }
-  for (let process of ll1Parser.value.getFollowSetProgressive(firstSet)) {
-    console.log(process);
-  }
-})
 
 const transferData = (table) => {
   return table?.map((item) => {
@@ -133,12 +205,11 @@ const genTableData = () => {
 }
 
 onMounted(() => {
+  genfirstData();
   genTableData();
 })
 
 const rules = ref([]);
-
-const interval = ref();
 
 const judgeArrEqual = (a, b) => {
   if (a?.length === b?.length && a.filter(t => !b.includes(t))) {
@@ -148,7 +219,6 @@ const judgeArrEqual = (a, b) => {
 }
 
 const diffArray = ref([]);
-let selectedSet = ref({});
 const selectedRuleIndex = ref();
 
 const showArrayDiff = (a, b) => {
@@ -168,14 +238,12 @@ const showArrayDiff = (a, b) => {
   return diffArr;
 }
 
-const play = ref(false);
-
 const hanlePlay = () => {
   play.value = !play.value;
 }
 
 const tablePlay = () => {
-  clearInterval(interval.value);
+  playStatus.value = false;
   tableData.value = [];
   const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
   rules.value = genetator.next().value;
@@ -183,11 +251,7 @@ const tablePlay = () => {
   const func = () => {
     const data = genetator.next();
     if (data.done) {
-      clearInterval(interval.value);
-      diffArray.value = [];
-      selectedSet.value = {};
       play.value = false;
-      selectedRuleIndex.value = -1;
     } else {
       diffArray.value = showArrayDiff(transferData(data.value?.result), tableData.value);
       if (diffArray.value[0]) {
@@ -204,9 +268,10 @@ const tablePlay = () => {
 
 onUnmounted(() => {
   clearInterval(interval.value);
+  clearInterval(intervalFirst.value);
 })
 
-const fistData = computed(() => {
+const genfirstData = () => {
   const firstSetMap = firstSet.value.reduce((acc, curr) => {
     acc[curr.tocken] = `{ ${[...curr.terminals.values()].join(" , ")} }`;
     return acc;
@@ -223,8 +288,8 @@ const fistData = computed(() => {
       FOLLOW: followSetMap[val],
     };
   });
-  return arr;
-});
+  displayData.value = arr;
+}
 
 const cellClassName = ({ row, column }) => {
   for (let i = 0; i < diffArray.value.length; i++) {
@@ -236,21 +301,52 @@ const cellClassName = ({ row, column }) => {
 }
 
 const setClassName = ({ row, column }) => {
-  if (column.label === Object.keys(selectedSet.value)[0] && row.nonTerminal === Object.values(selectedSet.value)[0]) {
-    return 'highlight';
+  const keys = Object.keys(selectedSet.value);
+  const values = Object.values(selectedSet.value);
+  let className = '';
+  for (let i = 0; i < keys.length; i++) {
+    if (column.label === keys[i]) {
+      if (!Array.isArray(values[i]) && row.nonTerminal === values[i]) {
+        className = 'highlight';
+      }
+      if (Array.isArray(values[i])) {
+        values[i].forEach((value) => {
+          if (row.nonTerminal === value) {
+            className = 'highlight';
+          }
+        })
+      }
+    }
   }
-  return '';
+  return className;
 }
 
 watch(() => play, (newValue) => {
+  clearInterval(interval.value);
+  diffArray.value = [];
+  selectedSet.value = {};
+  rules.value = [];
+  selectedRuleIndex.value = -1;
   if (newValue.value) {
     tablePlay();
   } else {
-    clearInterval(interval.value);
-    diffArray.value = [];
-    selectedSet.value = {};
-    rules.value = [];
     genTableData();
+  };
+}, {
+  deep: true
+})
+
+watch(() => playStatus, (newValue) => {
+  clearInterval(intervalFirst.value);
+  selectedFirstRules.value = -1;
+  selectedSet.value = {};
+  if (newValue.value === 1) {
+    playFirstData('FIRST');
+  } else if (newValue.value === 2) {
+    playFirstData('FOLLOW');
+  }
+  else {
+    genfirstData();
   };
 }, {
   deep: true
@@ -310,6 +406,7 @@ watch(() => play, (newValue) => {
       font-weight: 400;
       font-size: 14px;
       cursor: pointer;
+      margin-left: 10px;
     }
   }
 

@@ -40,7 +40,7 @@
 // import CustomHeader from "@/components/Header.vue";
 import InputString from "@/components/InputString.vue";
 import LL1Table from "@/views/LL1Table.vue";
-import { ref, computed, watch, reactive, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, reactive, onMounted, onUnmounted, nextTick } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -97,7 +97,7 @@ const generateResult = () => {
       nonTerminal.value,
       predictTable.value
     );
-    onMounted(() => {
+    nextTick(() => {
       console.log("ast", predictResult.astNode);
       const tree = new Tree("#astNodeContainer", {
         data: [predictResult.astNode],
