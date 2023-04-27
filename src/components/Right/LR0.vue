@@ -33,8 +33,8 @@
                         </div>
                         <div class="jump" @click="jump(0)">构造LR0自动机</div>
                         <div class="switch-container">
-                            <el-switch v-model="genStep" active-text="分步构建" />
-                            <el-switch v-model="genAuto" active-text="自动分步" />
+                            <el-switch v-model="genStep" active-text="分步构建" @change="updateDfaPlayStatus($event, 1)" />
+                            <el-switch v-model="genAuto" active-text="自动分步" @change="updateDfaPlayStatus($event, 0)" />
                         </div>
                     </div>
                     <div v-if="index === 1 && !ignoreLRTable">
@@ -51,23 +51,17 @@
 </template>
 
 <script setup>
-import { LLRoute, LRRoute } from '@/dataList.js';
-import { Menu, Finished } from '@element-plus/icons-vue';
+import { LRRoute } from '@/dataList.js';
+import { Finished } from '@element-plus/icons-vue';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import lucy from "lucy-compiler";
 import { genLL1 } from '@/genParser.js';
 
 const store = useStore();
 const active = ref(0);
 const router = useRouter();
 const inputString = ref('');
-const ignoreLRTable = ref('');
-
-const handleIgnore = () => {
-    ignoreLRTable.value = !ignoreLRTable.value;
-}
 
 const jump = (index) => {
     active.value = index;
@@ -88,6 +82,30 @@ const showArgument = () => {
 const genStep = ref(false);
 const genAuto = ref(false);
 
+const updateDfaPlayStatus = (val, param) => {
+    if (val) {
+        store.commit("grammarStore/updateDfaPlayMethod", param);
+        if (param === 0) {
+            genStep.value = false;
+        } else if (param === 1) {
+            genAuto.value = false;
+        }
+    } else {
+        if (!genStep.value && !genAuto.value) {
+            store.commit("grammarStore/updateDfaPlayMethod", 2);
+        }
+    }
+}
+
+
+const ignoreLRTable = computed(() => {
+    return store.getters["grammarStore/getHideLRTable"];
+})
+
+const handleIgnore = () => {
+    store.commit("grammarStore/updateHideLRTable", !ignoreLRTable.value);
+}
+
 const onFinishInput = () => {
     if (!inputString.value) {
         return;
@@ -95,18 +113,6 @@ const onFinishInput = () => {
     store.commit("grammarStore/updateLRParsingString", inputString.value);
     jump(2);
 };
-
-const nonTerminal = computed(() => {
-    return store.getters["grammarStore/getNonTerminal"];
-})
-
-const terminal = computed(() => {
-    return store.state.grammarStore.terminal;
-})
-
-const grammar = computed(() => {
-    return store.getters["grammarStore/getGrammar"];
-})
 
 const toLL1 = () => {
     const ll1 = store.getters["grammarStore/getLL1Parser"];

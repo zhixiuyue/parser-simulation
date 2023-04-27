@@ -1,17 +1,18 @@
 <template>
     <div class="table-container">
-        <div class="table" @click="test">
+        <Automaton class="dfa" />
+        <div class="table" @click="test" v-if="!ignoreLRTable">
             <!-- <CustomHeader :step=2 type="LR0" /> -->
             <div class="first">
                 LR(0)分析表
-                <el-tooltip class="box-item" effect="dark" :content="play ? '隐藏DFA' : '显示DFA'" placement="top">
-                    <el-icon @click="hanlePlay">
-                        <View v-if="!play" />
+                <el-tooltip class="box-item" effect="dark" :content="hideTable ? '显示' : '隐藏'" placement="top">
+                    <el-icon @click="handleTableDisplay">
+                        <View v-if="hideTable" />
                         <Hide v-else />
                     </el-icon>
                 </el-tooltip>
             </div>
-            <el-table :data="tableData" class="table-data" stripe>
+            <el-table v-show="!hideTable" :data="tableData" class="table-data" stripe style="max-width: 700px">
                 <el-table-column prop="State" label="STATE" align="center" />
                 <el-table-column label="ACTION" align="center">
                     <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
@@ -36,17 +37,17 @@
                     </el-table-column>
                 </el-table-column>
             </el-table>
-            <el-drawer v-model="drawer" title="LR(0)DFA" direction="rtl" size="33%">
+            <!-- <el-drawer v-model="drawer" title="LR(0)DFA" direction="rtl" size="33%">
                 <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
-            </el-drawer>
+            </el-drawer> -->
             <!-- <el-button v-show="!play" class="open-dfa" @click="openDrawer">
                 查看DFA
             </el-button> -->
         </div>
-        <div class="graph" v-show="play">
+        <!-- <div class="graph" v-show="play">
             <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true">
             </D3Graph>
-        </div>
+        </div> -->
     </div>
     <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
@@ -61,11 +62,14 @@ import { ArrowLeft } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { LRRoute } from '@/dataList.js';
+import Automaton from './Automaton.vue';
 
 const router = useRouter();
 const type = computed(() => {
     return router.currentRoute.value.query.type;
 })
+
+const hideTable = ref(false);
 
 const D3GrapghRef = ref(null);
 
@@ -74,6 +78,14 @@ const store = useStore();
 const drawer = ref(false)
 
 const showDialog = ref(false);
+
+const handleTableDisplay = () => {
+    hideTable.value = !hideTable.value;
+};
+
+const ignoreLRTable = computed(() => {
+    return store.getters["grammarStore/getHideLRTable"];
+})
 
 const nonTerminal = computed(() => {
     return store.getters["grammarStore/getNonTerminal"];
@@ -189,8 +201,15 @@ const passData = reactive({});
 <style scoped lang="less">
 .table-container {
     display: flex;
-    height: 100%;
-    gap: 10px;
+    flex-direction: column;
+}
+
+// .dfa {
+//     flex: 1 0 350px;
+// }
+
+.none-dfa {
+    height: fit-content;
 }
 
 .graph {
@@ -202,8 +221,10 @@ const passData = reactive({});
     display: flex;
     flex-direction: column;
     gap: 10px;
-    flex: 1;
-    width: 0;
+
+    :deep(.cell) {
+        color: #000;
+    }
 
     .first {
         font-weight: 600;

@@ -2,7 +2,23 @@
   <div class="analysis">
     <!-- <CustomHeader :step=1 type="LR0" /> -->
     <div class="argument">
-      <div class="first">LR(0)自动机</div>
+      <div class="first">LR(0)自动机
+        <el-tooltip class="box-item" effect="dark" :content="hideDfa ? '显示' : '隐藏'" placement="top">
+          <el-icon @click="handleDfaDisplay">
+            <View v-if="hideDfa" />
+            <Hide v-else />
+          </el-icon>
+        </el-tooltip>
+        <div class="control-btn" v-show="selectedItem === 1 && !hideDfa">
+          <el-button :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1">上一步</el-button>
+          <el-button @click="goForward" :disabled="dotIndex >= graph.length">
+            下一步<el-icon class="el-icon--right">
+              <ArrowRight />
+            </el-icon>
+          </el-button>
+          <span class="step">{{ dotIndex }} / {{ graph.length }}</span>
+        </div>
+      </div>
       <!-- <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
           {{ selectItems[selectedItem] }}
@@ -18,16 +34,7 @@
         </template>
       </el-dropdown> -->
     </div>
-    <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex"></D3Graph>
-    <div class="control-btn" v-show="selectedItem === 1">
-      <el-button text :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1">上一步</el-button>
-      <el-button text @click="goForward" :disabled="dotIndex >= graph.length">
-        下一步<el-icon class="el-icon--right">
-          <ArrowRight />
-        </el-icon>
-      </el-button>
-      {{ dotIndex }} / {{ graph.length }}
-    </div>
+    <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex" v-show="!hideDfa"></D3Graph>
   </div>
   <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
@@ -46,6 +53,8 @@ import { LRRoute } from "@/dataList.js";
 const store = useStore();
 const router = useRouter();
 
+const hideDfa = ref(false);
+
 const passData = reactive({});
 const showDialog = ref(false);
 
@@ -55,6 +64,11 @@ const D3GrapghRef = ref(null);
 //     store.commit("grammarStore/updateLRStartNonTerminal", value);
 //     showDialog.value = false;
 // }
+
+const handleDfaDisplay = () => {
+  hideDfa.value = !hideDfa.value;
+};
+
 
 const startNonTerminal = computed(() => {
   return store.getters["grammarStore/getStartTNonTer"];
@@ -181,7 +195,10 @@ const handleCommand = (command) => {
 };
 
 const selectItems = ["自动播放", "手动播放", "不播放"];
-const selectedItem = ref(2);
+
+const selectedItem = computed(() => {
+  return store.getters["grammarStore/getDfaPlayMethod"];
+})
 
 watch(
   () => startNonTerminal,
@@ -256,10 +273,13 @@ watch(
   }
 
   .control-btn {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translate(-50%);
+    margin-left: 20px;
+
+    .step {
+      margin-left: 10px;
+      display: inline-flex;
+      align-items: center;
+    }
   }
 }
 </style>

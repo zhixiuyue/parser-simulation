@@ -1,12 +1,18 @@
 <template>
-    <div id="graph"></div>
+    <div id="graph" :class="path !== 'Automaton' ? 'fix-height' : ''"></div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import * as d3 from "d3"
 import "@hpcc-js/wasm"
 import "d3-graphviz";
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const path = computed(() => {
+    return router.currentRoute.value.path.split('/')[2];
+})
 
 const props = defineProps({
     graph: {
@@ -73,5 +79,9 @@ defineExpose({
     width: 100%;
     height: 89%;
     margin-top: 20px;
+}
+
+.fix-height {
+    height: 350px !important;
 }
 </style>

@@ -86,6 +86,13 @@ const parserData = ref([]);
 
 const displayData = ref([]);
 
+const genAst = (data) => {
+  console.log("ast", data);
+  const tree = new Tree("#astNodeContainer", {
+    data: [data],
+  });
+}
+
 const generateResult = () => {
   if (!parserString.value || !nonTerminal.value) {
     return [];
@@ -98,10 +105,7 @@ const generateResult = () => {
       predictTable.value
     );
     nextTick(() => {
-      console.log("ast", predictResult.astNode);
-      const tree = new Tree("#astNodeContainer", {
-        data: [predictResult.astNode],
-      });
+      genAst(predictResult.astNode);
     });
   } catch (error) {
     // predictResult = [...error.value, {
@@ -123,7 +127,6 @@ const generateResult = () => {
   displayData.value = data;
 };
 
-
 const play = ref(false);
 
 const hanlePlay = () => {
@@ -133,25 +136,41 @@ const hanlePlay = () => {
 const interval = ref();
 
 const analysisPlay = () => {
-  if (!parserData.value.length) {
-    return;
+  if (!parserString.value || !nonTerminal.value || !predictTable.value) {
+    return [];
   }
-  let times = 1;
+  const gen = ll1Parser.value.getPredictProcessProgressive(parserString.value,
+    nonTerminal.value,
+    predictTable.value);
+  genAst(gen.next().value.astNode);
   interval.value = setInterval(() => {
-    displayData.value = parserData.value.slice(0, times);
-    if (times === parserData.value.length) {
-      clearInterval(interval.value);
+    const val = gen.next();
+    if (val.done) {
       play.value = false;
+    } else {
+      if (val.value.length) {
+        displayData.value = val.value.map((value, index) => {
+          return {
+            Step: index + 1,
+            Stack: value.parseStack?.slice()?.reverse()?.join(""),
+            Input: value.remainingInput + "$",
+            Action: value.parseAction,
+          };
+        });
+        nextTick(() => {
+          genAst(val.value.astNode);
+        });
+      }
     }
-    times += 1;
   }, 2000);
 }
 
 watch(() => play, (newValue) => {
+  clearInterval(interval.value);
   if (newValue.value) {
+    displayData.value = [];
     analysisPlay();
   } else {
-    clearInterval(interval.value);
     displayData.value = parserData.value;
   };
 }, {

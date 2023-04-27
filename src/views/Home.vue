@@ -70,6 +70,8 @@ import InputGrammar from '@/components/InputGrammar.vue';
     height: 100%;
     overflow: auto;
     padding: 20px 8%;
+    // display: flex;
+    // flex-direction: column;
   }
 }
 </style>

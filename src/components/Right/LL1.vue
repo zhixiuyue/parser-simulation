@@ -55,12 +55,11 @@
 </template>
 
 <script setup>
-import { LLRoute, LRRoute } from '@/dataList.js';
-import { Menu, Finished } from '@element-plus/icons-vue';
+import { LLRoute } from '@/dataList.js';
+import { Finished } from '@element-plus/icons-vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import lucy from "lucy-compiler";
 import { genLR0 } from '@/genParser.js';
 
 const store = useStore();

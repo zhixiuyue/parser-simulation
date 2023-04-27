@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div v-if="!parserData.length">字符串规约失败</div>
-            <el-table v-else :data="parserData" stripe style="width: 100%" border class="table">
+            <el-table v-else :data="parserData" stripe style="max-width: 700px" border class="table">
                 <el-table-column prop="Step" label="Step" header-align="center" />
                 <el-table-column prop="Stack" label="Stack" header-align="center" />
                 <el-table-column prop="Symbols" label="symbols" header-align="center" />
@@ -40,6 +40,8 @@ const type = computed(() => {
 
 const passData = reactive({});
 
+const parserData = ref([]);
+
 const analysisRef = ref(null);
 
 const nonTerminal = computed(() => {
@@ -59,15 +61,18 @@ const parserString = computed(() => {
     return store.getters["grammarStore/getLRParsingString"];
 })
 
-const parserData = computed(() => {
+const predictTable = computed(() => {
+    return store.getters["grammarStore/getLRPredictTable"];
+});
+
+const genParserData = () => {
     if (!parserString.value || !nonTerminal.value) {
         return [];
     }
     const lRParser = store.getters["grammarStore/getLRParser"];
-    const predictTable = store.getters["grammarStore/getLRPredictTable"];
     let predictResult = [];
     try {
-        predictResult = lRParser.predictInput(parserString.value, predictTable);
+        predictResult = lRParser.predictInput(parserString.value, predictTable.value);
     } catch (error) {
         console.error(error);
     }
@@ -80,8 +85,8 @@ const parserData = computed(() => {
             Action: value.move,
         }
     })
-    return data;
-})
+    parserData.value = data;
+}
 
 const showDialog = ref(false);
 
@@ -100,14 +105,20 @@ const modifyInput = () => {
     passData['value'] = nonTerminal;
 }
 
-// watch(() => parserString, (newValue) => {
-//     if (!newValue.value) {
-//         showDialog.value = true;
-//     }
-// }, {
-//     immediate: true,
-//     deep: true
-// })
+watch(
+    [() => parserString.value, predictTable],
+    ([string, nonTer], [preString, preNonTer]) => {
+        if (!string || !nonTer) {
+
+        } else {
+            genParserData();
+        }
+    },
+    {
+        immediate: true,
+        deep: true,
+    }
+);
 
 watch(() => parserData, (newValue) => {
     nextTick(() => {
@@ -122,7 +133,9 @@ watch(() => parserData, (newValue) => {
 
 <style scoped lang="less">
 .analysis {
-    height: 100%;
+    :deep(.cell) {
+        color: #000;
+    }
 
     .content {
         padding: 10px 0;

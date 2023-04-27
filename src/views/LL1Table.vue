@@ -131,7 +131,6 @@ const playFirstData = (params) => {
   displayData.value = [];
   play.value = false;
   firstRules.value = data?.next().value;
-  console.log(firstRules.value);
 
   const func = () => {
     const val = data.next();

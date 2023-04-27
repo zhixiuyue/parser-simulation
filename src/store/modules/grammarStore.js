@@ -25,6 +25,8 @@ const LRState = {
     lRParser: "",
     graph: [],
     argument: "",
+    dfaPlayMethod: 2,
+    hideLRTable: false,
 }
 
 const state = {
@@ -116,6 +118,12 @@ const getters = {
     },
     getShowArgument: (state) => {
         return state.showArgument;
+    },
+    getDfaPlayMethod: (state) => {
+        return state.dfaPlayMethod;
+    },
+    getHideLRTable: (state) => {
+        return state.hideLRTable;
     }
 }
 
@@ -127,6 +135,10 @@ const clearData = (state) => {
     state.LRPredictTable = [];
     state.graph = [];
     state.argument = "";
+    state.showArgument = false;
+    state.ll1Parser = "";
+    state.lRParser = "";
+    state.dfaPlayMethod = 2;
 }
 
 const mutations = {
@@ -204,6 +216,12 @@ const mutations = {
     updateShowArgument: (state, value) => {
         state.showArgument = value;
     },
+    updateDfaPlayMethod: (state, value) => {
+        state.dfaPlayMethod = value;
+    },
+    updateHideLRTable: (state, value) => {
+        state.hideLRTable = value;
+    }
 }
 
 const actions = {
