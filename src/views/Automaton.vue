@@ -162,6 +162,7 @@ const generateData = () => {
     parser = store.getters["grammarStore/getLR1LALRParser"];
   }
   const stateNodeValue = parser.stateGraph;
+  console.log(stateNodeValue);
   if (!argument.value) {
     store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
   }

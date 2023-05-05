@@ -82,6 +82,11 @@ export const LRRoute = [
     params: { type: "LR0" },
   },
   {
+    text: "SLR(1)分析表构建",
+    route: "/LR0/LR0Table",
+    params: { type: "SLR1" },
+  },
+  {
     text: "LR(0)模拟分析",
     route: "/LR0/LR0Analysis",
     params: { type: "LR0" },
