@@ -57,7 +57,31 @@ const router = createRouter({
           component: () => import("@/views/LR0Analysis.vue"),
           props: true,
         },
-      ]
+      ],
+    },
+    {
+      path: "/LR1LALR",
+      name: "LR1LALR",
+      component: Home,
+      children: [
+        {
+          path: "/LR1LALR/LR1LALRTable",
+          name: "LR1LALRTable",
+          component: () => import("@/views/LR1LALRTable.vue"),
+          props: true,
+        },
+        {
+          path: "/LR1LALR/Automaton",
+          name: "Automaton",
+          component: () => import("@/views/Automaton.vue"),
+        },
+        {
+          path: "/LR1LALR/LR1LALRAnalysis",
+          name: "LR1LALRAnalysis",
+          component: () => import("@/views/LR1LALRAnalysis.vue"),
+          props: true,
+        },
+      ],
     },
   ],
 });

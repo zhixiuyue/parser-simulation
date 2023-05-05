@@ -2,15 +2,23 @@
   <div class="analysis">
     <!-- <CustomHeader :step=1 type="LR0" /> -->
     <div class="argument">
-      <div class="first">LR(0)自动机
-        <el-tooltip class="box-item" effect="dark" :content="hideDfa ? '显示' : '隐藏'" placement="top">
+      <div class="first">
+        LR(1)自动机
+        <el-tooltip
+          class="box-item"
+          effect="dark"
+          :content="hideDfa ? '显示' : '隐藏'"
+          placement="top"
+        >
           <el-icon @click="handleDfaDisplay">
             <View v-if="hideDfa" />
             <Hide v-else />
           </el-icon>
         </el-tooltip>
         <div class="control-btn" v-show="selectedItem === 1 && !hideDfa">
-          <el-button :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1">上一步</el-button>
+          <el-button :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1"
+            >上一步</el-button
+          >
           <el-button @click="goForward" :disabled="dotIndex >= graph.length">
             下一步<el-icon class="el-icon--right">
               <ArrowRight />
@@ -34,7 +42,12 @@
         </template>
       </el-dropdown> -->
     </div>
-    <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex" v-show="!hideDfa"></D3Graph>
+    <D3Graph
+      ref="D3GrapghRef"
+      :graph="graph"
+      :dotIndex="dotIndex"
+      v-show="!hideDfa"
+    ></D3Graph>
   </div>
   <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
             :notShowInput="true" @onClose="onClose" /> -->
@@ -68,7 +81,6 @@ const D3GrapghRef = ref(null);
 const handleDfaDisplay = () => {
   hideDfa.value = !hideDfa.value;
 };
-
 
 const startNonTerminal = computed(() => {
   return store.getters["grammarStore/getStartTNonTer"];
@@ -105,7 +117,7 @@ const graphArr = ref([]);
 
 const stateValue = ref([]);
 const graphSet = ref(new Set());
-const convertEdge = (edgeItem) => { };
+const convertEdge = (edgeItem) => {};
 
 const generateDots = (stateNodeValue) => {
   let newArr = [];
@@ -122,9 +134,11 @@ const generateDots = (stateNodeValue) => {
         ...graphArr.value,
         edgeItem?.next?.id === -1
           ? `id [label="Accept" shape="none" style="none" ] id${item.id} -> id [ xlabel="${edgeItem?.tocken}"]`
-          : `id${edgeItem?.next?.id} [label="S${edgeItem?.next?.id
-          }\n${edgeItem?.next?.items.join("\n")}"] id${item.id} -> id${edgeItem?.next?.id
-          } [ xlabel="${edgeItem?.tocken}"]`,
+          : `id${edgeItem?.next?.id} [label="S${
+              edgeItem?.next?.id
+            }\n${edgeItem?.next?.items.join("\n")}"] id${item.id} -> id${
+              edgeItem?.next?.id
+            } [ xlabel="${edgeItem?.tocken}"]`,
       ];
       if (edgeItem?.next && !graphSet.value.has(edgeItem.next.id)) {
         newArr.push(edgeItem.next);
@@ -143,14 +157,17 @@ const argument = computed(() => {
 });
 
 const generateData = () => {
-  const lRParser = store.getters["grammarStore/getLRParser"];
-  const stateNodeValue = lRParser.stateGraph;
+  let parser = store.getters["grammarStore/getLRParser"];
+  if (!parser) {
+    parser = store.getters["grammarStore/getLR1LALRParser"];
+  }
+  const stateNodeValue = parser.stateGraph;
   if (!argument.value) {
     store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
   }
-  console.log(stateNodeValue);
   graphArr.value = [
-    `id${stateNodeValue?.id} [label="S${stateNodeValue?.id
+    `id${stateNodeValue?.id} [label="S${
+      stateNodeValue?.id
     }\n${stateNodeValue?.items.join("\n")}"] `,
   ];
   stateValue.value = [stateNodeValue];
@@ -198,7 +215,7 @@ const selectItems = ["自动播放", "手动播放", "不播放"];
 
 const selectedItem = computed(() => {
   return store.getters["grammarStore/getDfaPlayMethod"];
-})
+});
 
 watch(
   () => startNonTerminal,

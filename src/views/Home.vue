@@ -19,8 +19,8 @@
 </template>
 
 <script setup>
-import RightTips from '@/components/RightTips.vue';
-import InputGrammar from '@/components/InputGrammar.vue';
+import RightTips from "@/components/RightTips.vue";
+import InputGrammar from "@/components/InputGrammar.vue";
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -36,7 +36,7 @@ import InputGrammar from '@/components/InputGrammar.vue';
 .el-header,
 .el-footer {
   background-color: #fff;
-  color: #18191C;
+  color: #18191c;
 }
 
 .el-header {
