@@ -23,6 +23,7 @@ const LRState = {
   LRStartNonTerminal: "",
   LRPredictTable: [],
   lRParser: "",
+  LR0Type: "LR0",
   graph: [],
   argument: "",
   dfaPlayMethod: 2,
@@ -113,6 +114,9 @@ const getters = {
   },
   getLR1LALRType: (state) => {
     return state.LR1LALRType;
+  },
+  getLR0Type: (state) => {
+    return state.LR0Type;
   },
   getLRParser: (state) => {
     return state.lRParser;
@@ -225,6 +229,9 @@ const mutations = {
   },
   updateLR1LALRType: (state, value) => {
     state.LR1LALRType = value;
+  },
+  updateLR0Type: (state, value) => {
+    state.LR0Type = value;
   },
   updateGraph: (state, value) => {
     state.graph = value;
