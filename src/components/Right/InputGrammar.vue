@@ -254,7 +254,7 @@ const handleGrammar = () => {
         });
     let grammars = [];
     while (index < tokens.length) {
-        if (index + 1 < tokens.length && tokens[index + 1] === '=>') {
+        if (index + 1 < tokens.length && (tokens[index + 1] === '->' || tokens[index + 1] === '=>')) {
             const result = pushGrammar(head, grammar);
             if (result) {
                 grammars.push(result);

@@ -48,7 +48,7 @@ const router = createRouter({
         },
         {
           path: "/LR0/Automaton",
-          name: "Automaton",
+          name: "AutomatonForLR0",
           component: () => import("@/views/Automaton.vue"),
         },
         {

@@ -2,21 +2,11 @@
   <div class="right-LL1">
     <div class="title">LR(1)/LALR分析</div>
     <el-steps direction="vertical" :active="active" finish-status="success">
-      <el-step
-        v-for="(item, index) in LR1LALRRoute"
-        :key="item.text"
-        :title="item.text"
-        :icon="Finished"
-      >
+      <el-step v-for="(item, index) in LR1LALRRoute" :key="item.text" :title="item.text" :icon="Finished">
         <template #title>
           <div class="step-title">
             <span>{{ item.text }}</span>
-            <el-tooltip
-              v-if="index === 1"
-              effect="dark"
-              :content="ignoreLRTable ? '展开此步骤' : '忽略此步骤'"
-              placement="top"
-            >
+            <el-tooltip v-if="index === 1" effect="dark" :content="ignoreLRTable ? '展开此步骤' : '忽略此步骤'" placement="top">
               <el-icon @click="handleIgnore">
                 <Remove />
               </el-icon>
@@ -40,16 +30,8 @@
             </div>
             <div class="jump" @click="jump(0)">构造LR1自动机</div>
             <div class="switch-container">
-              <el-switch
-                v-model="genStep"
-                active-text="分步构建"
-                @change="updateDfaPlayStatus($event, 1)"
-              />
-              <el-switch
-                v-model="genAuto"
-                active-text="自动分步"
-                @change="updateDfaPlayStatus($event, 0)"
-              />
+              <el-switch v-model="genStep" active-text="分步构建" @change="updateDfaPlayStatus($event, 1)" />
+              <el-switch v-model="genAuto" active-text="自动分步" @change="updateDfaPlayStatus($event, 0)" />
             </div>
           </div>
           <div v-if="index === 1 && !ignoreLRTable">
@@ -57,19 +39,8 @@
             <div class="jump" @click="jump(2)">LALR分析表构建</div>
           </div>
           <div v-if="index === 2">
-            <el-input
-              v-model="inputString"
-              placeholder="请输入待分析字符串"
-              clearable
-              class="input-area"
-            />
-            <el-button
-              type="primary"
-              plain
-              class="sure-btn"
-              @click="onFinishInput"
-              >开始分析</el-button
-            >
+            <el-input v-model="inputString" placeholder="请输入待分析字符串" clearable class="input-area" />
+            <el-button type="primary" plain class="sure-btn" @click="onFinishInput">开始分析</el-button>
           </div>
         </template>
       </el-step>
@@ -192,7 +163,7 @@ const onFinishInput = () => {
     }
 
     .argument-ul {
-      li + li {
+      li+li {
         margin-top: 10px;
       }
     }
