@@ -34,7 +34,7 @@
                                 {{ tag }}
                             </el-tag>
                             <el-input v-if="noneTer.inputVisible" class="input-none-ter" ref="InputNoneTerRef"
-                                v-model="noneTer.inputValue" @keyup.enter="handleInputConfirm(noneTer, 1111)"
+                                v-model="noneTer.inputValue" @keyup.enter="handleInputConfirm(noneTer, 'Non')"
                                 @blur="handleBlur(noneTer, 'Non')" />
                             <el-button v-else :icon="Plus" circle size="small" @click="showInputNoneTer"
                                 :disabled="activeStep > 1" />
