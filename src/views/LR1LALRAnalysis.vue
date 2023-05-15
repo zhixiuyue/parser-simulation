@@ -10,29 +10,15 @@
         </div>
       </div>
       <div v-if="!parserData.length">字符串规约失败</div>
-      <el-table
-        v-else
-        :data="parserData"
-        stripe
-        style="max-width: 700px"
-        border
-        class="table"
-      >
+      <el-table v-else :data="parserData" stripe style="max-width: 700px" border class="table">
         <el-table-column prop="Step" label="Step" header-align="center" />
         <el-table-column prop="Stack" label="Stack" header-align="center" />
         <el-table-column prop="Symbols" label="symbols" header-align="center" />
-        <el-table-column
-          prop="Input"
-          label="Input"
-          align="right"
-          header-align="center"
-        />
+        <el-table-column prop="Input" label="Input" align="right" header-align="center" />
         <el-table-column prop="Action" label="Action" header-align="center" />
       </el-table>
     </div>
   </div>
-  <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
-        :notShowNonTer=notShowNonTer @onClose="onClose" /> -->
 </template>
 
 <script setup>
@@ -43,7 +29,6 @@ import { ref, computed, watch, reactive, onMounted, nextTick } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { LRRoute } from "@/dataList.js";
 
 const router = useRouter();
 const store = useStore();
@@ -63,12 +48,6 @@ const nonTerminal = computed(() => {
 });
 
 const notShowNonTer = ref(true);
-
-const saveInput = (string, value) => {
-  store.commit("grammarStore/updateLRParsingString", string);
-  // !notShowNonTer && store.commit("grammarStore/updateLRStartNonTerminal", value);
-  showDialog.value = false;
-};
 
 const parserString = computed(() => {
   return store.getters["grammarStore/getLRParsingString"];
@@ -103,23 +82,6 @@ const genParserData = () => {
     };
   });
   parserData.value = data;
-};
-
-const showDialog = ref(false);
-
-const onClose = () => {
-  if (!parserString.value || !nonTerminal.value) {
-    router.push(LRRoute[2].route);
-  } else {
-    showDialog.value = false;
-  }
-};
-
-const modifyInput = () => {
-  notShowNonTer.value = false;
-  showDialog.value = true;
-  passData["inputString"] = parserString;
-  passData["value"] = nonTerminal;
 };
 
 watch(
@@ -184,7 +146,7 @@ watch(
       }
     }
 
-    div + div {
+    div+div {
       margin-top: 10px;
     }
 

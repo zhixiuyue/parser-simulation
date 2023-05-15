@@ -1,11 +1,6 @@
 <template>
     <div class="right-LL1">
         <div class="title">LL(1)分析
-            <el-tooltip class="box-item" effect="dark" content="切换至LR(0)分析" placement="top">
-                <el-icon @click="toLR0">
-                    <Switch />
-                </el-icon>
-            </el-tooltip>
         </div>
         <el-steps direction="vertical" :active="active" finish-status="success">
             <el-step v-for="(item, index) in LLRoute" :key="item.text" :title="item.text" :icon="Finished">
@@ -96,13 +91,6 @@ const onFinishInput = () => {
     jump(2);
 };
 
-const toLR0 = () => {
-    const lR = store.getters["grammarStore/getLRParser"];
-    if (!lR) {
-        genLR0();
-    }
-    router.push('/LR0');
-}
 </script>
 
 <style lang="less" scoped>

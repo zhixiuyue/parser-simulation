@@ -1,34 +1,19 @@
 <template>
   <div class="right-LL1">
     <div class="title">
-      LR(0)分析
-      <el-tooltip
-        class="box-item"
-        effect="dark"
-        content="切换至LL(1)分析"
-        placement="top"
-      >
-        <el-icon @click="toLL1">
+      LR(0)/SLR(1)分析
+      <el-tooltip class="box-item" effect="dark" content="切换至LR(1)/LALR分析" placement="top">
+        <el-icon @click="toLR1">
           <Switch />
         </el-icon>
       </el-tooltip>
     </div>
     <el-steps direction="vertical" :active="active" finish-status="success">
-      <el-step
-        v-for="(item, index) in LRRoute"
-        :key="item.text"
-        :title="item.text"
-        :icon="Finished"
-      >
+      <el-step v-for="(item, index) in LRRoute" :key="item.text" :title="item.text" :icon="Finished">
         <template #title>
           <div class="step-title">
             <span>{{ item.text }}</span>
-            <el-tooltip
-              v-if="index === 1"
-              effect="dark"
-              :content="ignoreLRTable ? '展开此步骤' : '忽略此步骤'"
-              placement="top"
-            >
+            <el-tooltip v-if="index === 1" effect="dark" :content="ignoreLRTable ? '展开此步骤' : '忽略此步骤'" placement="top">
               <el-icon @click="handleIgnore">
                 <Remove />
               </el-icon>
@@ -50,38 +35,19 @@
                 </li>
               </ul>
             </div>
-            <div class="jump" @click="jump(0)">构造LR0自动机</div>
+            <div class="jump" @click="jump(0)">构造LR(0)自动机</div>
             <div class="switch-container">
-              <el-switch
-                v-model="genStep"
-                active-text="分步构建"
-                @change="updateDfaPlayStatus($event, 1)"
-              />
-              <el-switch
-                v-model="genAuto"
-                active-text="自动分步"
-                @change="updateDfaPlayStatus($event, 0)"
-              />
+              <el-switch v-model="genStep" active-text="分步构建" @change="updateDfaPlayStatus($event, 1)" />
+              <el-switch v-model="genAuto" active-text="自动分步" @change="updateDfaPlayStatus($event, 0)" />
             </div>
           </div>
           <div v-if="index === 1 && !ignoreLRTable">
-            <div class="jump" @click="jump(1)">LR(0)分析表构建</div>
-            <div class="jump" @click="jump(2)">SLR(1)分析表构建</div>
+            <div class="jump" @click="jump(1, 'LR(0)')">LR(0)分析表构建</div>
+            <div class="jump" @click="jump(1, 'SLR(1)')">SLR(1)分析表构建</div>
           </div>
           <div v-if="index === 2">
-            <el-input
-              v-model="inputString"
-              placeholder="请输入待分析字符串"
-              clearable
-              class="input-area"
-            />
-            <el-button
-              type="primary"
-              plain
-              class="sure-btn"
-              @click="onFinishInput"
-              >开始分析</el-button
-            >
+            <el-input v-model="inputString" placeholder="请输入待分析字符串" clearable class="input-area" />
+            <el-button type="primary" plain class="sure-btn" @click="onFinishInput">开始分析</el-button>
           </div>
         </template>
       </el-step>
@@ -95,23 +61,18 @@ import { Finished } from "@element-plus/icons-vue";
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { genLL1 } from "@/genParser.js";
+import { genLR1LALR } from "@/genParser.js";
 
 const store = useStore();
 const active = ref(0);
 const router = useRouter();
 const inputString = ref("");
 
-const jump = (index) => {
+const jump = (index, type) => {
   active.value = index;
   router.push(LRRoute[index].route);
-  switch (index) {
-    case 1:
-      store.commit("grammarStore/updateLR0Type", "LR0");
-      break;
-    case 2:
-      store.commit("grammarStore/updateLR0Type", "SLR1");
-      break;
+  if (type) {
+    store.commit("grammarStore/updateLR0Type", type);
   }
 };
 
@@ -157,15 +118,15 @@ const onFinishInput = () => {
     return;
   }
   store.commit("grammarStore/updateLRParsingString", inputString.value);
-  jump(3);
+  jump(2);
 };
 
-const toLL1 = () => {
-  const ll1 = store.getters["grammarStore/getLL1Parser"];
-  if (!ll1) {
-    genLL1();
+const toLR1 = () => {
+  const LR1 = store.getters["grammarStore/getLL1Parser"];
+  if (!LR1) {
+    genLR1LALR();
   }
-  router.push("/LL1");
+  router.push('/LR1LALR');
 };
 </script>
 
@@ -213,7 +174,7 @@ const toLL1 = () => {
     }
 
     .argument-ul {
-      li + li {
+      li+li {
         margin-top: 10px;
       }
     }

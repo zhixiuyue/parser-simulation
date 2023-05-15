@@ -1,6 +1,12 @@
 <template>
   <div class="right-LL1">
-    <div class="title">LR(1)/LALR分析</div>
+    <div class="title">LR(1)/LALR分析
+      <el-tooltip class="box-item" effect="dark" content="切换至LR(0)/SLR(1)分析" placement="top">
+        <el-icon @click="toLR0">
+          <Switch />
+        </el-icon>
+      </el-tooltip>
+    </div>
     <el-steps direction="vertical" :active="active" finish-status="success">
       <el-step v-for="(item, index) in LR1LALRRoute" :key="item.text" :title="item.text" :icon="Finished">
         <template #title>
@@ -28,15 +34,15 @@
                 </li>
               </ul>
             </div>
-            <div class="jump" @click="jump(0)">构造LR1自动机</div>
+            <div class="jump" @click="jump(0)">构造LR(1)自动机</div>
             <div class="switch-container">
               <el-switch v-model="genStep" active-text="分步构建" @change="updateDfaPlayStatus($event, 1)" />
               <el-switch v-model="genAuto" active-text="自动分步" @change="updateDfaPlayStatus($event, 0)" />
             </div>
           </div>
           <div v-if="index === 1 && !ignoreLRTable">
-            <div class="jump" @click="jump(1)">LR(1)分析表构建</div>
-            <div class="jump" @click="jump(2)">LALR分析表构建</div>
+            <div class="jump" @click="jump(1, 'LR(1)')">LR(1)分析表构建</div>
+            <div class="jump" @click="jump(1, 'LALR')">LALR分析表构建</div>
           </div>
           <div v-if="index === 2">
             <el-input v-model="inputString" placeholder="请输入待分析字符串" clearable class="input-area" />
@@ -54,22 +60,18 @@ import { Finished } from "@element-plus/icons-vue";
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { genLR0 } from "@/genParser.js";
 
 const store = useStore();
 const active = ref(0);
 const router = useRouter();
 const inputString = ref("");
 
-const jump = (index) => {
+const jump = (index, type) => {
   active.value = index;
   router.push(LR1LALRRoute[index].route);
-  switch (index) {
-    case 1:
-      store.commit("grammarStore/updateLR1LALRType", "LR1");
-      break;
-    case 2:
-      store.commit("grammarStore/updateLR1LALRType", "LALR");
-      break;
+  if (type) {
+    store.commit("grammarStore/updateLR1LALRType", type);
   }
 };
 
@@ -115,7 +117,15 @@ const onFinishInput = () => {
     return;
   }
   store.commit("grammarStore/updateLRParsingString", inputString.value);
-  jump(3);
+  jump(2);
+};
+
+const toLR0 = () => {
+  const lR = store.getters["grammarStore/getLRParser"];
+  if (!lR) {
+    genLR0();
+  }
+  router.push('/LR0');
 };
 </script>
 

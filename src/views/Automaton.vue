@@ -3,7 +3,7 @@
     <!-- <CustomHeader :step=1 type="LR0" /> -->
     <div class="argument">
       <div class="first">
-        LR(1)自动机
+        {{ type }}自动机
         <el-tooltip class="box-item" effect="dark" :content="hideDfa ? '显示' : '隐藏'" placement="top">
           <el-icon @click="handleDfaDisplay">
             <View v-if="hideDfa" />
@@ -37,8 +37,6 @@
     </div>
     <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex" v-show="!hideDfa"></D3Graph>
   </div>
-  <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            :notShowInput="true" @onClose="onClose" /> -->
 </template>
 
 <script setup>
@@ -49,22 +47,27 @@ import D3Graph from "@/components/D3Graph.vue";
 import { ref, computed, reactive, watch, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { LRRoute } from "@/dataList.js";
 
 const store = useStore();
 const router = useRouter();
 
+const type = computed(() => {
+  switch (router.currentRoute.value.path.split('/')[1]) {
+    case 'LR0':
+      return 'LR(0)'
+      break;
+    case 'LR1LALR':
+      return 'LR(1)'
+    default:
+      return '';
+  }
+})
+
 const hideDfa = ref(false);
 
 const passData = reactive({});
-const showDialog = ref(false);
 
 const D3GrapghRef = ref(null);
-
-// const saveInput = (string, value) => {
-//     store.commit("grammarStore/updateLRStartNonTerminal", value);
-//     showDialog.value = false;
-// }
 
 const handleDfaDisplay = () => {
   hideDfa.value = !hideDfa.value;
@@ -73,14 +76,6 @@ const handleDfaDisplay = () => {
 const startNonTerminal = computed(() => {
   return store.getters["grammarStore/getStartTNonTer"];
 });
-
-// const onClose = () => {
-//     if (!startNonTerminal.value) {
-//         router.push(LRRoute[1].route);
-//     } else {
-//         showDialog.value = false;
-//     }
-// }
 
 const graphArr = ref([]);
 // const dfs = (edges, fromNodeId) => {
@@ -207,13 +202,7 @@ watch(
   () => startNonTerminal,
   (newValue, preValue) => {
     if (!newValue.value) {
-      router.push(LRRoute[1].route);
-      // if (nonTerminals.value.length === 1) {
-      //     store.commit("grammarStore/updateLRStartNonTerminal", nonTerminals.value[0]);
-      // }
-      // else {
-      //     showDialog.value = true;
-      // }
+      router.push('/');
     } else {
       if (preValue == undefined) {
         setTimeout(() => {

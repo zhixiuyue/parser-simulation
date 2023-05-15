@@ -48,12 +48,12 @@
                                 size="large" @close="handleClose(Ter.values, tag)">
                                 {{ tag }}
                             </el-tag>
-                            <div v-if="Ter.inputVisible" @keyup.enter="handleInputConfirm(Ter)"
-                                @focusout="handleBlur(Ter)" tabindex="-2" class="input-container">
+                            <div v-if="Ter.inputVisible" @keyup.enter="handleInputConfirm(Ter)" tabindex="-2"
+                                class="input-container">
                                 <el-input class="input-none-ter" v-model="Ter.inputValue" ref="InputTerRef"
-                                    @input="showReg" placeholder="终止符" />
+                                    @input="showReg" placeholder="终止符" @blur="setTimer" @focus="clearTimer" />
                                 <el-input class="input-none-ter" v-model="Ter.inputValueReg" ref="InputTerRegRef"
-                                    placeholder="正则" />
+                                    placeholder="正则" @blur="setTimer" @focus="clearTimer" @input="checkReg" />
                             </div>
                             <el-button v-else :icon="Plus" circle size="small" @click="showInputTer"
                                 :disabled="activeStep > 1" />
@@ -66,9 +66,9 @@
                             v-model="inputGrammar" :disabled="activeStep > 1">
                         </el-input>
                     </div>
-                    <el-button v-if="activeStep === 1" class="btn-save" type="primary" plain
+                    <el-button v-if="activeStep === 1" class="btn-save" type="primary"
                         @click="handleGrammar">确定</el-button>
-                    <el-button v-else class="btn-save" :icon="Edit" @click="reDefine">重定义</el-button>
+                    <el-button v-else class="btn-save" :icon="Edit" type="info" @click="reDefine">重定义</el-button>
                 </div>
             </div>
         </el-collapse-item>
@@ -77,7 +77,7 @@
 
 <script setup>
 import { mode } from '@/dataList.js';
-import { computed, ref, reactive, nextTick, watch } from "vue";
+import { computed, ref, reactive, nextTick, watch, onUnmounted } from "vue";
 import { Plus, Edit } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import lucy from "lucy-compiler";
@@ -107,6 +107,13 @@ const inputRef = ref(null);
 const activeName = ref('1');
 
 const handleClose = (tags, tag) => {
+    if (activeStep.value > 1) {
+        ElMessage({
+            message: '重定义文法时可操作',
+            type: 'warning',
+        });
+        return;
+    }
     tags.splice(tags.indexOf(tag), 1);
 }
 
@@ -118,17 +125,44 @@ const handleInputConfirm = (tags, index) => {
         }
     } else {
         if (tags.inputValue.trim() && tags.inputValueReg) {
-            tags.values.push([tags.inputValue, tags.inputValueReg]);
+            let val = '';
+            try {
+                val = new RegExp(tags.inputValueReg);
+
+            } catch (error) {
+                ElMessage({
+                    message: '非法正则表达式，请重新输入',
+                    type: 'error',
+                });
+                return;
+            }
+            tags.values.push([tags.inputValue, val]);
             tags.inputValue = '';
             tags.inputValueReg = '';
         }
     }
 }
 
+const timer = ref(null);
+
 const handleBlur = (tags, index) => {
     handleInputConfirm(tags, index);
     tags.inputVisible = false;
 }
+
+const setTimer = () => {
+    timer.value = setTimeout(() => {
+        handleBlur(Ter);
+    }, 500);
+}
+
+const clearTimer = () => {
+    clearTimeout(timer.value);
+}
+
+onUnmounted(() => {
+    timer.value && clearTimeout(timer.value);
+})
 
 const showInputNoneTer = () => {
     noneTer.inputVisible = true;
@@ -148,7 +182,7 @@ const pushGrammar = (item, grammar) => {
     if (!grammar.length || !item) {
         return '';
     }
-    let str = `${item} =>`;
+    let str = `${item} ->`;
     grammar.forEach((val, index) => {
         val.forEach(token => {
             str += ` ${token}`;
@@ -197,21 +231,6 @@ const saveGrammar = (garmmar) => {
             saveStartNonTerminal(noneTer.values);
         }
         if (Ter.values) {
-            // const arr = Ter.values.map((item) => {
-            //     let regExp = '';
-            //     for (let i = 0; i < item.length; i++) {
-            //         const value = item[i];
-            //         if (specialChar.includes(value)) {
-            //             regExp += `\\${value}`;
-            //         } else {
-            //             regExp += value;
-            //         }
-            //     }
-            //     return [
-            //         item,
-            //         new RegExp(`^${regExp}`)
-            //     ]
-            // })
             saveTerminal(Ter.values);
             saveStartTerminal(Ter.values);
         }
@@ -316,7 +335,27 @@ const showReg = (value) => {
     } else {
         regExp += value;
     }
-    Ter.inputValueReg = value.trim() ? new RegExp(`^${regExp}`) : '';
+    try {
+        Ter.inputValueReg = value.trim() ? new RegExp(`^${regExp}`) : '';
+    } catch (error) {
+        console.error(error);
+        ElMessage({
+            message: '非法格式',
+            type: 'error',
+        });
+    }
+}
+
+const checkReg = (value) => {
+    try {
+        new RegExp(value);
+    } catch (e) {
+        console.error(e);
+        ElMessage({
+            message: '非法正则表达式',
+            type: 'error',
+        });
+    }
 }
 
 </script>

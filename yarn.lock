@@ -1740,10 +1740,10 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lucy-compiler@1.0.20:
-  version "1.0.20"
-  resolved "https://registry.npmjs.org/lucy-compiler/-/lucy-compiler-1.0.20.tgz#de47147e8e2461de6f84e54369d326e75349e326"
-  integrity sha512-8T51UZDSBDNQpNKuyHYH8a4JTC8Mw09Db5vKfFVCKVsl+tiIkf3XXYKdqMneRfvb+xDmt1IMNQ1DYrxXtjKGPg==
+lucy-compiler@1.0.24:
+  version "1.0.24"
+  resolved "https://registry.npmjs.org/lucy-compiler/-/lucy-compiler-1.0.24.tgz#f17ebd78fd8ccbada263c2b5c083e5055e0a88ac"
+  integrity sha512-F7bfZwNIzNTkLja/00Bg4ubJium+x9y4cgxZbkocfdATX2stiOSMK455bMOSwW6o6WHe+EHCYnv60uFm37IslQ==
 
 magic-string@^0.25.7:
   version "0.25.9"

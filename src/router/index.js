@@ -72,7 +72,7 @@ const router = createRouter({
         },
         {
           path: "/LR1LALR/Automaton",
-          name: "Automaton",
+          name: "AutomatonForLR1",
           component: () => import("@/views/Automaton.vue"),
         },
         {

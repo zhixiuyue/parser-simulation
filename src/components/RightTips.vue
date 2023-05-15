@@ -14,27 +14,30 @@
         <el-step :class="activeStep === 2 ? 'active-step' : 'step'">
           <template #title>
             <el-collapse :model-value="activeName" class="collapse">
-              <el-collapse-item title="分析算法选择" name="1">
-                <LL1
-                  v-if="router.currentRoute.value.path.split('/')[1] === 'LL1'"
-                />
-                <LR0
-                  v-else-if="
-                    router.currentRoute.value.path.split('/')[1] === 'LR0'
-                  "
-                />
-                <LR1LALR
-                  v-else-if="
-                    router.currentRoute.value.path.split('/')[1] === 'LR1LALR'
-                  "
-                />
+              <el-collapse-item name="1">
+                <template #title>
+                  <div class="select-title">
+                    分析算法选择
+                    <el-tooltip v-if="type" class="box-item" effect="dark" :content=content placement="top">
+                      <el-icon @click="transfer($event)">
+                        <Switch />
+                      </el-icon>
+                    </el-tooltip>
+                  </div>
+                </template>
+                <LL1 v-if="type === 'LL1'" />
+                <LR0 v-else-if="
+                  type === 'LR0'
+                " />
+                <LR1LALR v-else-if="
+                  type === 'LR1LALR'
+                " />
                 <div v-else v-for="item in analysisItems" :key="item.text">
                   <span class="jump" @click="jump(item)">{{ item.text }}</span>
                 </div>
               </el-collapse-item>
             </el-collapse>
-          </template></el-step
-        >
+          </template></el-step>
       </el-steps>
     </div>
   </div>
@@ -53,6 +56,14 @@ import { genLL1, genLR0, genLR1LALR } from "@/genParser.js";
 import { ElMessage } from "element-plus";
 const store = useStore();
 const router = useRouter();
+
+const type = computed(() => {
+  return router.currentRoute.value.path.split('/')[1];
+})
+
+const content = computed(() => {
+  return type.value === "LL1" ? '切换至LR(k)分析' : '切换至LL(1)分析';
+});
 
 const unfold = computed(() => {
   return store.getters["grammarStore/getUnFold"];
@@ -89,6 +100,37 @@ const terminal = computed(() => {
   return store.state.grammarStore.terminal;
 });
 
+const transfer = (e) => {
+  e.stopPropagation();
+  switch (type.value) {
+    case 'LL1':
+      const lR = store.getters["grammarStore/getLRParser"];
+      if (!lR) {
+        genLR0();
+      }
+      router.push('/LR0');
+      break;
+    case 'LR0':
+    case 'LR1LALR':
+      const ll1 = store.getters["grammarStore/getLL1Parser"];
+      if (!ll1) {
+        try {
+          genLL1();
+        } catch (error) {
+          ElMessage({
+            message: '文法输入有误，请检查',
+            type: 'error',
+          });
+          return;
+        }
+      }
+      router.push("/LL1");
+      break;
+    default:
+      break;
+  }
+}
+
 const jump = (item) => {
   const { route, params, key } = item;
   if (!route) {
@@ -105,7 +147,15 @@ const jump = (item) => {
   const ll1 = store.getters["grammarStore/getLL1Parser"];
   const LR1 = store.getters["grammarStore/getLL1Parser"];
   if (key === "LL1" && (isModify.value || !ll1)) {
-    genLL1();
+    try {
+      genLL1();
+    } catch (error) {
+      ElMessage({
+        message: '文法输入有误，请检查',
+        type: 'error',
+      });
+      return;
+    }
   } else if (key === "LR0" && (isModify.value || !lR)) {
     genLR0();
   } else if (key === "LR1LALR" && (isModify.value || !LR1)) {
@@ -211,31 +261,10 @@ watch(
       }
     }
 
-    .title {
+    .select-title {
       display: flex;
       align-items: center;
       gap: 10px;
-
-      .icon {
-        cursor: pointer;
-      }
-    }
-
-    .argument-title {
-      font-weight: 600;
-    }
-
-    .argument-statement {
-      font-size: 14px;
-      margin: 10px;
-    }
-
-    .argument-ul {
-      font-size: 14px;
-
-      li + li {
-        margin-top: 10px;
-      }
     }
   }
 }

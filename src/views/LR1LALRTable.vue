@@ -5,40 +5,20 @@
       <!-- <CustomHeader :step=2 type="LR0" /> -->
       <div class="first">
         {{ type }}分析表
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          :content="hideTable ? '显示' : '隐藏'"
-          placement="top"
-        >
+        <el-tooltip class="box-item" effect="dark" :content="hideTable ? '显示' : '隐藏'" placement="top">
           <el-icon @click="handleTableDisplay">
             <View v-if="hideTable" />
             <Hide v-else />
           </el-icon>
         </el-tooltip>
       </div>
-      <el-table
-        v-show="!hideTable"
-        :data="tableData"
-        class="table-data"
-        stripe
-        style="max-width: 700px"
-      >
+      <el-table v-show="!hideTable" :data="tableData" class="table-data" stripe style="max-width: 700px">
         <el-table-column prop="State" label="STATE" align="center" />
         <el-table-column label="ACTION" align="center">
-          <el-table-column
-            v-for="item in terminal"
-            :key="item"
-            :prop="item"
-            :label="item"
-            align="center"
-          >
+          <el-table-column v-for="item in terminal" :key="item" :prop="item" :label="item" align="center">
             <template #default="scope">
               <ul>
-                <li
-                  v-for="item in scope.row[scope.column.rawColumnKey]"
-                  :key="item"
-                >
+                <li v-for="item in scope.row[scope.column.rawColumnKey]" :key="item">
                   {{ item }}
                 </li>
               </ul>
@@ -46,19 +26,10 @@
           </el-table-column>
         </el-table-column>
         <el-table-column label="GOTO" align="center">
-          <el-table-column
-            v-for="item in nonTerminal"
-            :key="item"
-            :prop="item"
-            :label="item"
-            align="center"
-          >
+          <el-table-column v-for="item in nonTerminal" :key="item" :prop="item" :label="item" align="center">
             <template #default="scope">
               <ul>
-                <li
-                  v-for="item in scope.row[scope.column.rawColumnKey]"
-                  :key="item"
-                >
+                <li v-for="item in scope.row[scope.column.rawColumnKey]" :key="item">
                   {{ item }}
                 </li>
               </ul>
@@ -78,8 +49,6 @@
             </D3Graph>
         </div> -->
   </div>
-  <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LR0" @saveInput="saveInput" :data="passData"
-            :notShowInput="true" @onClose="onClose" /> -->
 </template>
 
 <script setup>
@@ -90,7 +59,6 @@ import { computed, watch, ref, reactive, onMounted } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { LRRoute } from "@/dataList.js";
 import Automaton from "./Automaton.vue";
 
 const router = useRouter();
@@ -104,8 +72,6 @@ const hideTable = ref(false);
 const D3GrapghRef = ref(null);
 
 const drawer = ref(false);
-
-const showDialog = ref(false);
 
 const handleTableDisplay = () => {
   hideTable.value = !hideTable.value;
@@ -131,11 +97,6 @@ const openDrawer = () => {
   drawer.value = true;
 };
 
-// const saveInput = (string, value) => {
-//     store.commit("grammarStore/updateLRStartNonTerminal", value);
-//     showDialog.value = false;
-// }
-
 const play = ref(false);
 
 const unfold = computed(() => {
@@ -149,7 +110,7 @@ const hanlePlay = () => {
 const LR1LALRPredictTable = computed(() => {
   const parser = store.getters["grammarStore/getLR1LALRParser"];
   switch (type.value) {
-    case "LR1":
+    case "LR(1)":
       return parser.generateLR1PredictTable();
     case "LALR":
       return parser.generateLALRPredictTable();
@@ -188,20 +149,11 @@ const startNonTerminal = computed(() => {
   return store.getters["grammarStore/getStartTNonTer"];
 });
 
-const onClose = () => {
-  if (!startNonTerminal.value) {
-    router.push(LRRoute[1].route);
-  } else {
-    showDialog.value = false;
-  }
-};
-
 watch(
   () => startNonTerminal,
   (newValue, preValue) => {
     if (!newValue.value) {
-      router.push(LRRoute[1].route);
-      // showDialog.value = true;
+      router.push('/');
     }
   },
   {

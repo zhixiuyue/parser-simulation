@@ -23,7 +23,7 @@ const LRState = {
   LRStartNonTerminal: "",
   LRPredictTable: [],
   lRParser: "",
-  LR0Type: "LR0",
+  LR0Type: "LR(0)",
   graph: [],
   argument: "",
   dfaPlayMethod: 2,
@@ -34,7 +34,7 @@ const LR1LALRState = {
   LRParsingString: "",
   LRStartNonTerminal: "",
   LR1LALRPredictTable: [],
-  LR1LALRType: "LR1",
+  LR1LALRType: "LR(1)",
   lR1Parser: "",
   graph: [],
   argument: "",
@@ -125,10 +125,13 @@ const getters = {
     return state.graph;
   },
   getArgument: (state) => {
-    return state.argument;
+    if (!state.argument) {
+      return '';
+    }
+    return state.argument.split('->')[0] + '-> ' + state.startNonTerminal;
   },
   getStartTNonTer: (state) => {
-    return state.grammar[0]?.split(" => ")[0];
+    return state.grammar[0]?.split(" -> ")[0];
   },
   getStep: (state) => {
     return state.step;

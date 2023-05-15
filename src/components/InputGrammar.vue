@@ -20,13 +20,7 @@
           <li v-for="item in showGrammar" :key="item" class="grammar-li">
             {{ item }}
           </li>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            :content="tooltip.content"
-            placement="top"
-            v-if="tooltip.if"
-          >
+          <el-tooltip class="box-item" effect="dark" :content="tooltip.content" placement="top" v-if="tooltip.if">
             <el-icon class="initial" @click="tooltip.click">
               <RefreshRight />
             </el-icon>
@@ -75,14 +69,14 @@ const argument = computed(() => {
 const showGrammar = computed(() => {
   if (path.value === "LR0") {
     const startGrammar = store.getters["grammarStore/getStartGrammar"];
-    return showArgument.value
+    return showArgument.value && argument.value
       ? [argument.value, ...startGrammar]
       : startGrammar;
   } else if (path.value === "LL1") {
     return showInitail.value ? initialGrammar.value : grammar.value;
   } else if (path.value === "LR1LALR") {
     const startGrammar = store.getters["grammarStore/getStartGrammar"];
-    return showArgument.value
+    return showArgument.value && argument.value
       ? [argument.value.split(",")[0], ...startGrammar]
       : startGrammar;
   }
@@ -90,7 +84,7 @@ const showGrammar = computed(() => {
 });
 
 const tooltip = computed(() => {
-  if (path.value === "LR0") {
+  if (path.value === "LR0" || path.value === "LR1LALR") {
     return {
       content: showArgument.value ? "查看原始文法" : "查看增广文法",
       if: argument.value,
