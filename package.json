@@ -16,7 +16,7 @@
     "d3-graphviz": "^5.0.2",
     "element-plus": "^2.2.35",
     "lodash": "^4.17.21",
-    "lucy-compiler": "1.0.24",
+    "lucy-compiler": "1.0.25",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0"
