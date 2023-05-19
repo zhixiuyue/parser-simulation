@@ -20,7 +20,13 @@
           <li v-for="item in showGrammar" :key="item" class="grammar-li">
             {{ item }}
           </li>
-          <el-tooltip class="box-item" effect="dark" :content="tooltip.content" placement="top" v-if="tooltip.if">
+          <el-tooltip
+            class="box-item"
+            effect="dark"
+            :content="tooltip.content"
+            placement="top"
+            v-if="tooltip.if"
+          >
             <el-icon class="initial" @click="tooltip.click">
               <RefreshRight />
             </el-icon>
@@ -70,7 +76,7 @@ const showGrammar = computed(() => {
   if (path.value === "LR0") {
     const startGrammar = store.getters["grammarStore/getStartGrammar"];
     return showArgument.value && argument.value
-      ? [argument.value, ...startGrammar]
+      ? [argument.value.split(",")[0], ...startGrammar]
       : startGrammar;
   } else if (path.value === "LL1") {
     return showInitail.value ? initialGrammar.value : grammar.value;
