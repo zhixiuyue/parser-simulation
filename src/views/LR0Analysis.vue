@@ -108,7 +108,7 @@ const genParserData = () => {
     return {
       Step: index + 1,
       Stack: value.stack.join(" "),
-      Symbols: value.symbols.join(" "),
+      Symbols: value.symbols.map(node => node.text).join(" "),
       Input: value.input.join(" "),
       Action: value.move,
     };
