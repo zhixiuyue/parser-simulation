@@ -16,7 +16,7 @@ specifiers:
   less: ^4.1.3
   less-loader: ^11.1.0
   lodash: ^4.17.21
-  lucy-compiler: 1.0.28
+  lucy-compiler: 1.0.31
   prettier: ^2.7.1
   vite: ^4.2.1
   vue: ^3.2.45
@@ -31,7 +31,7 @@ dependencies:
   d3-graphviz: 5.0.2
   element-plus: 2.3.3_vue@3.2.47
   lodash: 4.17.21
-  lucy-compiler: 1.0.28
+  lucy-compiler: 1.0.31
   vue: 3.2.47
   vue-router: 4.1.6_vue@3.2.47
   vuex: 4.1.0_vue@3.2.47
@@ -1945,8 +1945,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /lucy-compiler/1.0.28:
-    resolution: {integrity: sha512-3nVHKmJTAf7+dsAwIgMUMv2fhIAjoQvxxuw0dC4mzNl2IAJIk/tmMigTIYJi802gKb1IaGcXJZL9fdK+r3Kqsg==}
+  /lucy-compiler/1.0.31:
+    resolution: {integrity: sha512-cQrQITeJboIQeBDSo0QcnADadEWKKzNPpL7qfeYUQ0XVfPX/MrqTr0OKb5uAU1M6tryAJab0Dr3QkvxQ2BBiZw==}
     dev: false
 
   /magic-string/0.25.9:

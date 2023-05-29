@@ -2,21 +2,43 @@
   <div class="analysis">
     <!-- <CustomHeader :step=3 type="LR0" /> -->
     <LR0Table />
-    <div class="content" ref="analysisRef">
-      <div class="input-string">
-        <div class="first">
-          {{ type }}预测分析
-          <span class="parser-string">{{ parserString }}</span>
+    <div class="content-container">
+      <div class="content" ref="analysisRef">
+        <div class="input-string">
+          <div class="first">
+            {{ type }}预测分析
+            <span class="parser-string">{{ parserString }}</span>
+          </div>
         </div>
+        <div v-if="!parserData.length">字符串规约失败</div>
+        <el-table
+          v-else
+          :data="parserData"
+          stripe
+          style="max-width: 700px"
+          border
+          class="table"
+        >
+          <el-table-column prop="Step" label="Step" header-align="center" />
+          <el-table-column prop="Stack" label="Stack" header-align="center" />
+          <el-table-column
+            prop="Symbols"
+            label="symbols"
+            header-align="center"
+          />
+          <el-table-column
+            prop="Input"
+            label="Input"
+            align="right"
+            header-align="center"
+          />
+          <el-table-column prop="Action" label="Action" header-align="center" />
+        </el-table>
       </div>
-      <div v-if="!parserData.length">字符串规约失败</div>
-      <el-table v-else :data="parserData" stripe style="max-width: 700px" border class="table">
-        <el-table-column prop="Step" label="Step" header-align="center" />
-        <el-table-column prop="Stack" label="Stack" header-align="center" />
-        <el-table-column prop="Symbols" label="symbols" header-align="center" />
-        <el-table-column prop="Input" label="Input" align="right" header-align="center" />
-        <el-table-column prop="Action" label="Action" header-align="center" />
-      </el-table>
+      <div>
+        <h4>抽象语法树</h4>
+        <div id="astNodeContainer"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -29,6 +51,7 @@ import { ref, computed, watch, reactive, onMounted, nextTick } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import Tree from "@widgetjs/tree";
 
 const router = useRouter();
 const store = useStore();
@@ -47,6 +70,13 @@ const nonTerminal = computed(() => {
   return store.getters["grammarStore/getStartTNonTer"];
 });
 
+const genAst = (data) => {
+  console.log(data);
+  const tree = new Tree("#astNodeContainer", {
+    data,
+  });
+};
+
 const notShowNonTer = ref(true);
 
 const parserString = computed(() => {
@@ -64,10 +94,13 @@ const genParserData = () => {
   const lRParser = store.getters["grammarStore/getLRParser"];
   let predictResult = [];
   try {
-    predictResult = lRParser.predictInput(
+    predictResult = lRParser.predictInputWithAST(
       parserString.value,
       predictTable.value
     );
+    nextTick(() => {
+      genAst(predictResult[predictResult.length - 1].symbols);
+    });
   } catch (error) {
     console.error(error);
   }
@@ -112,6 +145,12 @@ watch(
 </script>
 
 <style scoped lang="less">
+.content-container {
+  display: flex;
+  .ast {
+    flex: 0 0 fit-content;
+  }
+}
 .analysis {
   :deep(.cell) {
     color: #000;
@@ -145,7 +184,7 @@ watch(
       }
     }
 
-    div+div {
+    div + div {
       margin-top: 10px;
     }
 

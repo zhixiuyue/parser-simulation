@@ -8,7 +8,12 @@
           <div class="first">
             LL(1)预测分析
             <span class="parser-string">{{ parserString }}</span>
-            <el-tooltip class="box-item" effect="dark" :content="play ? '退出播放' : '播放'" placement="top">
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              :content="play ? '退出播放' : '播放'"
+              placement="top"
+            >
               <el-icon @click="hanlePlay">
                 <VideoPlay v-if="!play" />
                 <CircleClose v-else />
@@ -19,7 +24,13 @@
           <Edit />
         </el-icon> -->
         </div>
-        <el-table :data="displayData" stripe style="width: 100%" border class="table">
+        <el-table
+          :data="displayData"
+          stripe
+          style="width: 100%"
+          border
+          class="table"
+        >
           <el-table-column prop="Step" label="Step" align="center" />
           <el-table-column prop="Stack" label="Stack" align="center" />
           <el-table-column prop="Input" label="Input" align="center" />
@@ -40,7 +51,15 @@
 // import CustomHeader from "@/components/Header.vue";
 import InputString from "@/components/InputString.vue";
 import LL1Table from "@/views/LL1Table.vue";
-import { ref, computed, watch, reactive, onMounted, onUnmounted, nextTick } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  reactive,
+  onMounted,
+  onUnmounted,
+  nextTick,
+} from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -87,11 +106,10 @@ const parserData = ref([]);
 const displayData = ref([]);
 
 const genAst = (data) => {
-  console.log("ast", data);
   const tree = new Tree("#astNodeContainer", {
     data: [data],
   });
-}
+};
 
 const generateResult = () => {
   if (!parserString.value || !nonTerminal.value) {
@@ -131,7 +149,7 @@ const play = ref(false);
 
 const hanlePlay = () => {
   play.value = !play.value;
-}
+};
 
 const interval = ref();
 
@@ -139,9 +157,11 @@ const analysisPlay = () => {
   if (!parserString.value || !nonTerminal.value || !predictTable.value) {
     return [];
   }
-  const gen = ll1Parser.value.getPredictProcessProgressive(parserString.value,
+  const gen = ll1Parser.value.getPredictProcessProgressive(
+    parserString.value,
     nonTerminal.value,
-    predictTable.value);
+    predictTable.value
+  );
   genAst(gen.next().value.astNode);
   interval.value = setInterval(() => {
     const val = gen.next();
@@ -163,23 +183,27 @@ const analysisPlay = () => {
       }
     }
   }, 2000);
-}
+};
 
-watch(() => play, (newValue) => {
-  clearInterval(interval.value);
-  if (newValue.value) {
-    displayData.value = [];
-    analysisPlay();
-  } else {
-    displayData.value = parserData.value;
-  };
-}, {
-  deep: true
-})
+watch(
+  () => play,
+  (newValue) => {
+    clearInterval(interval.value);
+    if (newValue.value) {
+      displayData.value = [];
+      analysisPlay();
+    } else {
+      displayData.value = parserData.value;
+    }
+  },
+  {
+    deep: true,
+  }
+);
 
 onUnmounted(() => {
   clearInterval(interval.value);
-})
+});
 
 const showDialog = ref(false);
 
@@ -215,7 +239,6 @@ watch(
 
 <style scoped lang="less">
 .analysis {
-
   .container {
     display: flex;
     gap: 50px;
@@ -263,7 +286,7 @@ watch(
       }
     }
 
-    div+div {
+    div + div {
       margin-top: 10px;
     }
 
