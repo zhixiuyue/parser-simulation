@@ -4,21 +4,14 @@
     <div class="argument">
       <div class="first">
         {{ type }}自动机
-        <el-tooltip
-          class="box-item"
-          effect="dark"
-          :content="hideDfa ? '显示' : '隐藏'"
-          placement="top"
-        >
+        <el-tooltip class="box-item" effect="dark" :content="hideDfa ? '显示' : '隐藏'" placement="top">
           <el-icon @click="handleDfaDisplay">
             <View v-if="hideDfa" />
             <Hide v-else />
           </el-icon>
         </el-tooltip>
         <div class="control-btn" v-show="selectedItem === 1 && !hideDfa">
-          <el-button :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1"
-            >上一步</el-button
-          >
+          <el-button :icon="ArrowLeft" @click="goBack" :disabled="dotIndex <= 1">上一步</el-button>
           <el-button @click="goForward" :disabled="dotIndex >= graph.length">
             下一步<el-icon class="el-icon--right">
               <ArrowRight />
@@ -42,12 +35,7 @@
         </template>
       </el-dropdown> -->
     </div>
-    <D3Graph
-      ref="D3GrapghRef"
-      :graph="graph"
-      :dotIndex="dotIndex"
-      v-show="!hideDfa"
-    ></D3Graph>
+    <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex" v-show="!hideDfa"></D3Graph>
   </div>
 </template>
 
@@ -112,7 +100,7 @@ const graphArr = ref([]);
 
 const stateValue = ref([]);
 const graphSet = ref(new Set());
-const convertEdge = (edgeItem) => {};
+const convertEdge = (edgeItem) => { };
 
 const generateDots = (stateNodeValue) => {
   let newArr = [];
@@ -129,13 +117,10 @@ const generateDots = (stateNodeValue) => {
         ...graphArr.value,
         edgeItem?.next?.id === -1
           ? `id [label="Accept" shape="none" style="none"] id${item.id} -> id [ xlabel="${edgeItem?.tocken}"]`
-          : `id${edgeItem?.next?.id} [label="S${
-              edgeItem?.next?.id
-            }\n${edgeItem?.next?.items.join("\n")}" ${
-              edgeItem?.next?.isCollision ? 'fillcolor="red"' : ""
-            }] id${item.id} -> id${edgeItem?.next?.id} [ xlabel="${
-              edgeItem?.tocken
-            }"]`,
+          : `id${edgeItem?.next?.id} [label="S${edgeItem?.next?.id
+          }\n${edgeItem?.next?.items.join("\n")}" ${edgeItem?.next?.isCollision ? 'fillcolor="#fc8353"' : ""
+          }] id${item.id} -> id${edgeItem?.next?.id} [ xlabel="${edgeItem?.tocken
+          }"]`,
       ];
       if (edgeItem?.next && !graphSet.value.has(edgeItem.next.id)) {
         newArr.push(edgeItem.next);
@@ -163,10 +148,8 @@ const generateData = () => {
     store.commit("grammarStore/updateArgument", stateNodeValue?.items[0]);
   }
   graphArr.value = [
-    `id${stateNodeValue?.id} [label="S${
-      stateNodeValue?.id
-    }\n${stateNodeValue?.items.join("\n")}" ${
-      stateNodeValue.isCollision ? 'fillcolor="red"' : ""
+    `id${stateNodeValue?.id} [label="S${stateNodeValue?.id
+    }\n${stateNodeValue?.items.join("\n")}" ${stateNodeValue.isCollision ? 'fillcolor="#fc8353"' : ""
     }] `,
   ];
   stateValue.value = [stateNodeValue];

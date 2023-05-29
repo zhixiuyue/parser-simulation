@@ -11,31 +11,15 @@
           </div>
         </div>
         <div v-if="!parserData.length">字符串规约失败</div>
-        <el-table
-          v-else
-          :data="parserData"
-          stripe
-          style="max-width: 700px"
-          border
-          class="table"
-        >
+        <el-table v-else :data="parserData" stripe style="max-width: 700px" border class="table">
           <el-table-column prop="Step" label="Step" header-align="center" />
           <el-table-column prop="Stack" label="Stack" header-align="center" />
-          <el-table-column
-            prop="Symbols"
-            label="symbols"
-            header-align="center"
-          />
-          <el-table-column
-            prop="Input"
-            label="Input"
-            align="right"
-            header-align="center"
-          />
+          <el-table-column prop="Symbols" label="symbols" header-align="center" />
+          <el-table-column prop="Input" label="Input" align="right" header-align="center" />
           <el-table-column prop="Action" label="Action" header-align="center" />
         </el-table>
       </div>
-      <div>
+      <div class="ast">
         <h4>抽象语法树</h4>
         <div id="astNodeContainer"></div>
       </div>
@@ -147,10 +131,13 @@ watch(
 <style scoped lang="less">
 .content-container {
   display: flex;
+  gap: 50px;
+
   .ast {
     flex: 0 0 fit-content;
   }
 }
+
 .analysis {
   :deep(.cell) {
     color: #000;
@@ -184,7 +171,7 @@ watch(
       }
     }
 
-    div + div {
+    div+div {
       margin-top: 10px;
     }
 
@@ -206,5 +193,9 @@ watch(
       }
     }
   }
+}
+
+/deep/.treejs .treejs-checkbox {
+  display: none;
 }
 </style>

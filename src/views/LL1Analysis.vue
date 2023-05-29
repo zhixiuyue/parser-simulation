@@ -8,12 +8,7 @@
           <div class="first">
             LL(1)预测分析
             <span class="parser-string">{{ parserString }}</span>
-            <el-tooltip
-              class="box-item"
-              effect="dark"
-              :content="play ? '退出播放' : '播放'"
-              placement="top"
-            >
+            <el-tooltip class="box-item" effect="dark" :content="play ? '退出播放' : '播放'" placement="top">
               <el-icon @click="hanlePlay">
                 <VideoPlay v-if="!play" />
                 <CircleClose v-else />
@@ -24,13 +19,7 @@
           <Edit />
         </el-icon> -->
         </div>
-        <el-table
-          :data="displayData"
-          stripe
-          style="width: 100%"
-          border
-          class="table"
-        >
+        <el-table :data="displayData" stripe style="width: 100%" border class="table">
           <el-table-column prop="Step" label="Step" align="center" />
           <el-table-column prop="Stack" label="Stack" align="center" />
           <el-table-column prop="Input" label="Input" align="center" />
@@ -286,7 +275,7 @@ watch(
       }
     }
 
-    div + div {
+    div+div {
       margin-top: 10px;
     }
 
