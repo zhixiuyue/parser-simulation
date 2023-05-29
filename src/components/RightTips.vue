@@ -214,7 +214,7 @@ watch(
     overflow: auto;
 
     .steps {
-      max-height: 100%;
+      // max-height: 100%;
       height: fit-content;
       min-height: 20%;
 
