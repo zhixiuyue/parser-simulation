@@ -2,7 +2,6 @@
   <div class="table-container">
     <Automaton class="dfa" />
     <div class="table" @click="test" v-if="!ignoreLRTable">
-      <!-- <CustomHeader :step=2 type="LR0" /> -->
       <div class="first">
         {{ type }}分析表
         <el-tooltip class="box-item" effect="dark" :content="hideTable ? '显示' : '隐藏'" placement="top">
@@ -37,26 +36,12 @@
           </el-table-column>
         </el-table-column>
       </el-table>
-      <!-- <el-drawer v-model="drawer" title="LR(0)DFA" direction="rtl" size="33%">
-                <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true"></D3Graph>
-            </el-drawer> -->
-      <!-- <el-button v-show="!play" class="open-dfa" @click="openDrawer">
-                查看DFA
-            </el-button> -->
     </div>
-    <!-- <div class="graph" v-show="play">
-            <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="1" :defaultDirection="true">
-            </D3Graph>
-        </div> -->
   </div>
 </template>
 
 <script setup>
-// import CustomHeader from '@/components/Header.vue';
-import InputString from "../components/InputString.vue";
-import D3Graph from "@/components/D3Graph.vue";
-import { computed, watch, ref, reactive, onMounted } from "vue";
-import { ArrowLeft } from "@element-plus/icons-vue";
+import { computed, watch, ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import Automaton from "./Automaton.vue";
@@ -70,8 +55,6 @@ const type = computed(() => {
 const hideTable = ref(false);
 
 const D3GrapghRef = ref(null);
-
-const drawer = ref(false);
 
 const handleTableDisplay = () => {
   hideTable.value = !hideTable.value;
@@ -89,26 +72,11 @@ const terminal = computed(() => {
   return [...store.getters["grammarStore/getTerminal"], "$"];
 });
 
-const graph = computed(() => {
-  return store.getters["grammarStore/getGraph"];
-});
-
-const openDrawer = () => {
-  drawer.value = true;
-};
-
 const play = ref(false);
-
-const unfold = computed(() => {
-  return store.getters["grammarStore/getUnFold"];
-});
-
-const hanlePlay = () => {
-  play.value = !play.value;
-};
 
 const LR1LALRPredictTable = computed(() => {
   const parser = store.getters["grammarStore/getLR1LALRParser"];
+  console.log(parser);
   switch (type.value) {
     case "LR(1)":
       return parser.generateLR1PredictTable();
@@ -173,7 +141,6 @@ watch(
     }
   },
   {
-    // immediate: true,
     deep: true,
   }
 );
@@ -194,26 +161,12 @@ watch(
   }
 );
 
-const passData = reactive({});
 </script>
 
 <style scoped lang="less">
 .table-container {
   display: flex;
   flex-direction: column;
-}
-
-// .dfa {
-//     flex: 1 0 350px;
-// }
-
-.none-dfa {
-  height: fit-content;
-}
-
-.graph {
-  flex: 1;
-  height: 100%;
 }
 
 .table {
@@ -237,10 +190,6 @@ const passData = reactive({});
     }
   }
 
-  .title {
-    margin: 10px 0;
-  }
-
   .table-data {
     ul {
       padding: 0;
@@ -249,14 +198,6 @@ const passData = reactive({});
     li {
       list-style-type: none;
     }
-
-    // :global(.el-table .cell) {
-    //     padding: 0;
-    // }
-  }
-
-  .open-dfa {
-    width: fit-content;
   }
 }
 </style>

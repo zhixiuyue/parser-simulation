@@ -1,6 +1,5 @@
 <template>
   <div class="table" @click="showData">
-    <!-- <CustomHeader :step=2 type="LL1" /> -->
     <div class="first" v-if="!getHideFirset">First Set & Follow Set
       <el-tooltip class="box-item" effect="dark" :content="hideSet ? '显示' : '隐藏'" placement="top">
         <el-icon @click="handleSetDisplay">
@@ -59,8 +58,7 @@
 </template>
 
 <script setup>
-// import CustomHeader from '@/components/Header.vue';
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -246,7 +244,6 @@ const tablePlay = () => {
   tableData.value = [];
   const genetator = ll1Parser.value.getPredictTableProgressive(firstSet.value, followSet.value);
   rules.value = genetator.next().value;
-  // tableData.value = transferData(genetator.next().value?.result);
   const func = () => {
     const data = genetator.next();
     if (data.done) {
@@ -373,7 +370,6 @@ watch(() => playStatus, (newValue) => {
 
   .table-data {
     background: none;
-    // width: 100%;
 
     td {
       font-weight: 600;

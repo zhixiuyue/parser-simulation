@@ -12,7 +12,6 @@
           </div>
           <RightTips />
         </el-main>
-        <!-- <el-main><router-view :key="$route.fullPath"></router-view></el-main> -->
       </el-container>
     </el-container>
   </div>
@@ -43,7 +42,6 @@ import InputGrammar from "@/components/InputGrammar.vue";
   height: 60px;
   display: flex;
   align-items: center;
-  // box-shadow: 0 2px 4px #00000014;
   border-bottom: 1px solid #dcdfe6;
   padding: 0 8%;
 
@@ -70,8 +68,6 @@ import InputGrammar from "@/components/InputGrammar.vue";
     height: 100%;
     overflow: auto;
     padding: 20px 8%;
-    // display: flex;
-    // flex-direction: column;
   }
 }
 </style>

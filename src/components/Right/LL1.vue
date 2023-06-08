@@ -55,7 +55,6 @@ import { Finished } from '@element-plus/icons-vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import { genLR0 } from '@/genParser.js';
 
 const store = useStore();
 const active = ref(0);
@@ -105,13 +104,6 @@ const onFinishInput = () => {
 
         svg {
             cursor: pointer;
-        }
-    }
-
-    .step-icon {
-        :global(.el-step__icon svg) {
-            width: 20px;
-            height: 20px;
         }
     }
 

@@ -14,5 +14,7 @@ module.exports = {
   rules: {
     "prettier/prettier": 0,
     "no-unused-vars": 0,
+    // 关闭名称校验
+    'vue/multi-word-component-names': "off"
   },
 };

@@ -20,13 +20,7 @@
           <li v-for="item in showGrammar" :key="item" class="grammar-li">
             {{ item }}
           </li>
-          <el-tooltip
-            class="box-item"
-            effect="dark"
-            :content="tooltip.content"
-            placement="top"
-            v-if="tooltip.if"
-          >
+          <el-tooltip class="box-item" effect="dark" :content="tooltip.content" placement="top" v-if="tooltip.if">
             <el-icon class="initial" @click="tooltip.click">
               <RefreshRight />
             </el-icon>
@@ -35,12 +29,11 @@
         <div v-else>请输入文法</div>
       </div>
     </div>
-    <!-- <RightTips type="examples" :mode="radioMode" /> -->
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { computed, watch } from "vue";
 import { Edit } from "@element-plus/icons-vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
@@ -99,7 +92,6 @@ const tooltip = computed(() => {
       },
     };
   }
-  // else if (path.value === 'LL1') {
   return {
     content: showInitail.value ? "查看改写文法" : "查看原始文法",
     if: initialGrammar.value.length,
@@ -107,14 +99,7 @@ const tooltip = computed(() => {
       store.commit("grammarStore/updateShowInitail", !showInitail.value);
     },
   };
-  // }
-  // return {}
 });
-
-// const showInitail = ref(false);
-const transfer = () => {
-  store.commit("grammarStore/updateShowInitail", !showInitail.value);
-};
 
 const nonTerminal = computed(() => {
   return store.getters["grammarStore/getNonTerminal"];
@@ -196,7 +181,6 @@ watch(
       margin: 0;
       border: 1px solid #dedfe6;
       border-radius: 5px;
-      // color: #a8abb2;
       min-height: 100px;
       max-width: 500px;
       position: relative;
@@ -237,26 +221,5 @@ watch(
     grid-template-areas: ". input-area";
   }
 
-  .analysis {
-    margin-left: 110px;
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    gap: 10px;
-
-    .enter-route {
-      margin-left: 20px;
-      display: inline-flex;
-      align-items: center;
-    }
-  }
-
-  .link-unfinish a {
-    color: #b3c0d1;
-
-    &:hover {
-      color: #b3c0d1;
-    }
-  }
 }
 </style>

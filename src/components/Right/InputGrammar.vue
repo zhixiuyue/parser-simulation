@@ -9,22 +9,6 @@
                 <div class="statement">
                     {{ mode[Number(openCustomMode)]?.statement }}
                 </div>
-                <!-- <div class="support-grammers">
-                                <span class="support-grammers-title">支持的文法输入格式</span>
-                                <ul class="support-grammers-list">
-                                    <li v-for="item in mode[Number(openCustomMode)]?.grammars" :key="item">{{ item }}
-                                    </li>
-                                </ul>
-                            </div> -->
-                <!-- <div class="support-grammers">
-                    <span class="support-grammers-title">例子</span>
-                    <ul class="support-grammers-list">
-                        <li v-for="item in mode[Number(openCustomMode)]?.examples" :key="item">{{
-                            item
-                        }}
-                        </li>
-                    </ul>
-                </div> -->
                 <div class="wrapper">
                     <div class="input-symbol" v-if="openCustomMode">
                         <span class="input-title-none">非终结符</span>
@@ -399,20 +383,6 @@ const checkReg = (value) => {
         .statement {
             font-size: 14px;
             padding: 5px 10px;
-        }
-
-        .support-grammers {
-
-            &-title {
-                font-weight: 600;
-                font-size: 15px;
-            }
-
-            &-list {
-                white-space: pre-line;
-                font-size: 14px;
-                line-height: 1.5;
-            }
         }
     }
 

@@ -154,13 +154,6 @@ const toLR0 = () => {
     }
   }
 
-  .step-icon {
-    :global(.el-step__icon svg) {
-      width: 20px;
-      height: 20px;
-    }
-  }
-
   :global(.el-step__description.is-success) {
     color: #000;
   }
@@ -182,10 +175,6 @@ const toLR0 = () => {
   .switch-container {
     display: flex;
     flex-direction: column;
-  }
-
-  .btn-save {
-    float: right;
   }
 
   .jump {

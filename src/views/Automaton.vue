@@ -1,6 +1,5 @@
 <template>
   <div class="analysis">
-    <!-- <CustomHeader :step=1 type="LR0" /> -->
     <div class="argument">
       <div class="first">
         {{ type }}自动机
@@ -20,31 +19,15 @@
           <span class="step">{{ dotIndex }} / {{ graph.length }}</span>
         </div>
       </div>
-      <!-- <el-dropdown @command="handleCommand">
-        <span class="el-dropdown-link">
-          {{ selectItems[selectedItem] }}
-          <el-icon class="el-icon--right">
-            <arrow-down />
-          </el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item v-for="(item, index) in selectItems" :key="item" :command="index"
-              :disabled="selectedItem === index">{{ item }}</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown> -->
     </div>
-    <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex" v-show="!hideDfa"></D3Graph>
+    <D3Graph ref="D3GrapghRef" :graph="graph" :dotIndex="dotIndex" v-show="!hideDfa" />
   </div>
 </template>
 
 <script setup>
-// import CustomHeader from '@/components/Header.vue';
-import InputString from "@/components/InputString.vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import D3Graph from "@/components/D3Graph.vue";
-import { ref, computed, reactive, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, reactive, watch, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -55,7 +38,6 @@ const type = computed(() => {
   switch (router.currentRoute.value.path.split("/")[1]) {
     case "LR0":
       return "LR(0)";
-      break;
     case "LR1LALR":
       return "LR(1)";
     default:
@@ -64,8 +46,6 @@ const type = computed(() => {
 });
 
 const hideDfa = ref(false);
-
-const passData = reactive({});
 
 const D3GrapghRef = ref(null);
 
@@ -78,29 +58,8 @@ const startNonTerminal = computed(() => {
 });
 
 const graphArr = ref([]);
-// const dfs = (edges, fromNodeId) => {
-//     if (!edges.length) {
-//         return;
-//     }
-//     edges.forEach((edgeItem) => {
-//         if (edgeItem?.next?.id == undefined) {
-//             return;
-//         }
-
-//         let str = edgeItem?.next?.id === -1 ? `id${edgeItem?.next?.id} [label="Accept" shape="none" style="none" ] ` : `id${edgeItem?.next?.id} [label="S${edgeItem?.next?.id}\n${edgeItem?.next?.items.join('\n')}"] `;
-//         if (fromNodeId != undefined) {
-//             str += `id${fromNodeId} -> id${edgeItem?.next?.id} [ xlabel="${edgeItem?.tocken}"] `;
-//         }
-//         graphArr.value = [...graphArr.value, str];
-//         setTimeout(() => {
-//             dfs(edgeItem?.next?.edges, edgeItem?.next?.id);
-//         }, 0);
-//     })
-// }
-
 const stateValue = ref([]);
 const graphSet = ref(new Set());
-const convertEdge = (edgeItem) => { };
 
 const generateDots = (stateNodeValue) => {
   let newArr = [];
@@ -129,10 +88,6 @@ const generateDots = (stateNodeValue) => {
   });
   stateValue.value = newArr;
 };
-
-const nonTerminals = computed(() => {
-  return store.getters["grammarStore/getNonTerminal"];
-});
 
 const argument = computed(() => {
   return store.getters["grammarStore/getArgument"];
@@ -189,12 +144,6 @@ onMounted(() => {
   }
 });
 
-const handleCommand = (command) => {
-  selectedItem.value = command;
-};
-
-const selectItems = ["自动播放", "手动播放", "不播放"];
-
 const selectedItem = computed(() => {
   return store.getters["grammarStore/getDfaPlayMethod"];
 });
@@ -228,7 +177,6 @@ watch(
     }
   },
   {
-    // immediate: true,
     deep: true,
   }
 );
@@ -243,7 +191,6 @@ watch(
     display: flex;
     align-items: center;
     gap: 20px;
-    // justify-content: space-between;
 
     .el-dropdown-link {
       cursor: pointer;

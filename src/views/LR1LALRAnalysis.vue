@@ -1,6 +1,5 @@
 <template>
   <div class="analysis">
-    <!-- <CustomHeader :step=3 type="LR0" /> -->
     <LR1LALRTable />
     <div class="content" ref="analysisRef">
       <div class="input-string">
@@ -22,32 +21,23 @@
 </template>
 
 <script setup>
-// import CustomHeader from '@/components/Header.vue';
 import LR1LALRTable from "@/views/LR1LALRTable.vue";
-import InputString from "../components/InputString.vue";
-import { ref, computed, watch, reactive, onMounted, nextTick } from "vue";
-import { ArrowLeft } from "@element-plus/icons-vue";
-import { useRouter } from "vue-router";
+import { ref, computed, watch, reactive, nextTick } from "vue";
 import { useStore } from "vuex";
 
-const router = useRouter();
 const store = useStore();
 const type = computed(() => {
   return store.getters["grammarStore/getLR1LALRType"];
 });
 
-const passData = reactive({});
 
 const parserData = ref([]);
 
 const analysisRef = ref(null);
 
 const nonTerminal = computed(() => {
-  // return store.getters["grammarStore/getLRStartNonTerminal"];
   return store.getters["grammarStore/getStartTNonTer"];
 });
-
-const notShowNonTer = ref(true);
 
 const parserString = computed(() => {
   return store.getters["grammarStore/getLRParsingString"];
@@ -58,11 +48,9 @@ const predictTable = computed(() => {
 });
 
 const genParserData = () => {
-  console.log(1);
   if (!parserString.value || !nonTerminal.value) {
     return [];
   }
-  console.log(2);
   const parser = store.getters["grammarStore/getLR1LALRParser"];
   let predictResult = [];
   try {
@@ -87,8 +75,7 @@ const genParserData = () => {
 watch(
   [() => parserString.value, predictTable],
   ([string, nonTer], [preString, preNonTer]) => {
-    if (!string || !nonTer) {
-    } else {
+    if (string && nonTer) {
       genParserData();
     }
   },
@@ -106,7 +93,6 @@ watch(
     });
   },
   {
-    // immediate: true,
     deep: true,
   }
 );
@@ -152,20 +138,6 @@ watch(
 
     .table {
       margin-top: 20px;
-    }
-
-    .table-data {
-      margin-top: 20px;
-      background: none;
-      width: 100%;
-
-      ul {
-        padding: 0;
-      }
-
-      li {
-        list-style-type: none;
-      }
     }
   }
 }

@@ -13,13 +13,13 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 ## Project Setup
 
 ```sh
-npm install
+npm install 或 yarn
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm run dev
+npm run dev 或 yarn dev
 ```
 
 ### Compile and Minify for Production

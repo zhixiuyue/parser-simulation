@@ -68,12 +68,10 @@ const content = computed(() => {
 const unfold = computed(() => {
   return store.getters["grammarStore/getUnFold"];
 });
-// const unfold = ref(true);
+
 const grammar = computed(() => {
   return store.getters["grammarStore/getGrammar"];
 });
-
-// const activeStep = ref(1);
 
 const activeStep = computed(() => {
   return store.getters["grammarStore/getStep"];
@@ -83,11 +81,6 @@ const activeName = ref("1");
 
 const toggleFold = () => {
   store.commit("grammarStore/updateUnfold", !unfold.value);
-  // unfold.value = !unfold.value;
-};
-
-const goBack = () => {
-  router.push({ path: "/", query: { step: 1 } });
 };
 
 const isModify = ref(true);
@@ -103,29 +96,32 @@ const terminal = computed(() => {
 const transfer = (e) => {
   e.stopPropagation();
   switch (type.value) {
-    case 'LL1':
+    case 'LL1': {
       const lR = store.getters["grammarStore/getLRParser"];
       if (!lR) {
         genLR0();
       }
       router.push('/LR0');
       break;
+    }
     case 'LR0':
     case 'LR1LALR':
-      const ll1 = store.getters["grammarStore/getLL1Parser"];
-      if (!ll1) {
-        try {
-          genLL1();
-        } catch (error) {
-          ElMessage({
-            message: '文法输入有误，请检查',
-            type: 'error',
-          });
-          return;
+      {
+        const ll1 = store.getters["grammarStore/getLL1Parser"];
+        if (!ll1) {
+          try {
+            genLL1();
+          } catch (error) {
+            ElMessage({
+              message: '文法输入有误，请检查',
+              type: 'error',
+            });
+            return;
+          }
         }
+        router.push("/LL1");
+        break;
       }
-      router.push("/LL1");
-      break;
     default:
       break;
   }
@@ -145,7 +141,7 @@ const jump = (item) => {
   }
   const lR = store.getters["grammarStore/getLRParser"];
   const ll1 = store.getters["grammarStore/getLL1Parser"];
-  const LR1 = store.getters["grammarStore/getLL1Parser"];
+  const LR1 = store.getters["grammarStore/getLR1LALRParser"];
   if (key === "LL1" && (isModify.value || !ll1)) {
     try {
       genLL1();
@@ -193,8 +189,6 @@ watch(
 .right-contant-container {
   background-color: #fff;
   position: relative;
-  // border-left: 1px solid rgb(219, 219, 219);
-  // box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px,
     rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 
@@ -238,7 +232,6 @@ watch(
 
       :global(.el-step) {
         min-height: 60px;
-        // padding-bottom: 10px;
       }
 
       :global(.el-step__description) {

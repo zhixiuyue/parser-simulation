@@ -1,6 +1,5 @@
 <template>
     <div class="judge" v-show="!showInitail">
-        <!-- <CustomHeader :step=1 type="LL1" /> -->
         <div class="conclusion">
             <el-icon v-if="!isLL1">
                 <Warning />
@@ -13,12 +12,10 @@
 
 <script setup>
 import FormatTips from '@/components/FormatTip.vue';
-// import CustomHeader from '@/components/Header.vue';
 import { computed, onMounted, ref } from 'vue';
 import lucy from "lucy-compiler";
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useStore } from 'vuex';
-import { LLRoute } from '@/dataList.js';
 import { ElMessage } from 'element-plus';
 
 const store = useStore();
@@ -88,7 +85,6 @@ const saveGrammar = (garmmar) => {
         const ll1Parser = new lucy.LL1Parser(terminals, nonTerminals, garmmar);
         const firstSet = ll1Parser.getFirstSet();
         const followSet = ll1Parser.getFollowSet(firstSet);
-        // const predictTable = ll1Parser.getPredictTable(firstSet, followSet);
         store.commit("grammarStore/updateLL1Parser", ll1Parser);
         store.commit("grammarStore/updateFirstSet", firstSet);
         store.commit("grammarStore/updateFollowSet", followSet);

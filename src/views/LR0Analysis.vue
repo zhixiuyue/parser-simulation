@@ -1,6 +1,5 @@
 <template>
   <div class="analysis">
-    <!-- <CustomHeader :step=3 type="LR0" /> -->
     <LR0Table />
     <div class="content-container">
       <div class="content" ref="analysisRef">
@@ -28,29 +27,22 @@
 </template>
 
 <script setup>
-// import CustomHeader from '@/components/Header.vue';
 import LR0Table from "@/views/LR0Table.vue";
-import InputString from "../components/InputString.vue";
-import { ref, computed, watch, reactive, onMounted, nextTick } from "vue";
+import { ref, computed, watch, reactive, nextTick } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
-import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import Tree from "@widgetjs/tree";
 
-const router = useRouter();
 const store = useStore();
 const type = computed(() => {
   return store.getters["grammarStore/getLR0Type"];
 });
-
-const passData = reactive({});
 
 const parserData = ref([]);
 
 const analysisRef = ref(null);
 
 const nonTerminal = computed(() => {
-  // return store.getters["grammarStore/getLRStartNonTerminal"];
   return store.getters["grammarStore/getStartTNonTer"];
 });
 
@@ -60,8 +52,6 @@ const genAst = (data) => {
     data,
   });
 };
-
-const notShowNonTer = ref(true);
 
 const parserString = computed(() => {
   return store.getters["grammarStore/getLRParsingString"];
@@ -103,8 +93,7 @@ const genParserData = () => {
 watch(
   [() => parserString.value, predictTable],
   ([string, nonTer], [preString, preNonTer]) => {
-    if (!string || !nonTer) {
-    } else {
+    if (string && nonTer) {
       genParserData();
     }
   },
@@ -122,7 +111,6 @@ watch(
     });
   },
   {
-    // immediate: true,
     deep: true,
   }
 );
@@ -195,7 +183,7 @@ watch(
   }
 }
 
-/deep/.treejs .treejs-checkbox {
+:deep(.treejs .treejs-checkbox) {
   display: none;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div class="analysis">
-    <!-- <CustomHeader :step="3" type="LL1" /> -->
     <LL1Table />
     <div class="container">
       <div class="content">
@@ -15,9 +14,6 @@
               </el-icon>
             </el-tooltip>
           </div>
-          <!-- <el-icon class="icon" @click="modifyInput">
-          <Edit />
-        </el-icon> -->
         </div>
         <el-table :data="displayData" stripe style="width: 100%" border class="table">
           <el-table-column prop="Step" label="Step" align="center" />
@@ -32,44 +28,25 @@
       </div>
     </div>
   </div>
-  <!-- <InputString v-if="showDialog" :dialogVisible="showDialog" type="LL1" @saveInput="saveInput" :data="passData"
-    @onClose="onClose" /> -->
 </template>
 
 <script setup>
-// import CustomHeader from "@/components/Header.vue";
-import InputString from "@/components/InputString.vue";
 import LL1Table from "@/views/LL1Table.vue";
 import {
   ref,
   computed,
   watch,
-  reactive,
-  onMounted,
   onUnmounted,
   nextTick,
 } from "vue";
-import { ArrowLeft } from "@element-plus/icons-vue";
-import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { LLRoute } from "@/dataList.js";
 import Tree from "@widgetjs/tree";
 
-const router = useRouter();
 const store = useStore();
-
-let passData = reactive({});
 
 const nonTerminal = computed(() => {
   return store.getters["grammarStore/getStartTNonTer"];
-  // return store.getters["grammarStore/getLL1StartNonTerminal"];
 });
-
-const saveInput = (string, value) => {
-  store.commit("grammarStore/updateLL1ParserString", string);
-  // store.commit("grammarStore/updateLL1StartNonTerminal", value);
-  showDialog.value = false;
-};
 
 const parserString = computed(() => {
   return store.getters["grammarStore/getLL1ParserString"];
@@ -84,10 +61,6 @@ const predictTable = computed(() => {
   const followSet = store.getters["grammarStore/getFollowSet"];
   const predictTable = ll1Parser.value.getPredictTable(firstSet, followSet);
   return predictTable;
-});
-
-const terminal = computed(() => {
-  return [...store.getters["grammarStore/getTerminal"], "$"];
 });
 
 const parserData = ref([]);
@@ -115,11 +88,6 @@ const generateResult = () => {
       genAst(predictResult.astNode);
     });
   } catch (error) {
-    // predictResult = [...error.value, {
-    //   parseStack: error.value[error.value.length - 1].parseStack?.slice(0, -1),
-    //   remainingInput: error.value[error.value.length - 1].remainingInput?.slice(1),
-    //   parseAction: "match failed"
-    // }];
     console.error(error);
   }
   const data = predictResult.map((value, index) => {
@@ -194,28 +162,10 @@ onUnmounted(() => {
   clearInterval(interval.value);
 });
 
-const showDialog = ref(false);
-
-const onClose = () => {
-  if (!parserString.value || !nonTerminal.value) {
-    router.push(LLRoute[2].route);
-  } else {
-    showDialog.value = false;
-  }
-};
-
-// const modifyInput = () => {
-//   showDialog.value = true;
-//   passData["inputString"] = parserString;
-//   passData["value"] = nonTerminal;
-// };
-
 watch(
   [() => parserString.value, nonTerminal],
   ([string, nonTer], [preString, preNonTer]) => {
-    if (!string || !nonTer) {
-      showDialog.value = true;
-    } else {
+    if (string && nonTer) {
       generateResult();
     }
   },
@@ -238,8 +188,6 @@ watch(
   }
 
   .content {
-    // flex: 1;
-    // width: 0;
     width: 700px;
     padding: 10px 0;
 
@@ -268,7 +216,6 @@ watch(
         gap: 20px;
 
         .parser-string {
-          // margin-left: 20px;
           color: red;
           font-weight: 400;
         }
@@ -282,24 +229,10 @@ watch(
     .table {
       margin-top: 20px;
     }
-
-    .table-data {
-      margin-top: 20px;
-      background: none;
-      width: 100%;
-
-      ul {
-        padding: 0;
-      }
-
-      li {
-        list-style-type: none;
-      }
-    }
   }
 }
 
-/deep/.treejs .treejs-checkbox {
+:deep(.treejs .treejs-checkbox) {
   display: none;
 }
 </style>

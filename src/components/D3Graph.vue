@@ -32,18 +32,14 @@ const props = defineProps({
 const dotIndexForGraph = ref(props.dotIndex || 1);
 const graphviz = ref();
 
-//  for(let tmp of IRParser.generateStateProgressive(grammers,"E",nonTerminals,terminals)) {
-// render IRParser.stateGraph
-
 const render = (selectedItem, graphs) => {
   const graph = graphs?.length ? graphs : props.graph;
   if (graph.length) {
     // eslint-disable-next-line no-inner-declarations
     function renderData(type) {
       const arr = type === 2 ? graph : graph.slice(0, dotIndexForGraph.value);
-      const disGraph = `digraph  { graph [rankdir = ${
-        props.defaultDirection ? "TB" : "LR"
-      } splines = ortho bgcolor = "#FFFFFF"] node [ shape="box" style="rounded,filled" 
+      const disGraph = `digraph  { graph [rankdir = ${props.defaultDirection ? "TB" : "LR"
+        } splines = ortho bgcolor = "#FFFFFF"] node [ shape="box" style="rounded,filled" 
                  fontsize = 14 margin=0.2]
                 ${arr.join("")} }`;
       graphviz.value?.renderDot(disGraph).on("end", function () {
@@ -66,7 +62,6 @@ const render = (selectedItem, graphs) => {
           d3
             .transition("main")
             .ease(d3.easeLinear)
-            // .delay(500)
             .duration(1500)
         );
       })
